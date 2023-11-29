@@ -8,8 +8,11 @@ import java.time.Duration;
 
 @Configuration
 public class GptConfig {
-    @Value("${open.api.token}")
-    private String token;
+    private final String token;
+
+    public GptConfig(@Value("${open.api.token}") String token) {
+        this.token = token;
+    }
 
     @Bean
     public OpenAiService openAiService() {
