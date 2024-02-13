@@ -1,4 +1,4 @@
-package com.lesso.neverland.config;
+package com.lesso.neverland.common.configuration;
 
 import com.theokanning.openai.service.OpenAiService;
 import org.springframework.context.annotation.Bean;
