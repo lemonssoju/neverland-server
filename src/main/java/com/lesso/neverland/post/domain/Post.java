@@ -2,6 +2,7 @@ package com.lesso.neverland.post.domain;
 
 import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.common.enums.Contents;
+import com.lesso.neverland.common.enums.Source;
 import com.lesso.neverland.group.domain.Group;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
@@ -21,8 +22,12 @@ public class Post extends BaseEntity {
     private Long postIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "user")
-    private User user;
+    @JoinColumn(name = "user")
+    private User user; // 작성자
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Source source;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group")
