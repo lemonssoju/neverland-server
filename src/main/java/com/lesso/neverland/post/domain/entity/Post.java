@@ -22,7 +22,7 @@ public class Post extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "userIdx")
-    private User writer;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "groupIdx")
@@ -45,4 +45,9 @@ public class Post extends BaseEntity {
 
     @Column(nullable = false)
     private String content;
+
+    public void setUser(User user) {
+        this.user = user;
+        user.getPosts().add(this);
+    }
 }

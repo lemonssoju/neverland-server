@@ -16,4 +16,9 @@ public class Interest extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "userIdx")
     private User user;
+
+    public void setUser(User user) {
+        this.user = user;
+        user.getInterests().add(this);
+    }
 }
