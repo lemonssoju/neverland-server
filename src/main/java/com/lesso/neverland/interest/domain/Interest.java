@@ -1,7 +1,8 @@
-package com.lesso.neverland.user.domain;
+package com.lesso.neverland.interest.domain;
 
 import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.common.enums.Contents;
+import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
 
 @Entity
