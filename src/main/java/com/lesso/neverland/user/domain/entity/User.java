@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @DynamicInsert
@@ -25,4 +28,7 @@ public class User extends BaseEntity {
 
     @Embedded
     private UserProfile profile;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Interest> interests = new ArrayList<>();
 }
