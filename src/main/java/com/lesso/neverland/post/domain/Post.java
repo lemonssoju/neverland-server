@@ -21,11 +21,11 @@ public class Post extends BaseEntity {
     private Long postIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "userIdx")
+    @JoinColumn(nullable = false, name = "user")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "groupIdx")
+    @JoinColumn(name = "group")
     private Group group;
 
     @Column(nullable = false, length = 30)
