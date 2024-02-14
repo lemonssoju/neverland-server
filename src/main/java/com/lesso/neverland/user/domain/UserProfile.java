@@ -1,4 +1,4 @@
-package com.lesso.neverland.user.domain.entity;
+package com.lesso.neverland.user.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

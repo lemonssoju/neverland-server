@@ -1,4 +1,4 @@
-package com.lesso.neverland.user.domain.entity;
+package com.lesso.neverland.user.domain;
 
 import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.common.enums.ThumbnailOrder;

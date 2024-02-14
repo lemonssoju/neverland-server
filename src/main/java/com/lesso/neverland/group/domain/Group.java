@@ -1,4 +1,4 @@
-package com.lesso.neverland.group.domain.entity;
+package com.lesso.neverland.group.domain;
 
 import com.lesso.neverland.common.BaseEntity;
 import jakarta.persistence.*;
