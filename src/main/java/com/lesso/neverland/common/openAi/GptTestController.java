@@ -1,4 +1,4 @@
-package com.lesso.neverland.openAi;
+package com.lesso.neverland.common.openAi;
 
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.CompletionRequest;
