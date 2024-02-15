@@ -1,5 +1,6 @@
 package com.lesso.neverland.post.domain;
 
+import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.common.enums.Source;
@@ -10,6 +11,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -50,6 +54,15 @@ public class Post extends BaseEntity {
 
     @Column(nullable = false)
     private String content;
+
+    @OneToMany(mappedBy = "post")
+    private List<PostTag> postTags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<PostLike> postLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments = new ArrayList<>();
 
     public void setUser(User user) {
         this.user = user;
