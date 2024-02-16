@@ -6,7 +6,7 @@ import com.lesso.neverland.user.domain.UserProfile;
 public record SignupRequest(String loginId,
                             String nickname,
                             String password,
-                            String passwordCheck) {
+                            String passwordCheck) { // TODO: 관심 콘텐츠, 취향 추가하기
     public User toUser(String encodedPassword) {
 
         UserProfile profile = UserProfile.builder()

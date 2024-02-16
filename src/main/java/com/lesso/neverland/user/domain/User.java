@@ -46,7 +46,7 @@ public class User extends BaseEntity {
     private List<Thumbnail> thumbnails = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<UserGroup> userGroups = new ArrayList<>();
+    private List<UserTeam> userTeams = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<GuestMemo> memos = new ArrayList<>();

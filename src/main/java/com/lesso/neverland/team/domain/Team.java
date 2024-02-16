@@ -1,8 +1,8 @@
-package com.lesso.neverland.group.domain;
+package com.lesso.neverland.team.domain;
 
 import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.user.domain.User;
-import com.lesso.neverland.user.domain.UserGroup;
+import com.lesso.neverland.user.domain.UserTeam;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,11 +16,11 @@ import java.util.List;
 @Getter
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Group extends BaseEntity {
+public class Team extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long groupIdx;
+    private Long teamIdx;
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "admin")
@@ -33,8 +33,8 @@ public class Group extends BaseEntity {
     private String subName;
 
     @Column(nullable = false)
-    private String groupImage;
+    private String teamImage;
 
-    @OneToMany(mappedBy = "group")
-    private List<UserGroup> userGroups = new ArrayList<>();
+    @OneToMany(mappedBy = "team")
+    private List<UserTeam> userTeams = new ArrayList<>();
 }
