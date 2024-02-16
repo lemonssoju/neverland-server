@@ -7,10 +7,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.Date;
 
 @Service
@@ -22,10 +20,11 @@ public class AuthService {
 
     @Value("${jwt.refresh-token-validity-in-millis}")
     private int refreshTokenExpirationTime;
+
     @Value("${jwt.secret-key}")
     private String secretKey;
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisService redisService;
 
     // 토큰 발급
     public SignupResponse generateToken(User user) {
@@ -55,7 +54,7 @@ public class AuthService {
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
-        redisTemplate.opsForValue().set(refreshToken, user.getLoginId(), Duration.ofMillis(refreshTokenExpirationTime));
+        redisService.signup(refreshToken, user.getLoginId());
         return refreshToken;
     }
 }
