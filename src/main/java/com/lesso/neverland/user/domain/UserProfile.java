@@ -2,6 +2,7 @@ package com.lesso.neverland.user.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,10 +13,13 @@ public class UserProfile {
 
     @Column(nullable = false, length = 20)
     private String nickname;
-
-    @Column(nullable = false)
     private String profileImage;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String profileMessage;
+
+    @Builder
+    public UserProfile(String nickname) {
+        this.nickname = nickname;
+    }
 }

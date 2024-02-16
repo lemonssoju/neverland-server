@@ -12,12 +12,12 @@ public class Thumbnail extends BaseEntity {
     private Long thumbnailIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "userIdx")
+    @JoinColumn(nullable = false, name = "user")
     private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ThumbnailOrder order;
+    private ThumbnailOrder thumbnailOrder;
 
     @Column(nullable = false)
     private String imageUrl;

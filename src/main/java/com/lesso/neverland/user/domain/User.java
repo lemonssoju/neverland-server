@@ -9,6 +9,7 @@ import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostLike;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -45,7 +46,7 @@ public class User extends BaseEntity {
     private List<Thumbnail> thumbnails = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<UserGroup> userGroups = new ArrayList<>();
+    private List<UserTeam> userTeams = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<GuestMemo> memos = new ArrayList<>();
@@ -58,4 +59,11 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<SearchHistory> searchHistories = new ArrayList<>();
+
+    @Builder
+    public User(String loginId, String password, UserProfile profile) {
+        this.loginId = loginId;
+        this.password = password;
+        this.profile = profile;
+    }
 }

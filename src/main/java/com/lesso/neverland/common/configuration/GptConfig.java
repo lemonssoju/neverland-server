@@ -10,7 +10,7 @@ import java.time.Duration;
 public class GptConfig {
     private final String token;
 
-    public GptConfig(@Value("${open.api.token}") String token) {
+    public GptConfig(@Value("${gpt.token}") String token) {
         this.token = token;
     }
 

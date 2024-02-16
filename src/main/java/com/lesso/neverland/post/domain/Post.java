@@ -4,7 +4,7 @@ import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.common.enums.Source;
-import com.lesso.neverland.group.domain.Group;
+import com.lesso.neverland.team.domain.Team;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -34,8 +34,8 @@ public class Post extends BaseEntity {
     private Source source;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group")
-    private Group group;
+    @JoinColumn(name = "team")
+    private Team team;
 
     @Column(nullable = false, length = 30)
     private String title;

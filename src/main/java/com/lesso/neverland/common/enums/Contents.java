@@ -1,10 +1,15 @@
 package com.lesso.neverland.common.enums;
 
+import com.lesso.neverland.common.BaseException;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static com.lesso.neverland.common.BaseResponseStatus.WRONG_CONTENTS_NAME;
+import static com.lesso.neverland.common.BaseResponseStatus.WRONG_PREFERENCE_NAME;
 
 @Getter
 public enum Contents {
@@ -29,5 +34,19 @@ public enum Contents {
         if(Objects.nonNull(parent)) {
             parent.child.add(this);
         }
+    }
+
+    public static Contents getEnumByName(String name) throws BaseException {
+        return Arrays.stream(Contents.values())
+                .filter(contents -> contents.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new BaseException(WRONG_CONTENTS_NAME));
+    }
+
+    public static Contents getPreference(Contents contents, String preference) throws BaseException {
+        return Arrays.stream(Contents.values())
+                .filter(c -> c.parent == contents && c.name().equalsIgnoreCase(preference))
+                .findFirst()
+                .orElseThrow(() -> new BaseException(WRONG_PREFERENCE_NAME));
     }
 }
