@@ -14,6 +14,7 @@ public enum BaseResponseStatus {
     /**
      * 2000: Request 오류
      */
+    UNMATCHED_PASSWORD(false, 2001, "비밀번호가 일치하지 않습니다."),
 
 
     /**
