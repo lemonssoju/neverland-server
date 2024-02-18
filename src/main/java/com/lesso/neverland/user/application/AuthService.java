@@ -1,7 +1,7 @@
 package com.lesso.neverland.user.application;
 
 import com.lesso.neverland.user.domain.User;
-import com.lesso.neverland.user.dto.SignupResponse;
+import com.lesso.neverland.user.dto.JwtDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,10 +27,10 @@ public class AuthService {
     private final RedisService redisService;
 
     // 토큰 발급
-    public SignupResponse generateToken(User user) {
+    public JwtDto generateToken(User user) {
         String accessToken = generateAccessToken(user);
         String refreshToken = generateRefreshToken(user);
-        return new SignupResponse(accessToken, refreshToken);
+        return new JwtDto(accessToken, refreshToken);
     }
 
     // accessToken 발급

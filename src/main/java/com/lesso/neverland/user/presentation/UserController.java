@@ -4,8 +4,7 @@ import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.user.application.AuthService;
 import com.lesso.neverland.user.application.UserService;
-import com.lesso.neverland.user.dto.SignupRequest;
-import com.lesso.neverland.user.dto.SignupResponse;
+import com.lesso.neverland.user.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +20,19 @@ public class UserController {
 
     // 회원가입
     @PostMapping(value = "/signup")
-    public BaseResponse<SignupResponse> signup(@RequestBody SignupRequest signupRequest) {
+    public BaseResponse<JwtDto> signup(@RequestBody SignupRequest signupRequest) {
         try {
             return new BaseResponse<>(userService.signup(signupRequest));
+        } catch(BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 로그인
+    @PostMapping("/login")
+    public BaseResponse<JwtDto> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            return new BaseResponse<>(userService.login(loginRequest));
         } catch(BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }

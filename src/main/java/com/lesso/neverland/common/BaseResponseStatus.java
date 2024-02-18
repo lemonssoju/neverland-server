@@ -15,7 +15,9 @@ public enum BaseResponseStatus {
      * 2000: Request 오류
      */
     // user(2000-2099)
+    INVALID_USER_IDX(false, 2000, "잘못된 user idx 입니다."),
     UNMATCHED_PASSWORD(false, 2001, "비밀번호가 일치하지 않습니다."),
+    INVALID_PASSWORD(false, 2002, "잘못된 비밀번호입니다."),
 
     // interest(2100-2199)
     WRONG_CONTENTS_NAME(false, 2100, "콘텐츠 이름이 잘못되었습니다."),

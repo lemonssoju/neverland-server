@@ -17,6 +17,8 @@ import org.hibernate.annotations.DynamicInsert;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.lesso.neverland.common.constants.Constants.ACTIVE;
+
 @Entity
 @Getter
 @DynamicInsert
@@ -65,5 +67,9 @@ public class User extends BaseEntity {
         this.loginId = loginId;
         this.password = password;
         this.profile = profile;
+    }
+
+    public void login() {
+        this.setStatus(ACTIVE);
     }
 }
