@@ -4,16 +4,14 @@ import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.interest.application.InterestService;
 import com.lesso.neverland.user.domain.User;
-import com.lesso.neverland.user.dto.SignupRequest;
-import com.lesso.neverland.user.dto.SignupResponse;
+import com.lesso.neverland.user.dto.*;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.lesso.neverland.common.BaseResponseStatus.DATABASE_ERROR;
-import static com.lesso.neverland.common.BaseResponseStatus.UNMATCHED_PASSWORD;
+import static com.lesso.neverland.common.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +22,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final InterestService interestService;
 
+    // 회원가입
     @Transactional(rollbackFor = Exception.class)
-    public SignupResponse signup(SignupRequest signupRequest) throws BaseException {
+    public JwtDto signup(SignupRequest signupRequest) throws BaseException {
         try {
             if(!signupRequest.password().equals(signupRequest.passwordCheck())) throw new BaseException(UNMATCHED_PASSWORD);
 
@@ -44,4 +43,24 @@ public class UserService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    // 로그인
+    @Transactional(rollbackFor = Exception.class)
+    public JwtDto login(LoginRequest loginRequest) throws BaseException {
+        try {
+            User user = userRepository.findByLoginId(loginRequest.loginId()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            if(!encoder.matches(loginRequest.password(), user.getPassword())) throw new BaseException(INVALID_PASSWORD);
+
+            JwtDto jwtDto = authService.generateToken(user);
+            user.login();
+            userRepository.save(user);
+
+            return new JwtDto(jwtDto.accessToken(), jwtDto.refreshToken());
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }
