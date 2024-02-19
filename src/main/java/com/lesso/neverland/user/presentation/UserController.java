@@ -60,4 +60,14 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    // access token 재발급
+    @PostMapping("/reissue-token")
+    public BaseResponse<TokenResponse> reissueToken(@RequestBody ReissueTokenRequest reissueTokenRequest) {
+        try{
+            return new BaseResponse<>(userService.reissueAccessToken(reissueTokenRequest));
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }

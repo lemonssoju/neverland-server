@@ -127,4 +127,8 @@ public class AuthService {
         Date accessTokenExpirationTime = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
         return accessTokenExpirationTime.getTime() - (new Date()).getTime();
     }
+
+    public String getLoginIdFromRedis(String refreshToken) {
+        return redisTemplate.opsForValue().get(refreshToken);
+    }
 }

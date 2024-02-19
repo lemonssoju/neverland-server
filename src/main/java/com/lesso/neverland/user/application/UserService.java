@@ -22,6 +22,7 @@ public class UserService {
     private final AuthService authService;
     private final UserRepository userRepository;
     private final InterestService interestService;
+    private final RedisService redisService;
 
     // 회원가입
     @Transactional(rollbackFor = Exception.class)
@@ -89,6 +90,38 @@ public class UserService {
 
             user.signout();
             userRepository.save(user);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // Access Token 재발급
+    @Transactional(rollbackFor = Exception.class)
+    public TokenResponse reissueAccessToken(ReissueTokenRequest reissueTokenRequest) throws BaseException {
+        try {
+            validateRefreshToken(reissueTokenRequest);
+            String loginId = authService.getLoginIdFromRedis(reissueTokenRequest.refreshToken());
+            User user = userRepository.findByLoginIdAndStatusEquals(loginId, ACTIVE).orElseThrow(() -> new BaseException(NO_MATCH_USER));
+
+            // refresh token이 만료되지 않은 경우 access token 재발급
+            if (redisService.checkExistsRedis(reissueTokenRequest.refreshToken())) {
+                return new TokenResponse(authService.generateAccessToken(user));
+            } else throw new BaseException(INVALID_REFRESH_TOKEN);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // refreshToken 유효성 체크
+    private void validateRefreshToken(ReissueTokenRequest reissueTokenRequest) throws BaseException {
+        try {
+            String refreshTokenFromRequest = reissueTokenRequest.refreshToken();
+            if (refreshTokenFromRequest == null || refreshTokenFromRequest.isEmpty())
+                throw new BaseException(INVALID_REFRESH_TOKEN);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
