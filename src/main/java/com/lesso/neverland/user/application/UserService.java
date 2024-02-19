@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -52,10 +53,26 @@ public class UserService {
             if(!encoder.matches(loginRequest.password(), user.getPassword())) throw new BaseException(INVALID_PASSWORD);
 
             JwtDto jwtDto = authService.generateToken(user);
+
             user.login();
             userRepository.save(user);
+            return jwtDto;
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
-            return new JwtDto(jwtDto.accessToken(), jwtDto.refreshToken());
+    // 로그아웃
+    @Transactional(rollbackFor = Exception.class)
+    public void logout(Long userIdx, String refreshToken ) throws BaseException {
+        try {
+            User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            authService.logout(refreshToken);
+
+            user.logout();
+            userRepository.save(user);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
