@@ -8,6 +8,7 @@ import com.lesso.neverland.user.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.user;
 
 @RestController
@@ -34,6 +35,17 @@ public class UserController {
         try {
             return new BaseResponse<>(userService.login(loginRequest));
         } catch(BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 로그아웃
+    @PatchMapping("/logout")
+    public BaseResponse<?> logout(@RequestBody TokenRequest tokenDto) {
+        try{
+            userService.logout(authService.getUserIdx(), tokenDto.refreshToken());
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
         }
     }
