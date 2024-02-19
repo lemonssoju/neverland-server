@@ -15,7 +15,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.time.Duration;
 import java.util.Date;
 
 import static com.lesso.neverland.common.constants.Constants.INACTIVE;
@@ -91,8 +90,8 @@ public class AuthService {
         // 토큰 유효성 검사
         String accessToken = getTokenFromRequest();
 
-        deleteFromRedis(refreshToken);
-        registerBlackList(accessToken, LOGOUT);
+        redisService.deleteFromRedis(refreshToken);
+        redisService.registerBlackList(accessToken, LOGOUT);
     }
 
     // 회원 탈퇴
@@ -100,8 +99,8 @@ public class AuthService {
         // 토큰 유효성 검사
         String accessToken = getTokenFromRequest();
 
-        deleteFromRedis(refreshToken);
-        registerBlackList(accessToken, INACTIVE);
+        redisService.deleteFromRedis(refreshToken);
+        redisService.registerBlackList(accessToken, INACTIVE);
     }
 
     public String getTokenFromRequest() {
@@ -111,20 +110,5 @@ public class AuthService {
             return bearerToken.substring(7);
         }
         else return null;
-    }
-
-    private void deleteFromRedis(String refreshToken) {
-        if(redisTemplate.opsForValue().get(refreshToken) != null) redisTemplate.delete(refreshToken);
-    }
-
-    private void registerBlackList(String accessToken, String status) {
-        // accessToken expirationTime 동안 전달받은 staus 상태로 redis에 저장
-        Long expirationTime = getExpirationTime(accessToken);
-        redisTemplate.opsForValue().set(accessToken, status, Duration.ofMillis(expirationTime));
-    }
-
-    public Long getExpirationTime(String token) {
-        Date accessTokenExpirationTime = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
-        return accessTokenExpirationTime.getTime() - (new Date()).getTime();
     }
 }
