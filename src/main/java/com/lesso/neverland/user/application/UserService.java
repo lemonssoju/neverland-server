@@ -102,7 +102,7 @@ public class UserService {
     public TokenResponse reissueAccessToken(ReissueTokenRequest reissueTokenRequest) throws BaseException {
         try {
             validateRefreshToken(reissueTokenRequest);
-            String loginId = authService.getLoginIdFromRedis(reissueTokenRequest.refreshToken());
+            String loginId = redisService.getLoginIdFromRedis(reissueTokenRequest.refreshToken());
             User user = userRepository.findByLoginIdAndStatusEquals(loginId, ACTIVE).orElseThrow(() -> new BaseException(NO_MATCH_USER));
 
             // refresh token이 만료되지 않은 경우 access token 재발급
