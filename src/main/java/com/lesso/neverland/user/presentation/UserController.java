@@ -41,9 +41,20 @@ public class UserController {
 
     // 로그아웃
     @PatchMapping("/logout")
-    public BaseResponse<?> logout(@RequestBody TokenRequest tokenDto) {
+    public BaseResponse<?> logout(@RequestBody TokenRequest tokenRequest) {
         try{
-            userService.logout(authService.getUserIdx(), tokenDto.refreshToken());
+            userService.logout(authService.getUserIdx(), tokenRequest.refreshToken());
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 회원 탈퇴
+    @PatchMapping("/signout")
+    public BaseResponse<?> signOut(@RequestBody TokenRequest tokenRequest) {
+        try{
+            userService.signout(authService.getUserIdx(), tokenRequest.refreshToken());
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());

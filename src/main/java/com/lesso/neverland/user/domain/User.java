@@ -17,8 +17,7 @@ import org.hibernate.annotations.DynamicInsert;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.lesso.neverland.common.constants.Constants.ACTIVE;
-import static com.lesso.neverland.common.constants.Constants.LOGOUT;
+import static com.lesso.neverland.common.constants.Constants.*;
 
 @Entity
 @Getter
@@ -76,4 +75,8 @@ public class User extends BaseEntity {
     public void logout() {
         this.setStatus(LOGOUT);
     }
+    public void signout() {
+        this.setStatus(INACTIVE);
+    }
+
 }
