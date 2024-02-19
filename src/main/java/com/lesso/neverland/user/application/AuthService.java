@@ -18,6 +18,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.time.Duration;
 import java.util.Date;
 
+import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 import static com.lesso.neverland.common.constants.Constants.LOGOUT;
 
 @Service
@@ -92,6 +93,15 @@ public class AuthService {
 
         deleteFromRedis(refreshToken);
         registerBlackList(accessToken, LOGOUT);
+    }
+
+    // 회원 탈퇴
+    public void signout(String refreshToken) throws BaseException {
+        // 토큰 유효성 검사
+        String accessToken = getTokenFromRequest();
+
+        deleteFromRedis(refreshToken);
+        registerBlackList(accessToken, INACTIVE);
     }
 
     public String getTokenFromRequest() {

@@ -80,4 +80,20 @@ public class UserService {
         }
     }
 
+    // 회원 탈퇴
+    @Transactional(rollbackFor = Exception.class)
+    public void signout(Long userIdx, String refreshToken) throws BaseException {
+        try {
+            User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            authService.signout(refreshToken);
+
+            user.signout();
+            userRepository.save(user);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }
