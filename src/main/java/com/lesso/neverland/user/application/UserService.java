@@ -129,4 +129,8 @@ public class UserService {
         }
     }
 
+    // 닉네임 중복 체크
+    public void validateNickname(String nickname) throws BaseException {
+        if(userRepository.existsByProfile_Nickname(nickname)) throw new BaseException(DUPLICATED_NICKNAME);
+    }
 }

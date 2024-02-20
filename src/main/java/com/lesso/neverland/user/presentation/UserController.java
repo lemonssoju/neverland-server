@@ -70,4 +70,15 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    // 닉네임 중복 체크
+    @PostMapping("/nickname")
+    public BaseResponse<?> validateNickname(@RequestBody NicknameRequest nicknameRequest) {
+        try {
+            userService.validateNickname(nicknameRequest.nickname());
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }

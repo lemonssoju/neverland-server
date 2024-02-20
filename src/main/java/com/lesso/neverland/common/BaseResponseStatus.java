@@ -21,6 +21,7 @@ public enum BaseResponseStatus {
     INVALID_REFRESH_TOKEN(false, 2003, "잘못된 refresh token입니다."),
     NO_MATCH_USER(false, 2004, "일치하는 user가 없습니다."),
     EXPIRED_REFRESH_TOKEN(false, 2005, "만료된 refresh token입니다."),
+    DUPLICATED_NICKNAME(false, 2006, "중복된 닉네임입니다."),
 
     // interest(2100-2199)
     WRONG_CONTENTS_NAME(false, 2100, "콘텐츠 이름이 잘못되었습니다."),
