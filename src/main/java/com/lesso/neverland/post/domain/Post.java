@@ -47,7 +47,8 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private Contents contentsType;
 
-    private String backgroundMusic;
+    private String backgroundMusic; // 가수 - 제목
+    private String backgroundMusicUrl; // 유튜브 링크 url
 
     @Column(nullable = false)
     private String postImage;
