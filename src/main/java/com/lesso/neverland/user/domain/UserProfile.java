@@ -17,6 +17,8 @@ public class UserProfile {
 
     @Column(length = 50)
     private String profileMessage;
+    private String profileMusic; // 가수 - 제목
+    private String profileMusicUrl; // 유튜브 링크 url
 
     @Builder
     public UserProfile(String nickname) {
