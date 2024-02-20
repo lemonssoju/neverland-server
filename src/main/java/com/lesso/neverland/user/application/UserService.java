@@ -133,4 +133,9 @@ public class UserService {
     public void validateNickname(String nickname) throws BaseException {
         if(userRepository.existsByProfile_Nickname(nickname)) throw new BaseException(DUPLICATED_NICKNAME);
     }
+
+    // 아이디 중복 체크
+    public void validateLoginId(String loginId) throws BaseException {
+        if(userRepository.existsByLoginId(loginId)) throw new BaseException(DUPLICATED_LOGIN_ID);
+    }
 }

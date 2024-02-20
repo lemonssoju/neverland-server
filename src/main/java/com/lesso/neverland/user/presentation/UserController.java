@@ -81,4 +81,15 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    // 아이디 중복 체크
+    @PostMapping("/loginId")
+    public BaseResponse<?> validateLoginId(@RequestBody LoginIdRequest loginIdRequest) {
+        try {
+            userService.validateLoginId(loginIdRequest.loginId());
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }
