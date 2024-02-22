@@ -28,6 +28,10 @@ public enum BaseResponseStatus {
     WRONG_CONTENTS_NAME(false, 2100, "콘텐츠 이름이 잘못되었습니다."),
     WRONG_PREFERENCE_NAME(false, 2101, "취향 이름이 잘못되었습니다."),
 
+    // post(2200-2299)
+    INVALID_POST_IDX(false, 2200, "잘못된 post idx 입니다."),
+    ALREADY_DELETED_POST(false, 2201, "이미 삭제된 post 입니다."),
+
 
     /**
      * 3000: Response 오류

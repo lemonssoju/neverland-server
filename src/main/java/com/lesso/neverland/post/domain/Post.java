@@ -45,7 +45,7 @@ public class Post extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Contents contentsType;
+    private Contents contentsType; // 콘텐츠 종류
 
     private String backgroundMusic; // 가수 - 제목
     private String backgroundMusicUrl; // 유튜브 링크 url
@@ -57,7 +57,7 @@ public class Post extends BaseEntity {
     private String content;
 
     @OneToMany(mappedBy = "post")
-    private List<PostTag> postTags = new ArrayList<>();
+    private List<PostTag> postTags = new ArrayList<>(); // 취향 관련 태그
 
     @OneToMany(mappedBy = "post")
     private List<PostLike> postLikes = new ArrayList<>();

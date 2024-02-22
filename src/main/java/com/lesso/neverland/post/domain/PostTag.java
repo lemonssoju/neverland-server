@@ -1,6 +1,7 @@
 package com.lesso.neverland.post.domain;
 
 import com.lesso.neverland.common.BaseEntity;
+import com.lesso.neverland.common.enums.Contents;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,6 +17,10 @@ public class PostTag extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postTagIdx;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Contents tagName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post")
