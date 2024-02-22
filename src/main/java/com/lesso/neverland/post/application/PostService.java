@@ -14,6 +14,7 @@ import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,6 +84,17 @@ public class PostService {
 
         return new ModifyPostViewResponse(post.getTitle(), post.getSubtitle(), post.getContentsType().getName(),
                 post.getBackgroundMusic(), post.getBackgroundMusicUrl(), post.getPostImage(), post.getContent());
+    }
+
+    // [작성자] 피드 삭제
+    @Transactional(rollbackFor = Exception.class)
+    public void deletePost(Long postIdx) throws BaseException {
+        User user = userRepository.findById(getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
+        validateWriter(user, post);
+
+        post.delete();
+        postRepository.save(post);
     }
 
     // 회원만

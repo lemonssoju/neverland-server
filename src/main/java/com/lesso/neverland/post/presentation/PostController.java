@@ -8,6 +8,7 @@ import com.lesso.neverland.post.dto.PostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.post;
 
 @RestController
@@ -31,6 +32,17 @@ public class PostController {
     public BaseResponse<ModifyPostViewResponse> getModifyPostView(@PathVariable Long postIdx) {
         try {
             return new BaseResponse<>(postService.getModifyPostView(postIdx));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // [작성자] 피드 삭제
+    @PatchMapping("/{postIdx}/delete")
+    public BaseResponse<?> deletePost(@PathVariable Long postIdx) {
+        try {
+            postService.deletePost(postIdx);
+            return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
