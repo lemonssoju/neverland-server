@@ -5,6 +5,7 @@ import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.interest.domain.Interest;
 import com.lesso.neverland.post.domain.Post;
+import com.lesso.neverland.post.dto.ModifyPostViewResponse;
 import com.lesso.neverland.post.dto.PostResponse;
 import com.lesso.neverland.post.repository.PostLikeRepository;
 import com.lesso.neverland.post.repository.PostRepository;
@@ -72,5 +73,28 @@ public class PostService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    // [작성자] 피드 수정 화면 조회
+    public ModifyPostViewResponse getModifyPostView(Long postIdx) throws BaseException {
+        User user = userRepository.findById(getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
+        validateWriter(user, post);
+
+        return new ModifyPostViewResponse(post.getTitle(), post.getSubtitle(), post.getContentsType().getName(),
+                post.getBackgroundMusic(), post.getBackgroundMusicUrl(), post.getPostImage(), post.getContent());
+    }
+
+    // 회원만
+    private Long getUserIdxWithValidation() throws BaseException {
+        Long userIdx = authService.getUserIdx();
+        if (userIdx == null) throw new BaseException(NULL_ACCESS_TOKEN);
+        return userIdx;
+    }
+
+    // 작성자 validation
+    private static void validateWriter(User user, Post post) throws BaseException {
+        if (!post.getUser().equals(user)) throw new BaseException(NO_POST_WRITER);
+        if (post.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_POST);
     }
 }

@@ -3,12 +3,10 @@ package com.lesso.neverland.post.presentation;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.post.application.PostService;
+import com.lesso.neverland.post.dto.ModifyPostViewResponse;
 import com.lesso.neverland.post.dto.PostResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.lesso.neverland.common.constants.RequestURI.post;
 
@@ -23,6 +21,16 @@ public class PostController {
     public BaseResponse<PostResponse> getPost(@PathVariable Long postIdx) {
         try {
             return new BaseResponse<>(postService.getPost(postIdx));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // [작성자] 피드 수정 화면 조회
+    @PatchMapping("/{postIdx}/editView")
+    public BaseResponse<ModifyPostViewResponse> getModifyPostView(@PathVariable Long postIdx) {
+        try {
+            return new BaseResponse<>(postService.getModifyPostView(postIdx));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
