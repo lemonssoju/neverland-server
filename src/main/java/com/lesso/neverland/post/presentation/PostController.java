@@ -39,9 +39,20 @@ public class PostController {
 
     // [작성자] 피드 삭제
     @PatchMapping("/{postIdx}/delete")
-    public BaseResponse<?> deletePost(@PathVariable Long postIdx) {
+    public BaseResponse<String> deletePost(@PathVariable Long postIdx) {
         try {
             postService.deletePost(postIdx);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 좋아요/취소
+    @PostMapping("/{postIdx}")
+    public BaseResponse<String> likePost(@PathVariable("postIdx") Long postIdx) {
+        try {
+            postService.likePost(postIdx);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
