@@ -23,6 +23,7 @@ public enum BaseResponseStatus {
     EXPIRED_REFRESH_TOKEN(false, 2005, "만료된 refresh token입니다."),
     DUPLICATED_NICKNAME(false, 2006, "중복된 닉네임입니다."),
     DUPLICATED_LOGIN_ID(false, 2007, "중복된 아이디입니다."),
+    NULL_ACCESS_TOKEN(false, 2008, "access token이 비었습니다."),
 
     // interest(2100-2199)
     WRONG_CONTENTS_NAME(false, 2100, "콘텐츠 이름이 잘못되었습니다."),
@@ -31,6 +32,7 @@ public enum BaseResponseStatus {
     // post(2200-2299)
     INVALID_POST_IDX(false, 2200, "잘못된 post idx 입니다."),
     ALREADY_DELETED_POST(false, 2201, "이미 삭제된 post 입니다."),
+    NO_POST_WRITER(false, 2202, "해당 post의 작성자가 아닙니다."),
 
 
     /**
