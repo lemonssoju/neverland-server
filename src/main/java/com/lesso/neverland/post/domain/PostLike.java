@@ -4,9 +4,13 @@ import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
+
+import static com.lesso.neverland.common.constants.Constants.ACTIVE;
+import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 
 @Entity
 @Getter
@@ -34,5 +38,23 @@ public class PostLike extends BaseEntity {
     public void setUser(User user) {
         this.user = user;
         user.getPostLikes().add(this);
+    }
+
+    public void delete() {
+        this.setStatus(INACTIVE);
+        this.post.getPostLikes().remove(this);
+        this.user.getPostLikes().remove(this);
+    }
+
+    public void add() {
+        this.setStatus(ACTIVE);
+        setPost(this.post);
+        setUser(this.user);
+    }
+
+    @Builder
+    public PostLike(Post post, User user) {
+        this.post = post;
+        this.user = user;
     }
 }

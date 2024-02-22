@@ -5,6 +5,7 @@ import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.interest.domain.Interest;
 import com.lesso.neverland.post.domain.Post;
+import com.lesso.neverland.post.domain.PostLike;
 import com.lesso.neverland.post.dto.ModifyPostViewResponse;
 import com.lesso.neverland.post.dto.PostResponse;
 import com.lesso.neverland.post.repository.PostLikeRepository;
@@ -95,6 +96,35 @@ public class PostService {
 
         post.delete();
         postRepository.save(post);
+    }
+
+    // 좋아요/취소
+    @Transactional(rollbackFor = Exception.class)
+    public void likePost(Long postIdx) throws BaseException {
+        try {
+            User user = userRepository.findById(authService.getUserIdx()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
+            PostLike postLike = postLikeRepository.findByPostAndUser(post, user);
+
+            if (postLike == null) { // 이 게시글에 대한 해당 유저의 첫 좋아요
+                postLike = PostLike.builder()
+                        .post(post)
+                        .user(user).build();
+                postLike.setPost(post);
+                postLike.setUser(user);
+            } else { // 좋아요 기록이 이미 존재할 경우
+                if (postLike.getStatus().equals(ACTIVE)) { // 좋아요 상태면 취소
+                    postLike.delete();
+                } else { // 취소 상태면 좋아요
+                    postLike.add();
+                }
+            }
+            postLikeRepository.save(postLike);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 
     // 회원만
