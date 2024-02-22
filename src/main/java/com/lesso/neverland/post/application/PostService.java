@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.lesso.neverland.common.BaseResponseStatus.*;
@@ -36,26 +37,32 @@ public class PostService {
     // 피드 상세 조회
     public PostResponse getPost(Long postIdx) throws BaseException {
         try {
-            User user = userRepository.findById(authService.getUserIdx()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
             Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
             if (post.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_POST);
 
-            boolean isLike = postLikeRepository.existsByPostAndUserAndStatusEquals(post, user, ACTIVE);
+            Optional<Long> optionalUserIdx = Optional.ofNullable(authService.getUserIdx());
+            User user = null;
+            boolean isLike = false;
+            List<PostResponse.RecommendedPostDto> posts = null;
 
-            // 사용자의 취향 태그 조회
-            List<Contents> userInterests = user.getInterests().stream()
-                    .map(Interest::getPreference)
-                    .collect(Collectors.toList());
+            // 로그인 상태일 경우에만 좋아요 여부 및 추천글 조회
+            if (optionalUserIdx.isPresent()) {
+                user = userRepository.findById(optionalUserIdx.get()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+                isLike = postLikeRepository.existsByPostAndUserAndStatusEquals(post, user, ACTIVE);
 
-            // 추천글 조회
-            List<Post> recommendedPosts = postRepository.findTop3ByPostTags_TagNameIn(userInterests);
-            List<PostResponse.RecommendedPostDto> posts = recommendedPosts.stream()
-                    .map(recommendedPost -> new PostResponse.RecommendedPostDto(
-                            recommendedPost.getTitle(),
-                            recommendedPost.getPostTags().stream()
-                                    .map(postTag -> postTag.getTagName().getName())
-                                    .collect(Collectors.toList())))
-                    .collect(Collectors.toList());
+                List<Contents> userInterests = user.getInterests().stream()
+                        .map(Interest::getPreference)
+                        .collect(Collectors.toList());
+
+                List<Post> recommendedPosts = postRepository.findTop3ByPostTags_TagNameIn(userInterests);
+                posts = recommendedPosts.stream()
+                        .map(recommendedPost -> new PostResponse.RecommendedPostDto(
+                                recommendedPost.getTitle(),
+                                recommendedPost.getPostTags().stream()
+                                        .map(postTag -> postTag.getTagName().getName())
+                                        .collect(Collectors.toList())))
+                        .collect(Collectors.toList());
+            }
 
             // 댓글 조회
             List<Comment> postComments = post.getComments();
@@ -68,8 +75,8 @@ public class PostService {
                     .collect(Collectors.toList());
 
             return new PostResponse(post.getTitle(), post.getSubtitle(), post.getContent(), post.getCreatedDate(),
-                    post.getUser().getProfile().getNickname(), user.getProfile().getNickname(), post.getBackgroundMusic(), post.getBackgroundMusicUrl(),
-                    post.getPostImage(), isLike, posts, comments);
+                    post.getUser().getProfile().getNickname(), user != null ? user.getProfile().getNickname() : null,
+                    post.getBackgroundMusic(), post.getBackgroundMusicUrl(), post.getPostImage(), isLike, posts, comments);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
