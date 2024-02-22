@@ -15,6 +15,8 @@ import org.hibernate.annotations.DynamicInsert;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.lesso.neverland.common.constants.Constants.INACTIVE;
+
 @Entity
 @Getter
 @DynamicInsert
@@ -68,5 +70,9 @@ public class Post extends BaseEntity {
     public void setUser(User user) {
         this.user = user;
         user.getPosts().add(this);
+    }
+
+    public void delete() {
+        this.setStatus(INACTIVE);
     }
 }
