@@ -17,7 +17,7 @@ public enum BaseResponseStatus {
     // user(2000-2099)
     INVALID_USER_IDX(false, 2000, "잘못된 user idx 입니다."),
     UNMATCHED_PASSWORD(false, 2001, "비밀번호가 일치하지 않습니다."),
-    INVALID_PASSWORD(false, 2002, "잘못된 비밀번호입니다."),
+    INVALID_PASSWORD(false, 2002, "형식이 잘못된 비밀번호입니다."),
     INVALID_REFRESH_TOKEN(false, 2003, "잘못된 refresh token입니다."),
     NO_MATCH_USER(false, 2004, "일치하는 user가 없습니다."),
     EXPIRED_REFRESH_TOKEN(false, 2005, "만료된 refresh token입니다."),
