@@ -38,7 +38,7 @@ public class UserService {
                 interestService.createInterest(contents, preference, newUser);
             }
             userRepository.save(newUser);
-            return authService.generateToken(newUser);
+            return authService.generateToken(newUser.getUserIdx());
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
@@ -53,7 +53,7 @@ public class UserService {
             User user = userRepository.findByLoginId(loginRequest.loginId()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
             if(!encoder.matches(loginRequest.password(), user.getPassword())) throw new BaseException(INVALID_PASSWORD);
 
-            JwtDto jwtDto = authService.generateToken(user);
+            JwtDto jwtDto = authService.generateToken(user.getUserIdx());
 
             user.login();
             userRepository.save(user);
@@ -67,10 +67,10 @@ public class UserService {
 
     // 로그아웃
     @Transactional(rollbackFor = Exception.class)
-    public void logout(Long userIdx, String refreshToken ) throws BaseException {
+    public void logout(Long userIdx) throws BaseException {
         try {
             User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            authService.logout(refreshToken);
+            authService.logout(userIdx);
 
             user.logout();
             userRepository.save(user);
@@ -83,10 +83,10 @@ public class UserService {
 
     // 회원 탈퇴
     @Transactional(rollbackFor = Exception.class)
-    public void signout(Long userIdx, String refreshToken) throws BaseException {
+    public void signout(Long userIdx) throws BaseException {
         try {
             User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            authService.signout(refreshToken);
+            authService.signout(userIdx);
 
             user.signout();
             userRepository.save(user);
@@ -101,14 +101,11 @@ public class UserService {
     @Transactional(rollbackFor = Exception.class)
     public TokenResponse reissueAccessToken(ReissueTokenRequest reissueTokenRequest) throws BaseException {
         try {
-            validateRefreshToken(reissueTokenRequest);
-            String loginId = redisService.getLoginIdFromRedis(reissueTokenRequest.refreshToken());
-            User user = userRepository.findByLoginIdAndStatusEquals(loginId, ACTIVE).orElseThrow(() -> new BaseException(NO_MATCH_USER));
+            User user = userRepository.findByLoginIdAndStatusEquals(reissueTokenRequest.loginId(), ACTIVE).orElseThrow(() -> new BaseException(NO_MATCH_USER));
+            validateRefreshToken(reissueTokenRequest, user.getUserIdx());
 
-            // refresh token이 만료되지 않은 경우 access token 재발급
-            if (redisService.checkExistsRedis(reissueTokenRequest.refreshToken())) {
-                return new TokenResponse(authService.generateAccessToken(user));
-            } else throw new BaseException(INVALID_REFRESH_TOKEN);
+            // refresh token이 유효한 경우 access token 재발급
+            return new TokenResponse(authService.generateAccessToken(user.getUserIdx()));
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
@@ -117,11 +114,14 @@ public class UserService {
     }
 
     // refreshToken 유효성 체크
-    private void validateRefreshToken(ReissueTokenRequest reissueTokenRequest) throws BaseException {
+    private void validateRefreshToken(ReissueTokenRequest reissueTokenRequest, Long userIdx) throws BaseException {
         try {
             String refreshTokenFromRequest = reissueTokenRequest.refreshToken();
             if (refreshTokenFromRequest == null || refreshTokenFromRequest.isEmpty())
                 throw new BaseException(INVALID_REFRESH_TOKEN);
+
+            String refreshTokenFromRedis = redisService.getToken(userIdx);
+            if(!refreshTokenFromRedis.equals(refreshTokenFromRequest)) throw new BaseException(INVALID_REFRESH_TOKEN);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
