@@ -83,9 +83,10 @@ public class UserService {
 
     // 회원 탈퇴
     @Transactional(rollbackFor = Exception.class)
-    public void signout(Long userIdx) throws BaseException {
+    public void signout(Long userIdx, SignoutRequest signoutRequest) throws BaseException {
         try {
             User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            if (!encoder.matches(signoutRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
             authService.signout(userIdx);
 
             user.signout();

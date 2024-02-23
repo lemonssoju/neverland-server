@@ -52,9 +52,9 @@ public class UserController {
 
     // 회원 탈퇴
     @PatchMapping("/signout")
-    public BaseResponse<?> signOut() {
+    public BaseResponse<?> signOut(@RequestBody SignoutRequest signoutRequest) {
         try{
-            userService.signout(authService.getUserIdx());
+            userService.signout(authService.getUserIdx(), signoutRequest);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());

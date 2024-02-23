@@ -24,6 +24,7 @@ public enum BaseResponseStatus {
     DUPLICATED_NICKNAME(false, 2006, "중복된 닉네임입니다."),
     DUPLICATED_LOGIN_ID(false, 2007, "중복된 아이디입니다."),
     NULL_ACCESS_TOKEN(false, 2008, "access token이 비었습니다."),
+    WRONG_PASSWORD(false, 2009, "잘못된 password 입니다."),
 
     // interest(2100-2199)
     WRONG_CONTENTS_NAME(false, 2100, "콘텐츠 이름이 잘못되었습니다."),
