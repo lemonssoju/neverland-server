@@ -51,7 +51,7 @@ public class UserService {
     public JwtDto login(LoginRequest loginRequest) throws BaseException {
         try {
             User user = userRepository.findByLoginId(loginRequest.loginId()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            if(!encoder.matches(loginRequest.password(), user.getPassword())) throw new BaseException(INVALID_PASSWORD);
+            if(!encoder.matches(loginRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
 
             JwtDto jwtDto = authService.generateToken(user.getUserIdx());
 
@@ -138,5 +138,16 @@ public class UserService {
     // 아이디 중복 체크
     public void validateLoginId(String loginId) throws BaseException {
         if(userRepository.existsByLoginId(loginId)) throw new BaseException(DUPLICATED_LOGIN_ID);
+    }
+
+    // 개인 정보 변경
+    @Transactional(rollbackFor = Exception.class)
+    public void modifyUser(Long userIdx, ModifyUserRequest modifyUserRequest) throws BaseException {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        if(!encoder.matches(modifyUserRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
+        if (modifyUserRequest.newPassword().equals("") || modifyUserRequest.newPassword().equals(" "))
+            throw new BaseException(INVALID_PASSWORD);
+        user.modifyPassword(modifyUserRequest.newPassword());
+        userRepository.save(user);
     }
 }

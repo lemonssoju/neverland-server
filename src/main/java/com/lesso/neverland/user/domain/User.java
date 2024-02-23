@@ -78,5 +78,6 @@ public class User extends BaseEntity {
     public void signout() {
         this.setStatus(INACTIVE);
     }
+    public void modifyPassword(String newPassword) { this.password = newPassword; }
 
 }
