@@ -23,12 +23,12 @@ public class RedisService {
     private String secretKey;
     private final RedisTemplate<String, String> redisTemplate;
 
-    public void signup(String refreshToken, String loginId) {
-        redisTemplate.opsForValue().set(refreshToken, loginId, Duration.ofMillis(refreshTokenExpirationTime));
+    public void signup(Long userIdx, String refreshToken) {
+        redisTemplate.opsForValue().set(String.valueOf(userIdx), refreshToken, Duration.ofMillis(refreshTokenExpirationTime));
     }
 
-    public void deleteFromRedis(String refreshToken) {
-        if(redisTemplate.opsForValue().get(refreshToken) != null) redisTemplate.delete(refreshToken);
+    public void deleteFromRedis(Long userIdx) {
+        if(redisTemplate.opsForValue().get(String.valueOf(userIdx)) != null) redisTemplate.delete(String.valueOf(userIdx));
     }
 
     public void registerBlackList(String accessToken, String status) {
@@ -42,12 +42,16 @@ public class RedisService {
         return accessTokenExpirationTime.getTime() - (new Date()).getTime();
     }
 
-    public boolean checkExistsRedis(String refreshToken) throws BaseException {
-        if (redisTemplate.opsForValue().get(refreshToken) != null) return true;
+    public boolean checkExistsRedis(Long userIdx) throws BaseException {
+        if (redisTemplate.opsForValue().get(String.valueOf(userIdx)) != null) return true;
         else throw new BaseException(EXPIRED_REFRESH_TOKEN);
     }
 
     public String getLoginIdFromRedis(String refreshToken) {
         return redisTemplate.opsForValue().get(refreshToken);
+    }
+
+    public String getToken(Long userIdx){
+        return redisTemplate.opsForValue().get(String.valueOf(userIdx));
     }
 }

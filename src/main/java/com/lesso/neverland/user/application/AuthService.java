@@ -1,7 +1,6 @@
 package com.lesso.neverland.user.application;
 
 import com.lesso.neverland.common.BaseException;
-import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.dto.JwtDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -38,17 +37,16 @@ public class AuthService {
 
 
     // 토큰 발급
-    public JwtDto generateToken(User user) {
-        String accessToken = generateAccessToken(user);
-        String refreshToken = generateRefreshToken(user);
+    public JwtDto generateToken(Long userIdx) {
+        String accessToken = generateAccessToken(userIdx);
+        String refreshToken = generateRefreshToken(userIdx);
         return new JwtDto(accessToken, refreshToken);
     }
 
     // accessToken 발급
-    public String generateAccessToken(User user) {
+    public String generateAccessToken(Long userIdx) {
         Claims claims = Jwts.claims();
-        claims.put("loginId", user.getLoginId());
-        claims.put("userIdx", user.getUserIdx());
+        claims.put("userIdx", userIdx);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -59,13 +57,13 @@ public class AuthService {
     }
 
     // refreshToken 발급
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(Long userIdx) {
         String refreshToken = Jwts.builder()
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
-        redisService.signup(refreshToken, user.getLoginId());
+        redisService.signup(userIdx, refreshToken);
         return refreshToken;
     }
 
@@ -86,20 +84,20 @@ public class AuthService {
     }
 
     // 로그아웃
-    public void logout(String refreshToken) throws BaseException {
+    public void logout(Long userIdx) throws BaseException {
         // 토큰 유효성 검사
         String accessToken = getTokenFromRequest();
 
-        redisService.deleteFromRedis(refreshToken);
+        redisService.deleteFromRedis(userIdx);
         redisService.registerBlackList(accessToken, LOGOUT);
     }
 
     // 회원 탈퇴
-    public void signout(String refreshToken) throws BaseException {
+    public void signout(Long userIdx) throws BaseException {
         // 토큰 유효성 검사
         String accessToken = getTokenFromRequest();
 
-        redisService.deleteFromRedis(refreshToken);
+        redisService.deleteFromRedis(userIdx);
         redisService.registerBlackList(accessToken, INACTIVE);
     }
 
