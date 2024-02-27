@@ -3,9 +3,9 @@ package com.lesso.neverland.post.application;
 import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.enums.Contents;
-import com.lesso.neverland.interest.domain.Interest;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostLike;
+import com.lesso.neverland.post.domain.PostTag;
 import com.lesso.neverland.post.dto.ModifyPostViewResponse;
 import com.lesso.neverland.post.dto.PostResponse;
 import com.lesso.neverland.post.repository.PostLikeRepository;
@@ -42,36 +42,32 @@ public class PostService {
             Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
             if (post.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_POST);
 
+            // 좋아요 여부
             Optional<Long> optionalUserIdx = Optional.ofNullable(authService.getUserIdx());
-            User user = null;
             boolean isLike = false;
-            List<PostResponse.RecommendedPostDto> posts = null;
-
-            // 로그인 상태일 경우에만 좋아요 여부 및 추천글 조회
-            // TODO: 유저 취향이 아닌 해당 피드 관련 태그 가진 post 조회하도록 수정
-            // TODO: 비회원 여부) 좋아요만
-            if (optionalUserIdx.isPresent()) {
-                user = userRepository.findById(optionalUserIdx.get()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            if (optionalUserIdx.isPresent()) { // 로그인 상태일 경우에만 좋아요 여부 및 추천글 조회
+                User user = userRepository.findById(optionalUserIdx.get()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
                 isLike = postLikeRepository.existsByPostAndUserAndStatusEquals(post, user, ACTIVE);
-
-                List<Contents> userInterests = user.getInterests().stream()
-                        .map(Interest::getPreference)
-                        .collect(Collectors.toList());
-
-                List<Post> recommendedPosts = postRepository.findTop3ByPostTags_TagNameIn(userInterests);
-                posts = recommendedPosts.stream()
-                        .map(recommendedPost -> new PostResponse.RecommendedPostDto(
-                                recommendedPost.getTitle(),
-                                recommendedPost.getPostTags().stream()
-                                        .map(postTag -> postTag.getTagName().getName())
-                                        .collect(Collectors.toList())))
-                        .collect(Collectors.toList());
             }
+
+            // 추천글 목록 구성
+            List<Contents> postTags = post.getPostTags().stream()
+                    .map(PostTag::getTagName).collect(Collectors.toList());
+
+            List<Post> recommendedPosts = postRepository.findTop3ByPostTags_TagNameIn(postTags);
+            List<PostResponse.RecommendedPostDto> posts = recommendedPosts.stream()
+                    .map(recommendedPost -> new PostResponse.RecommendedPostDto(
+                            recommendedPost.getPostImage(),
+                            recommendedPost.getTitle(),
+                            recommendedPost.getPostTags().stream()
+                                    .map(postTag -> postTag.getTagName().getName())
+                                    .collect(Collectors.toList()))).collect(Collectors.toList());
 
             // 댓글 조회
             List<Comment> postComments = post.getComments();
             List<PostResponse.CommentDto> comments = postComments.stream()
                     .map(comment -> new PostResponse.CommentDto(
+                            comment.getCommentIdx(),
                             comment.getUser().getProfile().getNickname(),
                             comment.getUser().getProfile().getProfileImage(),
                             comment.getCreatedDate(),
@@ -79,8 +75,8 @@ public class PostService {
                     .collect(Collectors.toList());
 
             return new PostResponse(post.getTitle(), post.getSubtitle(), post.getContent(), post.getCreatedDate(),
-                    post.getUser().getProfile().getNickname(), user != null ? user.getProfile().getNickname() : null,
-                    post.getBackgroundMusic(), post.getBackgroundMusicUrl(), post.getPostImage(), isLike, posts, comments);
+                    post.getUser().getProfile().getNickname(), post.getBackgroundMusic(), post.getBackgroundMusicUrl(),
+                    post.getPostImage(), isLike, posts, comments);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
