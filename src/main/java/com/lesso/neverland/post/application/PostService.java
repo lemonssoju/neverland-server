@@ -11,6 +11,7 @@ import com.lesso.neverland.post.dto.PostResponse;
 import com.lesso.neverland.post.repository.PostLikeRepository;
 import com.lesso.neverland.post.repository.PostRepository;
 import com.lesso.neverland.user.application.AuthService;
+import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 public class PostService {
 
     private final AuthService authService;
+    private final UserService userService;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostLikeRepository postLikeRepository;
@@ -46,6 +48,8 @@ public class PostService {
             List<PostResponse.RecommendedPostDto> posts = null;
 
             // 로그인 상태일 경우에만 좋아요 여부 및 추천글 조회
+            // TODO: 유저 취향이 아닌 해당 피드 관련 태그 가진 post 조회하도록 수정
+            // TODO: 비회원 여부) 좋아요만
             if (optionalUserIdx.isPresent()) {
                 user = userRepository.findById(optionalUserIdx.get()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
                 isLike = postLikeRepository.existsByPostAndUserAndStatusEquals(post, user, ACTIVE);
@@ -86,7 +90,7 @@ public class PostService {
 
     // [작성자] 피드 수정 화면 조회
     public ModifyPostViewResponse getModifyPostView(Long postIdx) throws BaseException {
-        User user = userRepository.findById(getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
         validateWriter(user, post);
 
@@ -97,7 +101,7 @@ public class PostService {
     // [작성자] 피드 삭제
     @Transactional(rollbackFor = Exception.class)
     public void deletePost(Long postIdx) throws BaseException {
-        User user = userRepository.findById(getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
         validateWriter(user, post);
 
@@ -132,13 +136,6 @@ public class PostService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
-    }
-
-    // 회원만
-    private Long getUserIdxWithValidation() throws BaseException {
-        Long userIdx = authService.getUserIdx();
-        if (userIdx == null) throw new BaseException(NULL_ACCESS_TOKEN);
-        return userIdx;
     }
 
     // 작성자 validation
