@@ -1,4 +1,4 @@
-package com.lesso.neverland.team.domain;
+package com.lesso.neverland.group.domain;
 
 import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.user.domain.User;
