@@ -29,7 +29,7 @@ public class GroupService {
     public GroupListResponse getGroupList() throws BaseException {
         try {
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            List<Team> groupList = groupRepository.findByUser(user);
+            List<Team> groupList = groupRepository.findByAdmin(user);
             List<GroupListDto> groupListDto = groupList.stream()
                     .map(group -> new GroupListDto(
                             group.getTeamIdx(),
