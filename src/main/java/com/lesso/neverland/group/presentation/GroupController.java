@@ -4,8 +4,10 @@ import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.group.application.GroupService;
 import com.lesso.neverland.group.dto.GroupListResponse;
+import com.lesso.neverland.group.dto.GroupPostListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +25,16 @@ public class GroupController {
     public BaseResponse<GroupListResponse> getGroupList() {
         try {
             return new BaseResponse<>(groupService.getGroupList());
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 그룹 피드 목록 조회
+    @GetMapping("/{groupIdx}/posts")
+    public BaseResponse<GroupPostListResponse> getGroupPostList(@PathVariable Long groupIdx) {
+        try {
+            return new BaseResponse<>(groupService.getGroupPostList(groupIdx));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }

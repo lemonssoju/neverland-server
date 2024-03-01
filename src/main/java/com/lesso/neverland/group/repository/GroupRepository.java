@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Team, Long> {
-    List<Team> findByUser(User user);
+    List<Team> findByAdminAndStatusEquals(User admin, String status);
 }

@@ -35,6 +35,8 @@ public enum BaseResponseStatus {
     ALREADY_DELETED_POST(false, 2201, "이미 삭제된 post 입니다."),
     NO_POST_WRITER(false, 2202, "해당 post의 작성자가 아닙니다."),
 
+    // group(2300-2399)
+    INVALID_GROUP_IDX(false, 2300, "잘못된 group idx 입니다."),
 
     /**
      * 3000: Response 오류
