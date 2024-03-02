@@ -37,6 +37,8 @@ public enum BaseResponseStatus {
 
     // group(2300-2399)
     INVALID_GROUP_IDX(false, 2300, "잘못된 group idx 입니다."),
+    NO_GROUP_POST(false, 2301, "이 글은 해당 그룹의 글이 아닙니다."),
+
 
     /**
      * 3000: Response 오류

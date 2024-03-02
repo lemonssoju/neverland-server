@@ -1,14 +1,15 @@
 package com.lesso.neverland.group.application;
 
+import com.lesso.neverland.comment.domain.Comment;
+import com.lesso.neverland.comment.dto.CommentDto;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.group.domain.Team;
-import com.lesso.neverland.group.dto.GroupListDto;
-import com.lesso.neverland.group.dto.GroupListResponse;
-import com.lesso.neverland.group.dto.GroupPostDto;
-import com.lesso.neverland.group.dto.GroupPostListResponse;
+import com.lesso.neverland.group.dto.*;
 import com.lesso.neverland.group.repository.GroupRepository;
 import com.lesso.neverland.post.domain.Post;
+import com.lesso.neverland.post.repository.PostLikeRepository;
 import com.lesso.neverland.post.repository.PostRepository;
+import com.lesso.neverland.user.application.AuthService;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.lesso.neverland.common.BaseResponseStatus.*;
@@ -29,6 +31,8 @@ public class GroupService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final PostRepository postRepository;
+    private final AuthService authService;
+    private final PostLikeRepository postLikeRepository;
 
     // 그룹 목록 조회
     public GroupListResponse getGroupList() throws BaseException {
@@ -63,6 +67,42 @@ public class GroupService {
                             groupPost.getPostImage(),
                             groupPost.getUser().getProfile().getNickname())).collect(Collectors.toList());
             return new GroupPostListResponse(group.getName(), groupPostListDto);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 그룹 피드 상세 조회
+    public GroupPostResponse getGroupPost(Long groupIdx, Long postIdx) throws BaseException {
+        try {
+            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+            Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
+            if (!post.getTeam().equals(group)) throw new BaseException(NO_GROUP_POST);
+
+            // 좋아요 여부 조회
+            Optional<Long> optionalUserIdx = Optional.ofNullable(authService.getUserIdx());
+            boolean isLike = false;
+            if (optionalUserIdx.isPresent()){
+                User user = userRepository.findById(optionalUserIdx.get()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+                isLike = postLikeRepository.existsByPostAndUserAndStatusEquals(post, user, ACTIVE);
+            }
+
+            // 댓글 조회
+            List<Comment> postComments = post.getComments();
+            List<CommentDto> comments = postComments.stream()
+                    .map(comment -> new CommentDto(
+                            comment.getCommentIdx(),
+                            comment.getUser().getProfile().getNickname(),
+                            comment.getUser().getProfile().getProfileImage(),
+                            comment.getCreatedDate(),
+                            comment.getContent()))
+                    .collect(Collectors.toList());
+
+            return new GroupPostResponse(post.getTitle(), post.getSubtitle(), post.getContent(), post.getCreatedDate(),
+                    post.getUser().getProfile().getNickname(), post.getBackgroundMusic(), post.getBackgroundMusicUrl(),
+                    post.getPostImage(), isLike, comments);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
