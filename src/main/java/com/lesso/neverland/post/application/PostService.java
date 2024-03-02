@@ -1,6 +1,7 @@
 package com.lesso.neverland.post.application;
 
 import com.lesso.neverland.comment.domain.Comment;
+import com.lesso.neverland.comment.dto.CommentDto;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.post.domain.Post;
@@ -8,6 +9,7 @@ import com.lesso.neverland.post.domain.PostLike;
 import com.lesso.neverland.post.domain.PostTag;
 import com.lesso.neverland.post.dto.ModifyPostViewResponse;
 import com.lesso.neverland.post.dto.PostResponse;
+import com.lesso.neverland.post.dto.RecommendedPostDto;
 import com.lesso.neverland.post.repository.PostLikeRepository;
 import com.lesso.neverland.post.repository.PostRepository;
 import com.lesso.neverland.user.application.AuthService;
@@ -55,8 +57,8 @@ public class PostService {
                     .map(PostTag::getTagName).collect(Collectors.toList());
 
             List<Post> recommendedPosts = postRepository.findTop3ByPostTags_TagNameIn(postTags);
-            List<PostResponse.RecommendedPostDto> posts = recommendedPosts.stream()
-                    .map(recommendedPost -> new PostResponse.RecommendedPostDto(
+            List<RecommendedPostDto> posts = recommendedPosts.stream()
+                    .map(recommendedPost -> new RecommendedPostDto(
                             recommendedPost.getPostImage(),
                             recommendedPost.getTitle(),
                             recommendedPost.getPostTags().stream()
@@ -65,8 +67,8 @@ public class PostService {
 
             // 댓글 조회
             List<Comment> postComments = post.getComments();
-            List<PostResponse.CommentDto> comments = postComments.stream()
-                    .map(comment -> new PostResponse.CommentDto(
+            List<CommentDto> comments = postComments.stream()
+                    .map(comment -> new CommentDto(
                             comment.getCommentIdx(),
                             comment.getUser().getProfile().getNickname(),
                             comment.getUser().getProfile().getProfileImage(),
