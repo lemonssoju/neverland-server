@@ -3,6 +3,7 @@ package com.lesso.neverland.group.application;
 import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.comment.dto.CommentDto;
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.group.dto.*;
 import com.lesso.neverland.group.repository.GroupRepository;
@@ -12,9 +13,13 @@ import com.lesso.neverland.post.repository.PostRepository;
 import com.lesso.neverland.user.application.AuthService;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
+import com.lesso.neverland.user.domain.UserTeam;
 import com.lesso.neverland.user.repository.UserRepository;
+import com.lesso.neverland.user.repository.UserTeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +38,8 @@ public class GroupService {
     private final PostRepository postRepository;
     private final AuthService authService;
     private final PostLikeRepository postLikeRepository;
+    private final ImageService imageService;
+    private final UserTeamRepository userTeamRepository;
 
     // 그룹 목록 조회
     public GroupListResponse getGroupList() throws BaseException {
@@ -108,5 +115,58 @@ public class GroupService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    // [관리자] 그룹 수정
+    @Transactional(rollbackFor = Exception.class)
+    public void modifyGroup(Long groupIdx, MultipartFile image, ModifyGroupRequest modifyGroupRequest) throws BaseException {
+        try {
+            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            validateAdmin(user, group);
+
+            if (modifyGroupRequest.name() != null) {
+                if (!modifyGroupRequest.name().equals("") && !modifyGroupRequest.name().equals(" "))
+                    group.modifyName(modifyGroupRequest.name());
+                else throw new BaseException(BLANK_GROUP_NAME);
+            }
+            if (modifyGroupRequest.subName() != null) {
+                if (!modifyGroupRequest.subName().equals("") && !modifyGroupRequest.subName().equals(" "))
+                    group.modifySubName(modifyGroupRequest.subName());
+                else throw new BaseException(BLANK_GROUP_SUB_NAME);
+            }
+            if (modifyGroupRequest.memberList() != null) {
+                List<UserTeam> originalMemberList = group.getUserTeams();
+                userTeamRepository.deleteAll(originalMemberList);
+
+                for(Long userIdx : modifyGroupRequest.memberList()) {
+                    User member = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+                    UserTeam userTeam = UserTeam.builder()
+                            .user(member)
+                            .team(group).build();
+                    userTeam.setUser(member);
+                    userTeam.setTeam(group);
+                    userTeamRepository.save(userTeam);
+                }
+            }
+
+            if (image != null) {//TODO: 이미지 삭제 및 업로드 설정 후 동작 확인하현
+                // delete previous image
+                imageService.deleteImage(group.getTeamImage());
+
+                // upload new image
+                String imagePath = imageService.uploadImage("group", image);
+                group.modifyImage(imagePath);
+            } else throw new BaseException(NULL_GROUP_IMAGE);
+            groupRepository.save(group);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    private void validateAdmin(User user, Team group) throws BaseException {
+        if (!group.getAdmin().equals(user)) throw new BaseException(NO_GROUP_ADMIN);
     }
 }

@@ -6,12 +6,12 @@ import com.lesso.neverland.group.application.GroupService;
 import com.lesso.neverland.group.dto.GroupListResponse;
 import com.lesso.neverland.group.dto.GroupPostListResponse;
 import com.lesso.neverland.group.dto.GroupPostResponse;
+import com.lesso.neverland.group.dto.ModifyGroupRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.group;
 
 @RestController
@@ -46,6 +46,17 @@ public class GroupController {
     public BaseResponse<GroupPostResponse> getGroupPostList(@PathVariable Long groupIdx, @PathVariable Long postIdx) {
         try {
             return new BaseResponse<>(groupService.getGroupPost(groupIdx, postIdx));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // [관리자] 그룹 수정
+    @PatchMapping("/{groupIdx}")
+    public BaseResponse<String> modifyGroup(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart ModifyGroupRequest modifyGroupRequest) {
+        try {
+            groupService.modifyGroup(groupIdx, image, modifyGroupRequest);
+            return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
