@@ -1,5 +1,7 @@
 package com.lesso.neverland.post.dto;
 
+import com.lesso.neverland.comment.dto.CommentDto;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,11 +15,4 @@ public record PostResponse(String title,
                            String postImage,
                            boolean isLike,
                            List<RecommendedPostDto> posts,
-                           List<CommentDto> comments) {
-    public record RecommendedPostDto(String postImage, String title, List<String> tags) {}
-    public record CommentDto(Long commentIdx,
-                             String writer,
-                             String profileImage,
-                             LocalDate createdDate,
-                             String content) {}
-}
+                           List<CommentDto> comments) {}
