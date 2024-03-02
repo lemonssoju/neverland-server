@@ -38,6 +38,13 @@ public enum BaseResponseStatus {
     // group(2300-2399)
     INVALID_GROUP_IDX(false, 2300, "잘못된 group idx 입니다."),
     NO_GROUP_POST(false, 2301, "이 글은 해당 그룹의 글이 아닙니다."),
+    NO_GROUP_ADMIN(false, 2302, "해당 그룹의 관리자가 아닙니다."),
+    BLANK_GROUP_NAME(false, 2303, "그룹명이 비었습니다."),
+    BLANK_GROUP_SUB_NAME(false, 2304, "그룹 subname이 비었습니다."),
+    NULL_GROUP_IMAGE(false, 2305, "그룹 이미지가 비었습니다."),
+
+    // image(2400-2499)
+    IMAGE_DELETE_FAIL(false, 2400, "이미지 삭제에 실패했습니다."),
 
 
     /**

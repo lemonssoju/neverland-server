@@ -4,6 +4,7 @@ import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.group.domain.Team;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -34,5 +35,11 @@ public class UserTeam extends BaseEntity {
     public void setTeam(Team team) {
         this.team = team;
         team.getUserTeams().add(this);
+    }
+
+    @Builder
+    public UserTeam(User user, Team team) {
+        this.user = user;
+        this.team = team;
     }
 }
