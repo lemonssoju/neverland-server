@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
+import static com.lesso.neverland.common.constants.Constants.INACTIVE;
+
 @Entity
 @Getter
 @DynamicInsert
@@ -41,5 +43,9 @@ public class UserTeam extends BaseEntity {
     public UserTeam(User user, Team team) {
         this.user = user;
         this.team = team;
+    }
+
+    public void delete() {
+        this.setStatus(INACTIVE);
     }
 }

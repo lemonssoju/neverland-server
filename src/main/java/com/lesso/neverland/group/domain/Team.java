@@ -12,6 +12,8 @@ import org.hibernate.annotations.DynamicInsert;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.lesso.neverland.common.constants.Constants.INACTIVE;
+
 @Entity
 @Getter
 @DynamicInsert
@@ -41,4 +43,5 @@ public class Team extends BaseEntity {
     public void modifyName(String name) { this.name = name; }
     public void modifySubName(String subName) { this.subName = subName; }
     public void modifyImage(String imageUrl) {this.teamImage = imageUrl; }
+    public void delete() { this.setStatus(INACTIVE);}
 }

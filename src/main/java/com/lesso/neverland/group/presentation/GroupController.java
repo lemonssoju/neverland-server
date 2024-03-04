@@ -61,4 +61,15 @@ public class GroupController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    // [관리자] 그룹 삭제
+    @PatchMapping("/delete/{groupIdx}")
+    public BaseResponse<String> deleteGroup(@PathVariable Long groupIdx) {
+        try {
+            groupService.deleteGroup(groupIdx);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }
