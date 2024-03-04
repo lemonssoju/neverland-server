@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
+import static com.lesso.neverland.common.constants.Constants.INACTIVE;
+
 @Entity
 @Getter
 @DynamicInsert
@@ -29,5 +31,9 @@ public class PostTag extends BaseEntity {
     public void setPost(Post post) {
         this.post = post;
         post.getPostTags().add(this);
+    }
+
+    public void delete() {
+        this.setStatus(INACTIVE);
     }
 }

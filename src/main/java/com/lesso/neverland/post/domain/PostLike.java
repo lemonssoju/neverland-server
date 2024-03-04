@@ -42,8 +42,6 @@ public class PostLike extends BaseEntity {
 
     public void delete() {
         this.setStatus(INACTIVE);
-        this.post.getPostLikes().remove(this);
-        this.user.getPostLikes().remove(this);
     }
 
     public void add() {
