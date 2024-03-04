@@ -150,7 +150,7 @@ public class GroupService {
                 }
             }
 
-            if (image != null) {//TODO: 이미지 삭제 및 업로드 설정 후 동작 확인하현
+            if (image != null) {//TODO: 이미지 삭제 및 업로드 설정 후 동작 확인하기
                 // delete previous image
                 imageService.deleteImage(group.getTeamImage());
 
@@ -158,6 +158,22 @@ public class GroupService {
                 String imagePath = imageService.uploadImage("group", image);
                 group.modifyImage(imagePath);
             } else throw new BaseException(NULL_GROUP_IMAGE);
+            groupRepository.save(group);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // [관리자] 그룹 삭제
+    public void deleteGroup(Long groupIdx) throws BaseException {
+        try {
+            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            validateAdmin(user, group);
+
+            group.delete();
             groupRepository.save(group);
         } catch (BaseException e) {
             throw e;
