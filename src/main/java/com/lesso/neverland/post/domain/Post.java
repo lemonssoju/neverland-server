@@ -8,9 +8,11 @@ import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,13 +61,30 @@ public class Post extends BaseEntity {
     private String content;
 
     @OneToMany(mappedBy = "post")
+    @Where(clause = "status = 'ACTIVE'")
     private List<PostTag> postTags = new ArrayList<>(); // 취향 관련 태그
 
     @OneToMany(mappedBy = "post")
+    @Where(clause = "status = 'ACTIVE'")
     private List<PostLike> postLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
+    @Where(clause = "status = 'ACTIVE'")
     private List<Comment> comments = new ArrayList<>();
+
+    @Builder
+    public Post(User user, Source source, Team team, String title, String subtitle, Contents contentsType, String backgroundMusic, String backgroundMusicUrl, String postImage, String content) {
+        this.user = user;
+        this.source = source;
+        this.team = team;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.contentsType = contentsType;
+        this.backgroundMusic = backgroundMusic;
+        this.backgroundMusicUrl = backgroundMusicUrl;
+        this.postImage = postImage;
+        this.content = content;
+    }
 
     public void setUser(User user) {
         this.user = user;
