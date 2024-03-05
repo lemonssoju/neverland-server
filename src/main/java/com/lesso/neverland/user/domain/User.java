@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,24 +40,31 @@ public class User extends BaseEntity {
     private UserProfile profile;
 
     @OneToMany(mappedBy = "user")
+    @Where(clause = "status = 'ACTIVE'")
     private List<Interest> interests = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
+    @Where(clause = "status = 'ACTIVE'")
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
+    @Where(clause = "status = 'ACTIVE'")
     private List<Thumbnail> thumbnails = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
+    @Where(clause = "status = 'ACTIVE'")
     private List<UserTeam> userTeams = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
+    @Where(clause = "status = 'ACTIVE'")
     private List<GuestMemo> memos = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
+    @Where(clause = "status = 'ACTIVE'")
     private List<PostLike> postLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
+    @Where(clause = "status = 'ACTIVE'")
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
