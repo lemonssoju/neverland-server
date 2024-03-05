@@ -48,4 +48,10 @@ public class UserTeam extends BaseEntity {
     public void delete() {
         this.setStatus(INACTIVE);
     }
+
+    public void withdraw() {
+        this.setStatus(INACTIVE);
+        this.user.getUserTeams().remove(this);
+        this.team.getUserTeams().remove(this);
+    }
 }

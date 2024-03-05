@@ -221,6 +221,24 @@ public class GroupService {
         }
     }
 
+    // 그룹 나가기
+    public void withdrawGroup(Long groupIdx) throws BaseException {
+        try {
+            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, group);
+            if (userTeam == null) throw new BaseException(NO_GROUP_MEMBER);
+            else {
+                userTeam.withdraw();
+                userTeamRepository.save(userTeam);
+            }
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     private void validateAdmin(User user, Team group) throws BaseException {
         if (!group.getAdmin().equals(user)) throw new BaseException(NO_GROUP_ADMIN);
     }
