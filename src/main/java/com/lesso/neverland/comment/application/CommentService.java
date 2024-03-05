@@ -1,6 +1,7 @@
 package com.lesso.neverland.comment.application;
 
 import com.lesso.neverland.comment.domain.Comment;
+import com.lesso.neverland.comment.dto.ModifyCommentRequest;
 import com.lesso.neverland.comment.dto.PostCommentRequest;
 import com.lesso.neverland.comment.repository.CommentRepository;
 import com.lesso.neverland.common.BaseException;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -39,5 +41,31 @@ public class CommentService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    // [작성자] 댓글 수정
+    public void modifyComment(Long commentIdx, ModifyCommentRequest modifyCommentRequest) throws BaseException {
+        try {
+            User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            Comment comment = commentRepository.findById(commentIdx).orElseThrow(() -> new BaseException(INVALID_COMMENT_IDX));
+            validateWriter(writer, comment);
+
+            if (modifyCommentRequest.content() != null) {
+                if (!modifyCommentRequest.content().equals("") && !modifyCommentRequest.content().equals(" "))
+                    comment.modifyContent(modifyCommentRequest.content());
+                else throw new BaseException(BLANK_COMMENT_CONTENT);
+            }
+            commentRepository.save(comment);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 작성자 validation
+    private static void validateWriter(User user, Comment comment) throws BaseException {
+        if (!comment.getUser().equals(user)) throw new BaseException(NO_COMMENT_WRITER);
+        if (comment.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_COMMENT);
     }
 }

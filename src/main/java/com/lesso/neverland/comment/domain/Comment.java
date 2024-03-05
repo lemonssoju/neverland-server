@@ -53,4 +53,5 @@ public class Comment extends BaseEntity {
     public void delete() {
         this.setStatus(INACTIVE);
     }
+    public void modifyContent(String content) { this.content = content; }
 }

@@ -48,6 +48,12 @@ public enum BaseResponseStatus {
     // image(2400-2499)
     IMAGE_DELETE_FAIL(false, 2400, "이미지 삭제에 실패했습니다."),
 
+    // comment(2500-2599)
+    INVALID_COMMENT_IDX(false, 2500, "잘못된 comment idx 입니다."),
+    NO_COMMENT_WRITER(false, 2501, "댓글 작성자가 아닙니다."),
+    ALREADY_DELETED_COMMENT(false, 2502, "이미 삭제된 댓글입니다."),
+    BLANK_COMMENT_CONTENT(false, 2503, "댓글 내용이 비었습니다."),
+
 
     /**
      * 3000: Response 오류
