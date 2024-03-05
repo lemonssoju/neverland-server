@@ -226,6 +226,8 @@ public class GroupService {
         try { // TODO: 관리자 그룹 나가기 불가능 validation 필요
             Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            if(user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
+
             UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, group);
             if (userTeam == null) throw new BaseException(NO_GROUP_MEMBER);
             else {
