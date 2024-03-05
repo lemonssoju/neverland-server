@@ -43,6 +43,7 @@ public enum BaseResponseStatus {
     BLANK_GROUP_SUB_NAME(false, 2304, "그룹 subname이 비었습니다."),
     NULL_GROUP_IMAGE(false, 2305, "그룹 이미지가 비었습니다."),
     NO_GROUP_MEMBER(false, 2306, "그룹 멤버가 아닙니다."),
+    GROUP_ADMIN(false, 2307, "그룹 관리자는 그룹을 나갈 수 없습니다."),
 
     // image(2400-2499)
     IMAGE_DELETE_FAIL(false, 2400, "이미지 삭제에 실패했습니다."),
