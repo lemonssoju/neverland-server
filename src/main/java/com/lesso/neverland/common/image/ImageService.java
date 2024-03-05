@@ -35,7 +35,7 @@ public class ImageService {
 
         amazonS3Client.putObject(new PutObjectRequest(bucketName, fullPath, multipartFile.getInputStream(), objectMetaData)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
-        String imagePath = amazonS3Client.getUrl(bucketName, fullPath).toString();
+        String imagePath = amazonS3Client.getUrl(bucketName, fullPath).toString(); // TODO: 전체 url 반환하는지 확인
         System.out.println("imagePath = " + imagePath);
         return imagePath;
     }

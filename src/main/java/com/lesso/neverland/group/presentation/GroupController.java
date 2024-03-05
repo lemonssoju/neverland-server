@@ -3,10 +3,7 @@ package com.lesso.neverland.group.presentation;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.group.application.GroupService;
-import com.lesso.neverland.group.dto.GroupListResponse;
-import com.lesso.neverland.group.dto.GroupPostListResponse;
-import com.lesso.neverland.group.dto.GroupPostResponse;
-import com.lesso.neverland.group.dto.ModifyGroupRequest;
+import com.lesso.neverland.group.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -78,6 +75,17 @@ public class GroupController {
     public BaseResponse<String> withdrawGroup(@PathVariable Long groupIdx) {
         try {
             groupService.withdrawGroup(groupIdx);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 그룹 생성
+    @PostMapping("")
+    public BaseResponse<String> createGroup(@RequestPart MultipartFile image, @RequestPart CreateGroupRequest createGroupRequest) {
+        try {
+            groupService.createGroup(image, createGroupRequest);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
