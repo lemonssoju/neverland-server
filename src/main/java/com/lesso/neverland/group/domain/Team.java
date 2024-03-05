@@ -5,6 +5,7 @@ import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.domain.UserTeam;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -39,6 +40,14 @@ public class Team extends BaseEntity {
 
     @OneToMany(mappedBy = "team")
     private List<UserTeam> userTeams = new ArrayList<>();
+
+    @Builder
+    public Team(User admin, String name, String subName, String teamImage) {
+        this.admin = admin;
+        this.name = name;
+        this.subName = subName;
+        this.teamImage = teamImage;
+    }
 
     public void modifyName(String name) { this.name = name; }
     public void modifySubName(String subName) { this.subName = subName; }

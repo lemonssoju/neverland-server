@@ -223,13 +223,44 @@ public class GroupService {
 
     // 그룹 나가기
     public void withdrawGroup(Long groupIdx) throws BaseException {
-        try {
+        try { // TODO: 관리자 그룹 나가기 불가능 validation 필요
             Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
             UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, group);
             if (userTeam == null) throw new BaseException(NO_GROUP_MEMBER);
             else {
                 userTeam.withdraw();
+                userTeamRepository.save(userTeam);
+            }
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 그룹 생성
+    @Transactional(rollbackFor = Exception.class)
+    public void createGroup(MultipartFile image, CreateGroupRequest createGroupRequest) throws BaseException {
+        try {
+            User admin = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+            // upload image
+            String imagePath = imageService.uploadImage("group", image);
+
+            Team group = new Team(admin, createGroupRequest.name(), createGroupRequest.subName(), imagePath);
+            groupRepository.save(group);
+
+            UserTeam newUserTeam = new UserTeam(admin, group);
+            newUserTeam.setUser(admin);
+            newUserTeam.setTeam(group);
+            userTeamRepository.save(newUserTeam);
+
+            for (Long memberIdx : createGroupRequest.memberList()) {
+                User member = userRepository.findById(memberIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+                UserTeam userTeam = new UserTeam(member, group);
+                userTeam.setUser(member);
+                userTeam.setTeam(group);
                 userTeamRepository.save(userTeam);
             }
         } catch (BaseException e) {
