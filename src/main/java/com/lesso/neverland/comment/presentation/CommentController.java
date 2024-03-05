@@ -48,6 +48,4 @@ public class CommentController {
             return new BaseResponse<>(e.getStatus());
         }
     }
-
-
 }
