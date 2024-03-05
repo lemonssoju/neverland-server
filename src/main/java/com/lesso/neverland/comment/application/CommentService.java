@@ -63,6 +63,22 @@ public class CommentService {
         }
     }
 
+    // [작성자] 댓글 삭제
+    public void deleteComment(Long commentIdx) throws BaseException {
+        try {
+            User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            Comment comment = commentRepository.findById(commentIdx).orElseThrow(() -> new BaseException(INVALID_COMMENT_IDX));
+            validateWriter(writer, comment);
+
+            comment.delete();
+            commentRepository.save(comment);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     // 작성자 validation
     private static void validateWriter(User user, Comment comment) throws BaseException {
         if (!comment.getUser().equals(user)) throw new BaseException(NO_COMMENT_WRITER);

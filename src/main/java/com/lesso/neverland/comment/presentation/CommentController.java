@@ -38,4 +38,16 @@ public class CommentController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    @PatchMapping("/{commentIdx}/delete")
+    public BaseResponse<?> deleteComment(@PathVariable Long commentIdx) {
+        try {
+            commentService.deleteComment(commentIdx);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+
 }
