@@ -1,10 +1,18 @@
-package com.lesso.neverland.user.domain;
+package com.lesso.neverland.profile.domain;
 
 import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.common.enums.ThumbnailOrder;
+import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
+@Getter
+@DynamicInsert
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Thumbnail extends BaseEntity {
 
     @Id

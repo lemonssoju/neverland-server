@@ -7,6 +7,7 @@ import com.lesso.neverland.history.domain.SearchHistory;
 import com.lesso.neverland.interest.domain.Interest;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostLike;
+import com.lesso.neverland.profile.domain.Thumbnail;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
