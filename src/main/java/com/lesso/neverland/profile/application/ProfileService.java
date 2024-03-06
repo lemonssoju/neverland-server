@@ -4,6 +4,7 @@ import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.follow.repository.FollowRepository;
 import com.lesso.neverland.profile.domain.Thumbnail;
 import com.lesso.neverland.profile.dto.GetProfileRequest;
+import com.lesso.neverland.profile.dto.ProfileModifyViewResponse;
 import com.lesso.neverland.profile.dto.ProfileResponse;
 import com.lesso.neverland.profile.dto.ThumbnailDto;
 import com.lesso.neverland.user.application.UserService;
@@ -53,5 +54,18 @@ public class ProfileService {
     private boolean isMyProfile(User user, String nickname) {
         User profileUser = userRepository.findByProfile_Nickname(nickname);
         return user.equals(profileUser);
+    }
+
+    // [유저] 프로필 수정 화면 조회
+    public ProfileModifyViewResponse getProfileModifyView() throws BaseException {
+        try {
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            return new ProfileModifyViewResponse(user.getProfile().getProfileImage(), user.getProfile().getNickname(), user.getProfile().getProfileMessage(),
+                    user.getProfile().getProfileMusic(), user.getProfile().getProfileMusicUrl());
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 }
