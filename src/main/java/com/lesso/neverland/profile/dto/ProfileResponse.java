@@ -2,7 +2,8 @@ package com.lesso.neverland.profile.dto;
 
 import java.util.List;
 
-public record ProfileResponse(String nickname,
+public record ProfileResponse(Long userIdx,
+                              String nickname,
                               String profileImage,
                               String profileMessage,
                               String profileMusic,
