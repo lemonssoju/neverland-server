@@ -85,13 +85,13 @@ public class PostService {
     }
 
     // [작성자] 피드 수정 화면 조회
-    public ModifyPostViewResponse getModifyPostView(Long postIdx) throws BaseException {
+    public PostEditViewResponse getPostEditView(Long postIdx) throws BaseException {
         try {
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
             Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
             validateWriter(user, post);
 
-            return new ModifyPostViewResponse(post.getTitle(), post.getSubtitle(), post.getContentsType().getName(),
+            return new PostEditViewResponse(post.getTitle(), post.getSubtitle(), post.getContentsType().getName(),
                     post.getBackgroundMusic(), post.getBackgroundMusicUrl(), post.getPostImage(), post.getContent());
         } catch (BaseException e) {
             throw e;
