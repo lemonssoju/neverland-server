@@ -6,4 +6,5 @@ public class RequestURI {
     public final static String group = "/groups";
     public final static String comment = "/comments";
     public final static String profile = "/profiles";
+    public final static String memo = "/profiles/memos";
 }

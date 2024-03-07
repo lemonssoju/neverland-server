@@ -4,6 +4,7 @@ import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,6 +27,13 @@ public class GuestMemo extends BaseEntity {
 
     @Column(nullable = false, length = 50)
     private String content;
+
+    @Builder
+    public GuestMemo(User user, User writer, String content) {
+        this.user = user;
+        this.writer = writer;
+        this.content = content;
+    }
 
     public void setUser(User user) {
         this.user = user;

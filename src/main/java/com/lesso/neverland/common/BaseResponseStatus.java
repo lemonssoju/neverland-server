@@ -58,10 +58,15 @@ public enum BaseResponseStatus {
     ALREADY_DELETED_COMMENT(false, 2502, "이미 삭제된 댓글입니다."),
     BLANK_COMMENT_CONTENT(false, 2503, "댓글 내용이 비었습니다."),
 
+    // guest memo(2600-2699)
+    TOO_LONG_CONTENT(false, 2600, "내용은 50자 이하여야 합니다."),
+
 
     /**
      * 3000: Response 오류
      */
+    // user(3000-3099)
+    INVALID_NICKNAME(false, 3000, "해당 닉네임으로 유저를 찾을 수 없습니다."),
 
 
     /**
