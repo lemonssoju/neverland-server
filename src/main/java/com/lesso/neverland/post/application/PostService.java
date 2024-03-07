@@ -7,9 +7,7 @@ import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostLike;
 import com.lesso.neverland.post.domain.PostTag;
-import com.lesso.neverland.post.dto.ModifyPostViewResponse;
-import com.lesso.neverland.post.dto.PostResponse;
-import com.lesso.neverland.post.dto.RecommendedPostDto;
+import com.lesso.neverland.post.dto.*;
 import com.lesso.neverland.post.repository.PostLikeRepository;
 import com.lesso.neverland.post.repository.PostRepository;
 import com.lesso.neverland.user.application.AuthService;
@@ -141,6 +139,26 @@ public class PostService {
                 }
             }
             postLikeRepository.save(postLike);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 작성한 글 목록 조회
+    public MyPostListResponse getMyPostList() throws BaseException {
+        try {
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+            List<Post> myPosts = postRepository.findByUserAndStatusEquals(user, ACTIVE);
+            List<MyPostDto> myPostDtoList = myPosts.stream()
+                    .map(post -> new MyPostDto(
+                            post.getPostImage(),
+                            post.getTitle(),
+                            post.getPostTags().stream().map(postTag -> postTag.getTagName().getName()).toList(),
+                            post.getCreatedDate())).toList();
+            return new MyPostListResponse(myPostDtoList);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
