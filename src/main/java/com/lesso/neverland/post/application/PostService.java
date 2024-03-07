@@ -15,6 +15,7 @@ import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -126,9 +127,7 @@ public class PostService {
             PostLike postLike = postLikeRepository.findByPostAndUser(post, user);
 
             if (postLike == null) { // 이 게시글에 대한 해당 유저의 첫 좋아요
-                postLike = PostLike.builder()
-                        .post(post)
-                        .user(user).build();
+                postLike = new PostLike(post, user);
                 postLike.setPost(post);
                 postLike.setUser(user);
             } else { // 좋아요 기록이 이미 존재할 경우
@@ -152,18 +151,39 @@ public class PostService {
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
             List<Post> myPosts = postRepository.findByUserAndStatusEquals(user, ACTIVE);
-            List<MyPostDto> myPostDtoList = myPosts.stream()
-                    .map(post -> new MyPostDto(
-                            post.getPostImage(),
-                            post.getTitle(),
-                            post.getPostTags().stream().map(postTag -> postTag.getTagName().getName()).toList(),
-                            post.getCreatedDate())).toList();
+            List<MyPostDto> myPostDtoList = getMyPostDtoList(myPosts);
             return new MyPostListResponse(myPostDtoList);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    // 좋아요한 글 목록 조회
+    public MyLikeListResponse getMyLikeList() throws BaseException {
+        try {
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+            List<Post> myLikes = user.getPostLikes().stream().map(PostLike::getPost).toList();
+            List<MyPostDto> myLikeDtoList = getMyPostDtoList(myLikes);
+            return new MyLikeListResponse(myLikeDtoList);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // MyPostDto로 가공
+    @NotNull
+    private static List<MyPostDto> getMyPostDtoList(List<Post> postList) {
+        return postList.stream()
+                .map(post -> new MyPostDto(
+                        post.getPostImage(),
+                        post.getTitle(),
+                        post.getPostTags().stream().map(postTag -> postTag.getTagName().getName()).toList(),
+                        post.getCreatedDate())).toList();
     }
 
     // 작성자 validation
