@@ -4,6 +4,8 @@ import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.comment.dto.CommentDto;
 import com.lesso.neverland.comment.repository.CommentRepository;
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.enums.Contents;
+import com.lesso.neverland.common.enums.Source;
 import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.group.dto.*;
@@ -126,27 +128,27 @@ public class GroupService {
 
     // [관리자] 그룹 수정
     @Transactional(rollbackFor = Exception.class)
-    public void modifyGroup(Long groupIdx, MultipartFile image, ModifyGroupRequest modifyGroupRequest) throws BaseException {
+    public void editGroup(Long groupIdx, MultipartFile image, EditGroupRequest editGroupRequest) throws BaseException {
         try {
             Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
             validateAdmin(user, group);
 
-            if (modifyGroupRequest.name() != null) {
-                if (!modifyGroupRequest.name().equals("") && !modifyGroupRequest.name().equals(" "))
-                    group.modifyName(modifyGroupRequest.name());
+            if (editGroupRequest.name() != null) {
+                if (!editGroupRequest.name().equals("") && !editGroupRequest.name().equals(" "))
+                    group.modifyName(editGroupRequest.name());
                 else throw new BaseException(BLANK_GROUP_NAME);
             }
-            if (modifyGroupRequest.subName() != null) {
-                if (!modifyGroupRequest.subName().equals("") && !modifyGroupRequest.subName().equals(" "))
-                    group.modifySubName(modifyGroupRequest.subName());
+            if (editGroupRequest.subName() != null) {
+                if (!editGroupRequest.subName().equals("") && !editGroupRequest.subName().equals(" "))
+                    group.modifySubName(editGroupRequest.subName());
                 else throw new BaseException(BLANK_GROUP_SUB_NAME);
             }
-            if (modifyGroupRequest.memberList() != null) {
+            if (editGroupRequest.memberList() != null) {
                 List<UserTeam> originalMemberList = group.getUserTeams();
                 userTeamRepository.deleteAll(originalMemberList);
 
-                for(Long userIdx : modifyGroupRequest.memberList()) {
+                for(Long userIdx : editGroupRequest.memberList()) {
                     User member = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
                     UserTeam userTeam = UserTeam.builder()
                             .user(member)
@@ -223,7 +225,7 @@ public class GroupService {
 
     // 그룹 나가기
     public void withdrawGroup(Long groupIdx) throws BaseException {
-        try { // TODO: 관리자 그룹 나가기 불가능 validation 필요
+        try {
             Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
             if(user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
@@ -231,7 +233,7 @@ public class GroupService {
             UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, group);
             if (userTeam == null) throw new BaseException(NO_GROUP_MEMBER);
             else {
-                userTeam.withdraw();
+                userTeam.delete();
                 userTeamRepository.save(userTeam);
             }
         } catch (BaseException e) {
@@ -265,6 +267,27 @@ public class GroupService {
                 userTeam.setTeam(group);
                 userTeamRepository.save(userTeam);
             }
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 그룹 피드 등록
+    public void createGroupPost(Long groupIdx, MultipartFile image, CreateGroupPostRequest createGroupPostRequest) throws BaseException {
+        try {
+            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+            User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+            // upload image
+            String imagePath = imageService.uploadImage("group", image);
+
+            Contents contentsType = Contents.getEnumByName(createGroupPostRequest.contentsType());
+            // TODO: gpt 활용한 태그 생성
+            Post post = new Post(writer, Source.USER, group, createGroupPostRequest.title(), createGroupPostRequest.subtitle(),
+                    contentsType, createGroupPostRequest.backgroundMusic(), createGroupPostRequest.backgroundMusicUrl(), imagePath, createGroupPostRequest.content());
+            postRepository.save(post);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
