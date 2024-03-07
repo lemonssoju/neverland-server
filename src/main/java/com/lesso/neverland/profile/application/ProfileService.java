@@ -31,19 +31,20 @@ public class ProfileService {
     // 프로필 조회
     public ProfileResponse getProfile(GetProfileRequest getProfileRequest) throws BaseException {
         try {
+            User profileOwner = userRepository.findById(getProfileRequest.userIdx()).orElseThrow(() -> new BaseException(NO_MATCH_USER));
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
-            Integer followingNumber = followRepository.countByFollowingUser(user);
-            Integer followerNumber = followRepository.countByFollowedUser(user);
+            Integer followingNumber = followRepository.countByFollowingUser(profileOwner);
+            Integer followerNumber = followRepository.countByFollowedUser(profileOwner);
 
-            List<Thumbnail> thumbnails = user.getThumbnails();
+            List<Thumbnail> thumbnails = profileOwner.getThumbnails();
             List<ThumbnailDto> thumbnailList = thumbnails.stream()
                     .map(thumbnail -> new ThumbnailDto(
                             thumbnail.getThumbnailOrder().getOrder(),
                             thumbnail.getImageUrl())).collect(Collectors.toList());
 
-            return new ProfileResponse(user.getProfile().getNickname(), user.getProfile().getProfileImage(), user.getProfile().getProfileImage(), user.getProfile().getProfileMusic(),
-                    user.getProfile().getProfileMusicUrl(), followingNumber, followerNumber, isMyProfile(user, getProfileRequest.nickname()), thumbnailList);
+            return new ProfileResponse(profileOwner.getUserIdx(), profileOwner.getProfile().getNickname(), profileOwner.getProfile().getProfileImage(), profileOwner.getProfile().getProfileMessage(),
+                    profileOwner.getProfile().getProfileMusic(), profileOwner.getProfile().getProfileMusicUrl(), followingNumber, followerNumber, isMyProfile(profileOwner, user), thumbnailList);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
@@ -52,9 +53,8 @@ public class ProfileService {
     }
 
     // 유저가 해당 프로필의 주인인지 체크
-    private boolean isMyProfile(User user, String nickname) {
-        User profileUser = userRepository.findByProfile_Nickname(nickname);
-        return user.equals(profileUser);
+    private boolean isMyProfile(User profileOwner, User user) {
+        return profileOwner.equals(user);
     }
 
     // [유저] 프로필 수정 화면 조회
