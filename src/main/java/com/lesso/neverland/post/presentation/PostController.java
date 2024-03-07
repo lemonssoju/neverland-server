@@ -3,6 +3,7 @@ package com.lesso.neverland.post.presentation;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.post.application.PostService;
+import com.lesso.neverland.post.dto.MyLikeListResponse;
 import com.lesso.neverland.post.dto.PostEditViewResponse;
 import com.lesso.neverland.post.dto.MyPostListResponse;
 import com.lesso.neverland.post.dto.PostResponse;
@@ -65,6 +66,16 @@ public class PostController {
     public BaseResponse<MyPostListResponse> getMyPostList() {
         try {
             return new BaseResponse<>(postService.getMyPostList());
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // [유저] 졸아요한 글 목록 조회
+    @GetMapping("/myLikes")
+    public BaseResponse<MyLikeListResponse> getMyLikeList() {
+        try {
+            return new BaseResponse<>(postService.getMyLikeList());
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
