@@ -24,4 +24,10 @@ public class UserProfile {
     public UserProfile(String nickname) {
         this.nickname = nickname;
     }
+
+    public void modifyNickname(String nickname) { this.nickname = nickname; }
+    public void modifyProfileMessage(String profileMessage) { this.profileMessage = profileMessage; }
+    public void modifyProfileMusic(String profileMusic) { this.profileMusic = profileMusic; }
+    public void modifyProfileMusicUrl(String profileMusicUrl) { this.profileMusicUrl = profileMusicUrl; }
+    public void modifyProfileImage(String profileImage) { this.profileImage = profileImage; }
 }

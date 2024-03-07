@@ -3,15 +3,15 @@ package com.lesso.neverland.profile.presentation;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.profile.application.ProfileService;
+import com.lesso.neverland.profile.dto.EditProfileRequest;
 import com.lesso.neverland.profile.dto.GetProfileRequest;
-import com.lesso.neverland.profile.dto.ProfileModifyViewResponse;
+import com.lesso.neverland.profile.dto.ProfileEditViewResponse;
 import com.lesso.neverland.profile.dto.ProfileResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.profile;
 
 @RestController
@@ -33,12 +33,22 @@ public class ProfileController {
 
     // [유저] 프로필 수정 화면 조회
     @GetMapping("/editView")
-    public BaseResponse<ProfileModifyViewResponse> getProfileModifyView() {
+    public BaseResponse<ProfileEditViewResponse> getProfileEditView() {
         try {
-            return new BaseResponse<>(profileService.getProfileModifyView());
+            return new BaseResponse<>(profileService.getProfileEditView());
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
     }
 
+    // [유저] 프로필 수정
+    @PatchMapping("/edit")
+    public BaseResponse<String> editProfile(@RequestPart MultipartFile image, @RequestPart EditProfileRequest editProfileRequest) {
+        try {
+            profileService.editProfile(image, editProfileRequest);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }

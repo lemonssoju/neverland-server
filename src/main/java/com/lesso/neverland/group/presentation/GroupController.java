@@ -50,9 +50,9 @@ public class GroupController {
 
     // [관리자] 그룹 수정
     @PatchMapping("/{groupIdx}")
-    public BaseResponse<String> modifyGroup(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart ModifyGroupRequest modifyGroupRequest) {
+    public BaseResponse<String> editGroup(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart EditGroupRequest editGroupRequest) {
         try {
-            groupService.modifyGroup(groupIdx, image, modifyGroupRequest);
+            groupService.editGroup(groupIdx, image, editGroupRequest);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
@@ -86,6 +86,17 @@ public class GroupController {
     public BaseResponse<String> createGroup(@RequestPart MultipartFile image, @RequestPart CreateGroupRequest createGroupRequest) {
         try {
             groupService.createGroup(image, createGroupRequest);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 그룹 피드 등록
+    @PostMapping("/{groupIdx}")
+    public BaseResponse<String> createGroupPost(@PathVariable("groupIdx") Long groupIdx, @RequestPart MultipartFile image, @RequestPart CreateGroupPostRequest createGroupPostRequest) {
+        try {
+            groupService.createGroupPost(groupIdx, image, createGroupPostRequest);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
