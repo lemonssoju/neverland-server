@@ -3,6 +3,8 @@ package com.lesso.neverland.guestMemo.presentation;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.guestMemo.application.GuestMemoService;
+import com.lesso.neverland.guestMemo.dto.GetGuestMemoListRequest;
+import com.lesso.neverland.guestMemo.dto.GuestMemoListResponse;
 import com.lesso.neverland.guestMemo.dto.PostGuestMemoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,16 @@ public class GuestMemoController {
         try {
             guestMemoService.postGuestMemo(postGuestMemoRequest);
             return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 방명록 목록 조회
+    @GetMapping("")
+    public BaseResponse<GuestMemoListResponse> getGuestMemoList(@RequestBody GetGuestMemoListRequest getGuestMemoListRequest) {
+        try {
+            return new BaseResponse<>(guestMemoService.getGuestMemoList(getGuestMemoListRequest));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
