@@ -58,10 +58,10 @@ public class ProfileService {
     }
 
     // [유저] 프로필 수정 화면 조회
-    public ProfileModifyViewResponse getProfileModifyView() throws BaseException {
+    public ProfileEditViewResponse getProfileEditView() throws BaseException {
         try {
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            return new ProfileModifyViewResponse(user.getProfile().getProfileImage(), user.getProfile().getNickname(), user.getProfile().getProfileMessage(),
+            return new ProfileEditViewResponse(user.getProfile().getProfileImage(), user.getProfile().getNickname(), user.getProfile().getProfileMessage(),
                     user.getProfile().getProfileMusic(), user.getProfile().getProfileMusicUrl());
         } catch (BaseException e) {
             throw e;

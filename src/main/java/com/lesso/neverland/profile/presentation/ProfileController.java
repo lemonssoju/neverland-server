@@ -5,7 +5,7 @@ import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.profile.application.ProfileService;
 import com.lesso.neverland.profile.dto.EditProfileRequest;
 import com.lesso.neverland.profile.dto.GetProfileRequest;
-import com.lesso.neverland.profile.dto.ProfileModifyViewResponse;
+import com.lesso.neverland.profile.dto.ProfileEditViewResponse;
 import com.lesso.neverland.profile.dto.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -33,9 +33,9 @@ public class ProfileController {
 
     // [유저] 프로필 수정 화면 조회
     @GetMapping("/editView")
-    public BaseResponse<ProfileModifyViewResponse> getProfileModifyView() {
+    public BaseResponse<ProfileEditViewResponse> getProfileEditView() {
         try {
-            return new BaseResponse<>(profileService.getProfileModifyView());
+            return new BaseResponse<>(profileService.getProfileEditView());
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
