@@ -5,6 +5,7 @@ import com.lesso.neverland.common.enums.ThumbnailOrder;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -33,5 +34,12 @@ public class Thumbnail extends BaseEntity {
     public void setUser(User user) {
         this.user = user;
         user.getThumbnails().add(this);
+    }
+
+    @Builder
+    public Thumbnail(User user, ThumbnailOrder order, String imageUrl) {
+        this.user = user;
+        this.thumbnailOrder = order;
+        this.imageUrl = imageUrl;
     }
 }

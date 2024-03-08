@@ -2,6 +2,8 @@ package com.lesso.neverland.common.enums;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+
 @Getter
 public enum ThumbnailOrder {
     LEFT_TOP(1),
@@ -13,5 +15,13 @@ public enum ThumbnailOrder {
 
     ThumbnailOrder(Integer order) {
         this.order = order;
+    }
+
+    // order 값으로 label 찾기
+    public static ThumbnailOrder valueOfOrder(Integer order) {
+        return Arrays.stream(values())
+                .filter(thumbnailOrder -> thumbnailOrder.order.equals(order))
+                .findAny()
+                .orElse(null);
     }
 }

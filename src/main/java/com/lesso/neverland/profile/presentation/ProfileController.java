@@ -3,10 +3,7 @@ package com.lesso.neverland.profile.presentation;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.profile.application.ProfileService;
-import com.lesso.neverland.profile.dto.EditProfileRequest;
-import com.lesso.neverland.profile.dto.GetProfileRequest;
-import com.lesso.neverland.profile.dto.ProfileEditViewResponse;
-import com.lesso.neverland.profile.dto.ProfileResponse;
+import com.lesso.neverland.profile.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +43,17 @@ public class ProfileController {
     public BaseResponse<String> editProfile(@RequestPart MultipartFile image, @RequestPart EditProfileRequest editProfileRequest) {
         try {
             profileService.editProfile(image, editProfileRequest);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 대표 사진(Thumbnail) 등록
+    @PostMapping("/thumbnail")
+    public BaseResponse<String> postThumbnail(@RequestPart MultipartFile image, @RequestPart PostThumbnailRequest postThumbnailRequest) {
+        try {
+            profileService.postThumbnail(image, postThumbnailRequest);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
