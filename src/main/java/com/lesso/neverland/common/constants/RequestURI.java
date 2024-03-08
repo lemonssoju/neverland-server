@@ -7,4 +7,5 @@ public class RequestURI {
     public final static String comment = "/comments";
     public final static String profile = "/profiles";
     public final static String memo = "/profiles/memos";
+    public final static String follow = "/follows";
 }
