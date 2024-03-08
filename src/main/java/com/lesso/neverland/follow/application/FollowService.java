@@ -4,6 +4,8 @@ import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.follow.dto.FollowDto;
 import com.lesso.neverland.follow.dto.FollowListResponse;
 import com.lesso.neverland.follow.repository.FollowRepository;
+import com.lesso.neverland.profile.dto.MemberInviteDto;
+import com.lesso.neverland.profile.dto.MemberInviteListResponse;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
@@ -12,8 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.lesso.neverland.common.BaseResponseStatus.DATABASE_ERROR;
-import static com.lesso.neverland.common.BaseResponseStatus.INVALID_USER_IDX;
+import static com.lesso.neverland.common.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service
@@ -38,6 +39,24 @@ public class FollowService {
                             follow.getFollowingUser().getProfile().getNickname(),
                             follow.getFollowingUser().getProfile().getProfileImage())).toList();
             return new FollowListResponse(followingList, followedList);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 맞팔로우 목록 조회
+    public MemberInviteListResponse getMemberInviteList() throws BaseException {
+        try {
+            User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+            List<MemberInviteDto> memberInviteList = followRepository.findByFollowingUserAndStatusEquals(writer, ACTIVE).stream()
+                    .filter(follow -> followRepository.findByFollowingUserAndFollowedUserAndStatusEquals(follow.getFollowedUser(), writer, ACTIVE).isPresent())
+                    .map(follow -> new MemberInviteDto(
+                            follow.getFollowedUser().getProfile().getNickname(),
+                            follow.getFollowedUser().getProfile().getProfileImage())).toList();
+            return new MemberInviteListResponse(memberInviteList);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
