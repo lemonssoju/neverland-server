@@ -1,10 +1,12 @@
 package com.lesso.neverland.profile.application;
 
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.enums.ThumbnailOrder;
 import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.follow.repository.FollowRepository;
 import com.lesso.neverland.profile.domain.Thumbnail;
 import com.lesso.neverland.profile.dto.*;
+import com.lesso.neverland.profile.repository.ThumbnailRepository;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
@@ -27,6 +29,7 @@ public class ProfileService {
     UserService userService;
     FollowRepository followRepository;
     ImageService imageService;
+    ThumbnailRepository thumbnailRepository;
 
     // 프로필 조회
     public ProfileResponse getProfile(GetProfileRequest getProfileRequest) throws BaseException {
@@ -94,6 +97,26 @@ public class ProfileService {
                 user.getProfile().modifyProfileImage(imagePath);
             }
             userRepository.save(user);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 대표 사진(Thumbnail) 등록
+    @Transactional(rollbackFor = Exception.class)
+    public void postThumbnail(MultipartFile image, PostThumbnailRequest postThumbnailRequest) throws BaseException {
+        try {
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+            // TODO: 동작 확인 필요
+            // upload image
+            String imagePath = imageService.uploadImage("thumbnail", image);
+
+            Thumbnail thumbnail = new Thumbnail(user, ThumbnailOrder.valueOfOrder(postThumbnailRequest.order()), imagePath);
+            thumbnailRepository.save(thumbnail);
+            thumbnail.setUser(user);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
