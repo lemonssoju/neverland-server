@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static com.lesso.neverland.common.BaseResponseStatus.*;
 import static com.lesso.neverland.common.BaseResponseStatus.DATABASE_ERROR;
+import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -104,17 +105,20 @@ public class ProfileService {
         }
     }
 
-    // 대표 사진(Thumbnail) 등록
+    // 대표 사진(Thumbnail) 등록 및 수정
     @Transactional(rollbackFor = Exception.class)
     public void postThumbnail(MultipartFile image, PostThumbnailRequest postThumbnailRequest) throws BaseException {
         try {
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
             // TODO: 동작 확인 필요
+            thumbnailRepository.findByUserAndThumbnailOrderAndStatusEquals(user, ThumbnailOrder.valueOfOrder(postThumbnailRequest.order()), ACTIVE)
+                    .ifPresent(originalThumbnail -> imageService.deleteImage(originalThumbnail.getImageUrl()));
+
             // upload image
             String imagePath = imageService.uploadImage("thumbnail", image);
-
             Thumbnail thumbnail = new Thumbnail(user, ThumbnailOrder.valueOfOrder(postThumbnailRequest.order()), imagePath);
+
             thumbnailRepository.save(thumbnail);
             thumbnail.setUser(user);
         } catch (BaseException e) {
