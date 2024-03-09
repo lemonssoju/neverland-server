@@ -49,7 +49,7 @@ public class ProfileController {
         }
     }
 
-    // 대표 사진(Thumbnail) 등록
+    // 대표 사진(Thumbnail) 등록 및 수정
     @PostMapping("/thumbnail")
     public BaseResponse<String> postThumbnail(@RequestPart MultipartFile image, @RequestPart PostThumbnailRequest postThumbnailRequest) {
         try {
