@@ -32,10 +32,12 @@ public class FollowService {
 
             List<FollowDto> followingList = followRepository.findByFollowingUserAndStatusEquals(user, ACTIVE).stream()
                     .map(follow -> new FollowDto(
+                            follow.getFollowedUser().getUserIdx(),
                             follow.getFollowedUser().getProfile().getNickname(),
                             follow.getFollowedUser().getProfile().getProfileImage())).toList();
             List<FollowDto> followedList = followRepository.findByFollowedUserAndStatusEquals(user, ACTIVE).stream()
                     .map(follow -> new FollowDto(
+                            follow.getFollowingUser().getUserIdx(),
                             follow.getFollowingUser().getProfile().getNickname(),
                             follow.getFollowingUser().getProfile().getProfileImage())).toList();
             return new FollowListResponse(followingList, followedList);

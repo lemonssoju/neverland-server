@@ -6,9 +6,7 @@ import com.lesso.neverland.follow.application.FollowService;
 import com.lesso.neverland.follow.dto.FollowListResponse;
 import com.lesso.neverland.profile.dto.MemberInviteListResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.lesso.neverland.common.constants.RequestURI.follow;
 
