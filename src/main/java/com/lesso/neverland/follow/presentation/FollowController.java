@@ -4,12 +4,12 @@ import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.follow.application.FollowService;
 import com.lesso.neverland.follow.dto.FollowListResponse;
+import com.lesso.neverland.follow.dto.FollowRequest;
 import com.lesso.neverland.profile.dto.MemberInviteListResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.follow;
 
 @RestController
@@ -34,6 +34,17 @@ public class FollowController {
     public BaseResponse<MemberInviteListResponse> getMemberInviteList() {
         try {
             return new BaseResponse<>(followService.getMemberInviteList());
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 팔로우/취소
+    @PostMapping("")
+    public BaseResponse<String> follow(@RequestBody FollowRequest followRequest) {
+        try {
+            followService.follow(followRequest);
+            return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
