@@ -48,6 +48,16 @@ public class GroupController {
         }
     }
 
+    // [관리자] 그룹 수정 화면 조회
+    @GetMapping("/{groupIdx}/editView")
+    public BaseResponse<GroupEditViewResponse> getGroupEditView(@PathVariable Long groupIdx) {
+        try {
+            return new BaseResponse<>(groupService.getGroupEditView(groupIdx));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
     // [관리자] 그룹 수정
     @PatchMapping("/{groupIdx}")
     public BaseResponse<String> editGroup(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart EditGroupRequest editGroupRequest) {
