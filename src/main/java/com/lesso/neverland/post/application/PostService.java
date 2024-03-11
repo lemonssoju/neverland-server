@@ -15,7 +15,6 @@ import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -151,7 +150,7 @@ public class PostService {
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
             List<Post> myPosts = postRepository.findByUserAndStatusEquals(user, ACTIVE);
-            List<MyPostDto> myPostDtoList = getMyPostDtoList(myPosts);
+            List<MyPostDto> myPostDtoList = convertToMyPostDtoList(myPosts);
             return new MyPostListResponse(myPostDtoList);
         } catch (BaseException e) {
             throw e;
@@ -166,7 +165,7 @@ public class PostService {
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
             List<Post> myLikes = user.getPostLikes().stream().map(PostLike::getPost).toList();
-            List<MyPostDto> myLikeDtoList = getMyPostDtoList(myLikes);
+            List<MyPostDto> myLikeDtoList = convertToMyPostDtoList(myLikes);
             return new MyLikeListResponse(myLikeDtoList);
         } catch (BaseException e) {
             throw e;
@@ -176,8 +175,7 @@ public class PostService {
     }
 
     // MyPostDto로 가공
-    @NotNull
-    private static List<MyPostDto> getMyPostDtoList(List<Post> postList) {
+    private List<MyPostDto> convertToMyPostDtoList(List<Post> postList) {
         return postList.stream()
                 .map(post -> new MyPostDto(
                         post.getPostImage(),
