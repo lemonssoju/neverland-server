@@ -30,7 +30,7 @@ public class PostController {
     }
 
     // [작성자] 피드 수정 화면 조회
-    @PatchMapping("/{postIdx}/editView")
+    @GetMapping("/{postIdx}/editView")
     public BaseResponse<PostEditViewResponse> getPostEditView(@PathVariable Long postIdx) {
         try {
             return new BaseResponse<>(postService.getPostEditView(postIdx));
