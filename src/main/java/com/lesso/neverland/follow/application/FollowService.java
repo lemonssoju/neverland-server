@@ -2,9 +2,7 @@ package com.lesso.neverland.follow.application;
 
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.follow.domain.Follow;
-import com.lesso.neverland.follow.dto.FollowDto;
-import com.lesso.neverland.follow.dto.FollowListResponse;
-import com.lesso.neverland.follow.dto.FollowRequest;
+import com.lesso.neverland.follow.dto.*;
 import com.lesso.neverland.follow.repository.FollowRepository;
 
 import com.lesso.neverland.profile.dto.MemberInviteDto;
@@ -29,27 +27,48 @@ public class FollowService {
     UserService userService;
     FollowRepository followRepository;
 
-    // 팔로우 목록 조회(following, follower)
-    public FollowListResponse getFollowList() throws BaseException {
+    // 팔로잉 목록 조회
+    public FollowingListResponse getFollowingList(String searchWord) throws BaseException {
         try {
             User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
-            List<FollowDto> followingList = followRepository.findByFollowingUserAndStatusEquals(user, ACTIVE).stream()
-                    .map(follow -> new FollowDto(
-                            follow.getFollowedUser().getUserIdx(),
-                            follow.getFollowedUser().getProfile().getNickname(),
-                            follow.getFollowedUser().getProfile().getProfileImage())).toList();
-            List<FollowDto> followedList = followRepository.findByFollowedUserAndStatusEquals(user, ACTIVE).stream()
-                    .map(follow -> new FollowDto(
-                            follow.getFollowingUser().getUserIdx(),
-                            follow.getFollowingUser().getProfile().getNickname(),
-                            follow.getFollowingUser().getProfile().getProfileImage())).toList();
-            return new FollowListResponse(followingList, followedList);
+            List<FollowDto> followingList = Optional.ofNullable(searchWord)
+                    .map(search -> followRepository.findByFollowingUserAndFollowedNickname(user, search))
+                    .orElseGet(() -> followRepository.findByFollowingUserAndStatusEquals(user, ACTIVE))
+                    .stream()
+                    .map(this::convertToFollowDto).toList();
+            return new FollowingListResponse(followingList);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    // 팔로워 목록 조회
+    public FollowerListResponse getFollowerList(String searchWord) throws BaseException {
+        try {
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+            List<FollowDto> followerList = Optional.ofNullable(searchWord)
+                    .map(search -> followRepository.findByFollowedUserAndFollowingNickname(user, search))
+                    .orElseGet(() -> followRepository.findByFollowedUserAndStatusEquals(user, ACTIVE))
+                    .stream()
+                    .map(this::convertToFollowDto).toList();
+            return new FollowerListResponse(followerList);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // FollowDto로 가공
+    private FollowDto convertToFollowDto(Follow follow) {
+        return new FollowDto(
+                follow.getFollowedUser().getUserIdx(),
+                follow.getFollowedUser().getProfile().getNickname(),
+                follow.getFollowedUser().getProfile().getProfileImage());
     }
 
     // 맞팔로우 목록 조회
