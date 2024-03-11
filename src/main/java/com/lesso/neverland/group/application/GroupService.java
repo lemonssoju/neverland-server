@@ -126,6 +126,21 @@ public class GroupService {
         }
     }
 
+    // [관리자] 그룹 수정 화면 조회
+    public GroupEditViewResponse getGroupEditView(Long groupIdx) throws BaseException {
+        try {
+            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            validateAdmin(user, group);
+
+            return new GroupEditViewResponse(group.getName(), group.getSubName(), group.getTeamImage());
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     // [관리자] 그룹 수정
     @Transactional(rollbackFor = Exception.class)
     public void editGroup(Long groupIdx, MultipartFile image, EditGroupRequest editGroupRequest) throws BaseException {
