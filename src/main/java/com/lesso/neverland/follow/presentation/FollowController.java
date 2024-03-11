@@ -3,8 +3,9 @@ package com.lesso.neverland.follow.presentation;
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.follow.application.FollowService;
-import com.lesso.neverland.follow.dto.FollowListResponse;
 import com.lesso.neverland.follow.dto.FollowRequest;
+import com.lesso.neverland.follow.dto.FollowerListResponse;
+import com.lesso.neverland.follow.dto.FollowingListResponse;
 import com.lesso.neverland.profile.dto.MemberInviteListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +20,21 @@ public class FollowController {
 
     private final FollowService followService;
 
-    // 팔로우 목록 조회(following, follower)
-    @GetMapping("/followList")
-    public BaseResponse<FollowListResponse> getFollowList() {
+    // 팔로잉 목록 조회
+    @GetMapping("/followingList")
+    public BaseResponse<FollowingListResponse> getFollowingList(@RequestParam String searchWord) {
         try {
-            return new BaseResponse<>(followService.getFollowList());
+            return new BaseResponse<>(followService.getFollowingList(searchWord));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 팔로워 목록 조회
+    @GetMapping("/followerList")
+    public BaseResponse<FollowerListResponse> getFollowerList(@RequestParam String searchWord) {
+        try {
+            return new BaseResponse<>(followService.getFollowerList(searchWord));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
