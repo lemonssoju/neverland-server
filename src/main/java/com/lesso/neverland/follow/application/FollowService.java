@@ -5,16 +5,20 @@ import com.lesso.neverland.follow.domain.Follow;
 import com.lesso.neverland.follow.dto.*;
 import com.lesso.neverland.follow.repository.FollowRepository;
 
+import com.lesso.neverland.group.domain.Team;
+import com.lesso.neverland.group.repository.GroupRepository;
 import com.lesso.neverland.profile.dto.MemberInviteDto;
 import com.lesso.neverland.profile.dto.MemberInviteListResponse;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
+import com.lesso.neverland.user.repository.UserTeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static com.lesso.neverland.common.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
@@ -26,6 +30,8 @@ public class FollowService {
     UserRepository userRepository;
     UserService userService;
     FollowRepository followRepository;
+    GroupRepository groupRepository;
+    UserTeamRepository userTeamRepository;
 
     // 팔로잉 목록 조회
     public FollowingListResponse getFollowingList(String searchWord) throws BaseException {
@@ -71,22 +77,39 @@ public class FollowService {
                 follow.getFollowedUser().getProfile().getProfileImage());
     }
 
-    // 맞팔로우 목록 조회
+    // [그룹 생성] 맞팔로우 목록 조회
     public MemberInviteListResponse getMemberInviteList() throws BaseException {
         try {
             User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-
-            List<MemberInviteDto> memberInviteList = followRepository.findByFollowingUserAndStatusEquals(writer, ACTIVE).stream()
-                    .filter(follow -> followRepository.findByFollowingUserAndFollowedUserAndStatusEquals(follow.getFollowedUser(), writer, ACTIVE).isPresent())
-                    .map(follow -> new MemberInviteDto(
-                            follow.getFollowedUser().getProfile().getNickname(),
-                            follow.getFollowedUser().getProfile().getProfileImage())).toList();
-            return new MemberInviteListResponse(memberInviteList);
+            return new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> false));
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    // [그룹 수정] 맞팔로우 목록 조회
+    public MemberInviteListResponse getMemberInviteListEditView(Long groupIdx) throws BaseException {
+        try {
+            User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+
+            return new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> userTeamRepository.existsByUserAndTeam(follow.getFollowedUser(), group)));
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    private List<MemberInviteDto> getMemberInviteDtoList(User writer, Function<Follow, Boolean> isMemberFunction) {
+        return followRepository.findByFollowingUserAndStatusEquals(writer, ACTIVE).stream()
+                .filter(follow -> followRepository.findByFollowingUserAndFollowedUserAndStatusEquals(follow.getFollowedUser(), writer, ACTIVE).isPresent())
+                .map(follow -> new MemberInviteDto(
+                        follow.getFollowedUser().getProfile().getNickname(),
+                        follow.getFollowedUser().getProfile().getProfileImage(),
+                        isMemberFunction.apply(follow))).toList();
     }
 
     // 팔로우/취소

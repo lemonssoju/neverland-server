@@ -42,9 +42,13 @@ public class FollowController {
 
     // 맞팔로우 목록 조회
     @GetMapping("/inviteList")
-    public BaseResponse<MemberInviteListResponse> getMemberInviteList() {
+    public BaseResponse<MemberInviteListResponse> getMemberInviteList(@RequestParam(value = "groupIdx", required = false) Long groupIdx) {
         try {
-            return new BaseResponse<>(followService.getMemberInviteList());
+            if (groupIdx == null) { // 그룹 생성
+                return new BaseResponse<>(followService.getMemberInviteList());
+            } else { // 그룹 수정
+                return new BaseResponse<>(followService.getMemberInviteListEditView(groupIdx));
+            }
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
