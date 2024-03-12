@@ -22,7 +22,7 @@ public class FollowController {
 
     // 팔로잉 목록 조회
     @GetMapping("/followingList")
-    public BaseResponse<FollowingListResponse> getFollowingList(@RequestParam String searchWord) {
+    public BaseResponse<FollowingListResponse> getFollowingList(@RequestParam(required = false) String searchWord) {
         try {
             return new BaseResponse<>(followService.getFollowingList(searchWord));
         } catch (BaseException e) {
@@ -32,7 +32,7 @@ public class FollowController {
 
     // 팔로워 목록 조회
     @GetMapping("/followerList")
-    public BaseResponse<FollowerListResponse> getFollowerList(@RequestParam String searchWord) {
+    public BaseResponse<FollowerListResponse> getFollowerList(@RequestParam(required = false) String searchWord) {
         try {
             return new BaseResponse<>(followService.getFollowerList(searchWord));
         } catch (BaseException e) {
@@ -42,12 +42,12 @@ public class FollowController {
 
     // 맞팔로우 목록 조회
     @GetMapping("/inviteList")
-    public BaseResponse<MemberInviteListResponse> getMemberInviteList(@RequestParam(value = "groupIdx", required = false) Long groupIdx) {
+    public BaseResponse<MemberInviteListResponse> getMemberInviteList(@RequestParam(value = "groupIdx", required = false) Long groupIdx, @RequestParam(required = false) String searchWord) {
         try {
             if (groupIdx == null) { // 그룹 생성
-                return new BaseResponse<>(followService.getMemberInviteList());
+                return new BaseResponse<>(followService.getMemberInviteList(searchWord));
             } else { // 그룹 수정
-                return new BaseResponse<>(followService.getMemberInviteListEditView(groupIdx));
+                return new BaseResponse<>(followService.getMemberInviteListEditView(groupIdx, searchWord));
             }
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
