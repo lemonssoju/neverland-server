@@ -78,10 +78,10 @@ public class FollowService {
     }
 
     // [그룹 생성] 맞팔로우 목록 조회
-    public MemberInviteListResponse getMemberInviteList() throws BaseException {
+    public MemberInviteListResponse getMemberInviteList(String searchWord) throws BaseException {
         try {
             User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            return new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> false));
+            return new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> false, searchWord));
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
@@ -90,12 +90,12 @@ public class FollowService {
     }
 
     // [그룹 수정] 맞팔로우 목록 조회
-    public MemberInviteListResponse getMemberInviteListEditView(Long groupIdx) throws BaseException {
+    public MemberInviteListResponse getMemberInviteListEditView(Long groupIdx, String searchWord) throws BaseException {
         try {
             User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
             Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
 
-            return new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> userTeamRepository.existsByUserAndTeam(follow.getFollowedUser(), group)));
+            return new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> userTeamRepository.existsByUserAndTeam(follow.getFollowedUser(), group), searchWord));
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
@@ -103,8 +103,12 @@ public class FollowService {
         }
     }
 
-    private List<MemberInviteDto> getMemberInviteDtoList(User writer, Function<Follow, Boolean> isMemberFunction) {
-        return followRepository.findByFollowingUserAndStatusEquals(writer, ACTIVE).stream()
+    private List<MemberInviteDto> getMemberInviteDtoList(User writer, Function<Follow, Boolean> isMemberFunction, String searchWord) {
+        List<Follow> follows = Optional.ofNullable(searchWord)
+                .map(search -> followRepository.findByFollowingUserAndFollowedNickname(writer, search))
+                .orElseGet(() -> followRepository.findByFollowingUserAndStatusEquals(writer, ACTIVE));
+
+        return follows.stream()
                 .filter(follow -> followRepository.findByFollowingUserAndFollowedUserAndStatusEquals(follow.getFollowedUser(), writer, ACTIVE).isPresent())
                 .map(follow -> new MemberInviteDto(
                         follow.getFollowedUser().getProfile().getNickname(),
