@@ -75,7 +75,7 @@ public class PostService {
                     .collect(Collectors.toList());
 
             return new PostResponse(post.getTitle(), post.getSubtitle(), post.getContent(), post.getCreatedDate(),
-                    post.getUser().getProfile().getNickname(), post.getBackgroundMusic(), post.getBackgroundMusicUrl(),
+                    post.getUser().getUserIdx(), post.getUser().getProfile().getNickname(), post.getBackgroundMusic(), post.getBackgroundMusicUrl(),
                     post.getPostImage(), isLike, posts, comments);
         } catch (BaseException e) {
             throw e;

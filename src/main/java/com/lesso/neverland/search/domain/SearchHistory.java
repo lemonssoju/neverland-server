@@ -1,4 +1,4 @@
-package com.lesso.neverland.history.domain;
+package com.lesso.neverland.search.domain;
 
 import com.lesso.neverland.common.BaseEntity;
 import com.lesso.neverland.user.domain.User;
