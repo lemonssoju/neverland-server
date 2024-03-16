@@ -58,16 +58,22 @@ public class SearchService {
     // tag 검색
     public PostSearchResponse searchTag(String tag) throws BaseException {
         try {
+            User currentUser = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
             Contents tagName = Contents.getEnumByName(tag);
             List<PostTag> postTags = postTagRepository.findByTagName(tagName);
 
             List<Post> tagSearchList = postTags.stream().map(PostTag::getPost).distinct().toList(); // 중복 post 제거
             if (tagSearchList.isEmpty()) {
+                saveSearchHistory(currentUser, tag);
                 return new PostSearchResponse(Collections.emptyList());
             } else {
                 List<PostSearchDto> searchResultList = getPostSearchDtoList(tagSearchList);
+                saveSearchHistory(currentUser, tag);
                 return new PostSearchResponse(searchResultList);
             }
+        } catch (BaseException e) {
+            throw e;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
