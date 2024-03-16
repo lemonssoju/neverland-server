@@ -29,4 +29,9 @@ public class SearchHistory extends BaseEntity {
         this.user = user;
         user.getSearchHistories().add(this);
     }
+
+    public SearchHistory(User user, String searchWord) {
+        this.user = user;
+        this.searchWord = searchWord;
+    }
 }
