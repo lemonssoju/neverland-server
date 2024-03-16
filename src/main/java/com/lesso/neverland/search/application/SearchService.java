@@ -6,10 +6,13 @@ import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostTag;
 import com.lesso.neverland.post.repository.PostRepository;
 import com.lesso.neverland.post.repository.PostTagRepository;
+import com.lesso.neverland.search.domain.SearchHistory;
 import com.lesso.neverland.search.dto.PostSearchDto;
 import com.lesso.neverland.search.dto.PostSearchResponse;
 import com.lesso.neverland.search.dto.UserSearchDto;
 import com.lesso.neverland.search.dto.UserSearchResponse;
+import com.lesso.neverland.search.repository.SearchHistoryRepository;
+import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,18 +30,26 @@ public class SearchService {
     UserRepository userRepository;
     PostRepository postRepository;
     PostTagRepository postTagRepository;
+    SearchHistoryRepository searchHistoryRepository;
+    UserService userService;
 
     // user 검색
     public UserSearchResponse searchUser(String nickname) throws BaseException {
         try {
+            User currentUser = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
             List<User> userList = userRepository.searchUserByNickname(nickname);
             if (userList == null || userList.isEmpty()) {
+                saveSearchHistory(currentUser, nickname);
                 return new UserSearchResponse(Collections.emptyList());
             } else {
                 List<UserSearchDto> searchResultList = userList.stream()
                         .map(user -> new UserSearchDto(user.getUserIdx(), user.getProfile().getNickname(), user.getProfile().getProfileImage())).toList();
+                saveSearchHistory(currentUser, nickname);
                 return new UserSearchResponse(searchResultList);
             }
+        } catch (BaseException e) {
+            throw e;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -81,5 +92,11 @@ public class SearchService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    private void saveSearchHistory(User user, String searchWord) {
+        SearchHistory searchHistory = new SearchHistory(user, searchWord);
+        searchHistory.setUser(user);
+        searchHistoryRepository.save(searchHistory);
     }
 }
