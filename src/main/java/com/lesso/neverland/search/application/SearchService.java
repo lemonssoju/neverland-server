@@ -79,25 +79,31 @@ public class SearchService {
         }
     }
 
+    // post(title, content) 검색
+    public PostSearchResponse searchPost(String keyword) throws BaseException {
+        try {
+            User currentUser = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+            List<Post> titleAndContentSearchList = postRepository.searchTitleAndContentByKeyword(keyword);
+            if (titleAndContentSearchList == null || titleAndContentSearchList.isEmpty()) {
+                saveSearchHistory(currentUser, keyword);
+                return new PostSearchResponse(Collections.emptyList());
+            } else {
+                List<PostSearchDto> searchResultList = getPostSearchDtoList(titleAndContentSearchList);
+                saveSearchHistory(currentUser, keyword);
+                return new PostSearchResponse(searchResultList);
+            }
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
     private List<PostSearchDto> getPostSearchDtoList(List<Post> tagSearchList) {
         return tagSearchList.stream()
                 .map(post -> new PostSearchDto(post.getPostIdx(), post.getContent(), post.getTitle(), post.getPostImage(),
                         post.getPostTags().stream().map(postTag -> postTag.getTagName().getName()).toList())).toList();
-    }
-
-    // post(title, content) 검색
-    public PostSearchResponse searchPost(String keyword) throws BaseException {
-        try {
-            List<Post> titleAndContentSearchList = postRepository.searchTitleAndContentByKeyword(keyword);
-            if (titleAndContentSearchList == null || titleAndContentSearchList.isEmpty()) {
-                return new PostSearchResponse(Collections.emptyList());
-            } else {
-                List<PostSearchDto> searchResultList = getPostSearchDtoList(titleAndContentSearchList);
-                return new PostSearchResponse(searchResultList);
-            }
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
     }
 
     private void saveSearchHistory(User user, String searchWord) {
