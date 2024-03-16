@@ -2,15 +2,14 @@ package com.lesso.neverland.search.application;
 
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.enums.Contents;
+import com.lesso.neverland.interest.domain.Interest;
+import com.lesso.neverland.interest.repository.InterestRepository;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostTag;
 import com.lesso.neverland.post.repository.PostRepository;
 import com.lesso.neverland.post.repository.PostTagRepository;
 import com.lesso.neverland.search.domain.SearchHistory;
-import com.lesso.neverland.search.dto.PostSearchDto;
-import com.lesso.neverland.search.dto.PostSearchResponse;
-import com.lesso.neverland.search.dto.UserSearchDto;
-import com.lesso.neverland.search.dto.UserSearchResponse;
+import com.lesso.neverland.search.dto.*;
 import com.lesso.neverland.search.repository.SearchHistoryRepository;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
@@ -32,6 +31,7 @@ public class SearchService {
     PostTagRepository postTagRepository;
     SearchHistoryRepository searchHistoryRepository;
     UserService userService;
+    InterestRepository interestRepository;
 
     // user 검색
     public UserSearchResponse searchUser(String nickname) throws BaseException {
@@ -110,5 +110,23 @@ public class SearchService {
         SearchHistory searchHistory = new SearchHistory(user, searchWord);
         searchHistory.setUser(user);
         searchHistoryRepository.save(searchHistory);
+    }
+
+    // 검색 화면 조회
+    public SearchViewResponse getSearchView() throws BaseException {
+        try {
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+            List<Interest> userInterests = interestRepository.findByUser(user);
+            List<RecommendedSearchDto> recommendedSearchList = userInterests.stream()
+                    .map(interest -> new RecommendedSearchDto(interest.getPreference().name())).toList();
+            List<RecentSearchDto> recentSearchList = searchHistoryRepository.findByUserOrderByCreatedDateDesc(user).stream()
+                    .map(history -> new RecentSearchDto(history.getSearchHistoryIdx(), history.getSearchWord())).toList();
+            return new SearchViewResponse(recommendedSearchList, recentSearchList);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 }

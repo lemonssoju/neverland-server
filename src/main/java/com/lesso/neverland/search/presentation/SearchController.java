@@ -4,6 +4,7 @@ import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.search.application.SearchService;
 import com.lesso.neverland.search.dto.SearchResponse;
+import com.lesso.neverland.search.dto.SearchViewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ public class SearchController {
 
     // 검색(제목, 내용, 태그)
     // 닉네임으로 유저 검색(맨 앞에 @ 붙이기)
+    // 태그 검색(# 붙이기)
     @PostMapping("")
     public BaseResponse<SearchResponse<?>> searchKeyword(@RequestParam String keyword) {
         try {
@@ -30,6 +32,16 @@ public class SearchController {
             } else { // post(title, content) 검색
                 return new BaseResponse<>(searchService.searchPost(keyword));
             }
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 검색 화면 조회
+    @GetMapping("/history")
+    public BaseResponse<SearchViewResponse> getSearchView() {
+        try {
+            return new BaseResponse<>(searchService.getSearchView());
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
