@@ -8,6 +8,7 @@ import com.lesso.neverland.search.dto.SearchViewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.search;
 
 @RestController
@@ -42,6 +43,17 @@ public class SearchController {
     public BaseResponse<SearchViewResponse> getSearchView() {
         try {
             return new BaseResponse<>(searchService.getSearchView());
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    // 최근 검색어 개별 삭제
+    @PatchMapping("/history/{historyIdx}/delete")
+    public BaseResponse<String> deleteRecentSearch(@PathVariable Long historyIdx) {
+        try {
+            searchService.deleteRecentSearch(historyIdx);
+            return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }

@@ -129,4 +129,20 @@ public class SearchService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    // 최근 검색어 개별 삭제
+    public void deleteRecentSearch(Long historyIdx) throws BaseException {
+        try {
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            SearchHistory history = searchHistoryRepository.findById(historyIdx).orElseThrow(() -> new BaseException(INVALID_HISTORY_IDX));
+            if (!history.getUser().equals(user)) throw new BaseException(NO_HISTORY_OWNER);
+
+            history.delete();
+            searchHistoryRepository.save(history);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

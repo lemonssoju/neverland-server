@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
+import static com.lesso.neverland.common.constants.Constants.INACTIVE;
+
 @Entity
 @Getter
 @DynamicInsert
@@ -33,5 +35,9 @@ public class SearchHistory extends BaseEntity {
     public SearchHistory(User user, String searchWord) {
         this.user = user;
         this.searchWord = searchWord;
+    }
+
+    public void delete() {
+        this.setStatus(INACTIVE);
     }
 }

@@ -61,6 +61,10 @@ public enum BaseResponseStatus {
     // guest memo(2600-2699)
     TOO_LONG_CONTENT(false, 2600, "내용은 50자 이하여야 합니다."),
 
+    // history(2700-2799)
+    INVALID_HISTORY_IDX(false, 2700, "잘못된 history idx 입니다."),
+    NO_HISTORY_OWNER(false, 2701, "해당 user의 search history가 아닙니다."),
+
 
     /**
      * 3000: Response 오류
