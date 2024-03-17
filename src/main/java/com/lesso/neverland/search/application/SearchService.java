@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -120,7 +121,7 @@ public class SearchService {
             List<Interest> userInterests = interestRepository.findByUser(user);
             List<RecommendedSearchDto> recommendedSearchList = userInterests.stream()
                     .map(interest -> new RecommendedSearchDto(interest.getPreference().name())).toList();
-            List<RecentSearchDto> recentSearchList = searchHistoryRepository.findByUserOrderByCreatedDateDesc(user).stream()
+            List<RecentSearchDto> recentSearchList = searchHistoryRepository.findByUserAndStatusEqualsOrderByCreatedDateDesc(user, ACTIVE).stream()
                     .map(history -> new RecentSearchDto(history.getSearchHistoryIdx(), history.getSearchWord())).toList();
             return new SearchViewResponse(recommendedSearchList, recentSearchList);
         } catch (BaseException e) {
@@ -139,6 +140,23 @@ public class SearchService {
 
             history.delete();
             searchHistoryRepository.save(history);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 최근 검색어 전체 삭제
+    public void deleteAllRecentSearch() throws BaseException {
+        try {
+            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            List<SearchHistory> historyList = searchHistoryRepository.findByUser(user);
+
+            for (SearchHistory history : historyList) {
+                history.delete();
+                searchHistoryRepository.save(history);
+            }
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {

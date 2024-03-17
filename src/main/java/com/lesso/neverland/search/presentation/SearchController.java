@@ -58,4 +58,15 @@ public class SearchController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    // 최근 검색어 전체 삭제
+    @PatchMapping("/history/deleteAll")
+    public BaseResponse<String> deleteAllRecentSearch() {
+        try {
+            searchService.deleteAllRecentSearch();
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }
