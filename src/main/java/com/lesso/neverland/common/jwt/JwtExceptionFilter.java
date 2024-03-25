@@ -47,7 +47,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 
         JSONObject responseJson = new JSONObject();
         responseJson.put("message", responseStatus.getMessage());
-        responseJson.put("code", responseStatus.getCode());
+        responseJson.put("status", responseStatus.getHttpStatus().value());
 
         response.getWriter().print(responseJson);
     }

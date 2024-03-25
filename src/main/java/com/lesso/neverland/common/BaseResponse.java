@@ -18,21 +18,17 @@ public class BaseResponse<T> {
 
     private final String message;
 
-    private final int code;
-
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T result;
 
     public BaseResponse(T result) {
         this.isSuccess = SUCCESS.isSuccess();
         this.message = SUCCESS.getMessage();
-        this.code = SUCCESS.getCode();
         this.result = result;
     }
 
     public BaseResponse(BaseResponseStatus status) {
         this.isSuccess = status.isSuccess();
         this.message = status.getMessage();
-        this.code = status.getCode();
     }
 }
