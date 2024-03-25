@@ -104,7 +104,7 @@ public class SearchService {
     private List<PostSearchDto> getPostSearchDtoList(List<Post> tagSearchList) {
         return tagSearchList.stream()
                 .map(post -> new PostSearchDto(post.getPostIdx(), post.getContent(), post.getTitle(), post.getPostImage(),
-                        post.getPostTags().stream().map(postTag -> postTag.getTagName().getName()).toList())).toList();
+                        post.getPostTags().stream().map(postTag -> postTag.getTagName().getContentsName()).toList())).toList();
     }
 
     private void saveSearchHistory(User user, String searchWord) {

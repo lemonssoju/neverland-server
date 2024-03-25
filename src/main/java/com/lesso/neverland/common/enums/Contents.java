@@ -23,13 +23,13 @@ public enum Contents {
     MUSIC("음악", null),
     ENTERTAINMENT("예능", null);
 
-    private final String name;
+    private final String contentsName;
     private final Contents parent;
     private final List<Contents> child;
 
     Contents(String name, Contents parent) {
         this.child = new ArrayList<>();
-        this.name = name;
+        this.contentsName = name;
         this.parent = parent;
         if(Objects.nonNull(parent)) {
             parent.child.add(this);
@@ -38,14 +38,14 @@ public enum Contents {
 
     public static Contents getEnumByName(String name) throws BaseException {
         return Arrays.stream(Contents.values())
-                .filter(contents -> contents.name().equalsIgnoreCase(name))
+                .filter(contents -> contents.getContentsName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElseThrow(() -> new BaseException(WRONG_CONTENTS_NAME));
     }
 
     public static Contents getPreference(Contents contents, String preference) throws BaseException {
         return Arrays.stream(Contents.values())
-                .filter(c -> c.parent == contents && c.name().equalsIgnoreCase(preference))
+                .filter(c -> c.parent == contents && c.getContentsName().equalsIgnoreCase(preference))
                 .findFirst()
                 .orElseThrow(() -> new BaseException(WRONG_PREFERENCE_NAME));
     }

@@ -60,7 +60,7 @@ public class PostService {
                             recommendedPost.getPostImage(),
                             recommendedPost.getTitle(),
                             recommendedPost.getPostTags().stream()
-                                    .map(postTag -> postTag.getTagName().getName())
+                                    .map(postTag -> postTag.getTagName().getContentsName())
                                     .collect(Collectors.toList()))).collect(Collectors.toList());
 
             // 댓글 조회
@@ -91,7 +91,7 @@ public class PostService {
             Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
             validateWriter(user, post);
 
-            return new PostEditViewResponse(post.getTitle(), post.getSubtitle(), post.getContentsType().getName(),
+            return new PostEditViewResponse(post.getTitle(), post.getSubtitle(), post.getContentsType().getContentsName(),
                     post.getBackgroundMusic(), post.getBackgroundMusicUrl(), post.getPostImage(), post.getContent());
         } catch (BaseException e) {
             throw e;
@@ -180,7 +180,7 @@ public class PostService {
                 .map(post -> new MyPostDto(
                         post.getPostImage(),
                         post.getTitle(),
-                        post.getPostTags().stream().map(postTag -> postTag.getTagName().getName()).toList(),
+                        post.getPostTags().stream().map(postTag -> postTag.getTagName().getContentsName()).toList(),
                         post.getCreatedDate())).toList();
     }
 
