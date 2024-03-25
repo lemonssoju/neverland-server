@@ -18,6 +18,6 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Query("SELECT f FROM Follow f WHERE f.followingUser = :followingUser AND f.followedUser.profile.nickname LIKE CONCAT('%', :nickname, '%') AND f.status = 'ACTIVE'")
     List<Follow> findByFollowingUserAndFollowedNickname(@Param("followingUser") User followingUser, @Param("nickname") String nickname);
 
-    @Query("SELECT f FROM Follow f WHERE f.followedUser = :followeduser AND f.followingUser.profile.nickname LIKE CONCAT('%', :nickname, '%') AND f.status = 'ACTIVE'")
+    @Query("SELECT f FROM Follow f WHERE f.followedUser = :followedUser AND f.followingUser.profile.nickname LIKE CONCAT('%', :nickname, '%') AND f.status = 'ACTIVE'")
     List<Follow> findByFollowedUserAndFollowingNickname(@Param("followedUser") User followedUser, @Param("nickname") String nickname);
 }
