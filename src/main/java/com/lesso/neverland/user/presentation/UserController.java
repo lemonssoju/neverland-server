@@ -1,6 +1,5 @@
 package com.lesso.neverland.user.presentation;
 
-import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.user.application.AuthService;
 import com.lesso.neverland.user.application.UserService;
@@ -22,85 +21,53 @@ public class UserController {
     // 회원가입
     @PostMapping(value = "/signup")
     public BaseResponse<JwtDto> signup(@RequestBody SignupRequest signupRequest) {
-        try {
-            return new BaseResponse<>(userService.signup(signupRequest));
-        } catch(BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(userService.signup(signupRequest));
     }
 
     // 로그인
     @PostMapping("/login")
     public BaseResponse<JwtDto> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            return new BaseResponse<>(userService.login(loginRequest));
-        } catch(BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(userService.login(loginRequest));
     }
 
     // 로그아웃
     @PatchMapping("/logout")
     public BaseResponse<String> logout() {
-        try{
-            userService.logout(authService.getUserIdx());
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
+        userService.logout(authService.getUserIdx());
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 회원 탈퇴
     @PatchMapping("/signout")
     public BaseResponse<String> signOut(@RequestBody SignoutRequest signoutRequest) {
-        try{
-            userService.signout(authService.getUserIdx(), signoutRequest);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
+        userService.signout(authService.getUserIdx(), signoutRequest);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // access token 재발급
     @PostMapping("/reissue-token")
     public BaseResponse<TokenResponse> reissueToken(@RequestBody ReissueTokenRequest reissueTokenRequest) {
-        try{
-            return new BaseResponse<>(userService.reissueAccessToken(reissueTokenRequest));
-        } catch (BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(userService.reissueAccessToken(reissueTokenRequest));
     }
 
     // 닉네임 중복 체크
     @PostMapping("/nickname")
     public BaseResponse<String> validateNickname(@RequestBody NicknameRequest nicknameRequest) {
-        try {
-            userService.validateNickname(nicknameRequest.nickname());
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
+        userService.validateNickname(nicknameRequest.nickname());
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 아이디 중복 체크
     @PostMapping("/loginId")
     public BaseResponse<String> validateLoginId(@RequestBody LoginIdRequest loginIdRequest) {
-        try {
-            userService.validateLoginId(loginIdRequest.loginId());
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
+        userService.validateLoginId(loginIdRequest.loginId());
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 개인 정보 수정
     @PatchMapping("/modify")
     public BaseResponse<String> modifyUser(@RequestBody ModifyUserRequest modifyUserRequest) {
-        try{
-            userService.modifyUser(authService.getUserIdx(), modifyUserRequest);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
+        userService.modifyUser(authService.getUserIdx(), modifyUserRequest);
+        return new BaseResponse<>(SUCCESS);
     }
 }
