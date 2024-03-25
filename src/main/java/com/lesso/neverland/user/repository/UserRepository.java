@@ -18,4 +18,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByLoginId(String loginId);
     @Query("SELECT u FROM User u WHERE u.profile.nickname LIKE CONCAT('%', :keyword, '%')")
     List<User> searchUserByNickname(@Param("keyword") String keyword);
+    Optional<User> findByUserIdx(Long userIdx);
 }

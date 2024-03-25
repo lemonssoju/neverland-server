@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static com.lesso.neverland.common.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
@@ -151,10 +153,18 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 회원만
+    // 회원 validation
     public Long getUserIdxWithValidation() throws BaseException {
         Long userIdx = authService.getUserIdx();
         if (userIdx == null) throw new BaseException(NULL_ACCESS_TOKEN);
         return userIdx;
+    }
+
+    public User getUserByUserIdx(Long userIdx) {
+        if(userIdx == null) return null;
+        else {
+            Optional<User> user = userRepository.findByUserIdx(userIdx);
+            return user.orElse(null);
+        }
     }
 }
