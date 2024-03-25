@@ -18,13 +18,20 @@ public enum BaseResponseStatus {
     INVALID_USER_IDX(false, 2000, "잘못된 user idx 입니다."),
     UNMATCHED_PASSWORD(false, 2001, "비밀번호가 일치하지 않습니다."),
     INVALID_PASSWORD(false, 2002, "형식이 잘못된 비밀번호입니다."),
-    INVALID_REFRESH_TOKEN(false, 2003, "잘못된 refresh token입니다."),
     NO_MATCH_USER(false, 2004, "일치하는 user가 없습니다."),
-    EXPIRED_REFRESH_TOKEN(false, 2005, "만료된 refresh token입니다."),
     DUPLICATED_NICKNAME(false, 2006, "중복된 닉네임입니다."),
     DUPLICATED_LOGIN_ID(false, 2007, "중복된 아이디입니다."),
-    NULL_ACCESS_TOKEN(false, 2008, "access token이 비었습니다."),
     WRONG_PASSWORD(false, 2009, "잘못된 password 입니다."),
+    INVALID_ACCESS_TOKEN(false, 2006, "잘못된 access token 입니다."),
+    INVALID_REFRESH_TOKEN(false, 2007, "잘못된 refresh token 입니다."),
+    NULL_ACCESS_TOKEN(false, 2008, "access token을 입력해주세요."),
+    INVALID_JWT_SIGNATURE(false, 2009, "유효하지 않은 JWT 시그니처입니다."),
+    EXPIRED_ACCESS_TOKEN(false, 2010, "만료된 토큰입니다."),
+    UNSUPPORTED_JWT_TOKEN(false, 2011, "지원하지 않는 JWT 토큰 형식입니다."),
+    EMPTY_JWT_CLAIM(false, 2012, "JWT claims string이 비었습니다."),
+    EXPIRED_REFRESH_TOKEN(false, 2013, "만료된 refresh token 입니다."),
+    ACCESS_DENIED(false, 403, "접근 권한이 없습니다."),
+
 
     // userprofile(2050-2099)
     BLANK_NICKNAME(false, 2050, "nickname이 비었습니다."),
