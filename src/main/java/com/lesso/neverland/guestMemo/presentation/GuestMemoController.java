@@ -1,6 +1,5 @@
 package com.lesso.neverland.guestMemo.presentation;
 
-import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.guestMemo.application.GuestMemoService;
 import com.lesso.neverland.guestMemo.dto.GetGuestMemoListRequest;
@@ -22,21 +21,13 @@ public class GuestMemoController {
     // 방명록 등록
     @PostMapping("")
     public BaseResponse<String> postGuestMemo(@RequestBody PostGuestMemoRequest postGuestMemoRequest) {
-        try {
-            guestMemoService.postGuestMemo(postGuestMemoRequest);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        guestMemoService.postGuestMemo(postGuestMemoRequest);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 방명록 목록 조회
     @GetMapping("")
     public BaseResponse<GuestMemoListResponse> getGuestMemoList(@RequestBody GetGuestMemoListRequest getGuestMemoListRequest) {
-        try {
-            return new BaseResponse<>(guestMemoService.getGuestMemoList(getGuestMemoListRequest));
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(guestMemoService.getGuestMemoList(getGuestMemoListRequest));
     }
 }

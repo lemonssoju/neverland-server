@@ -1,6 +1,5 @@
 package com.lesso.neverland.follow.presentation;
 
-import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.follow.application.FollowService;
 import com.lesso.neverland.follow.dto.FollowRequest;
@@ -23,45 +22,29 @@ public class FollowController {
     // 팔로잉 목록 조회
     @GetMapping("/followingList")
     public BaseResponse<FollowingListResponse> getFollowingList(@RequestParam(required = false) String searchWord) {
-        try {
-            return new BaseResponse<>(followService.getFollowingList(searchWord));
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(followService.getFollowingList(searchWord));
     }
 
     // 팔로워 목록 조회
     @GetMapping("/followerList")
     public BaseResponse<FollowerListResponse> getFollowerList(@RequestParam(required = false) String searchWord) {
-        try {
-            return new BaseResponse<>(followService.getFollowerList(searchWord));
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(followService.getFollowerList(searchWord));
     }
 
     // 맞팔로우 목록 조회
     @GetMapping("/inviteList")
     public BaseResponse<MemberInviteListResponse> getMemberInviteList(@RequestParam(value = "groupIdx", required = false) Long groupIdx, @RequestParam(required = false) String searchWord) {
-        try {
-            if (groupIdx == null) { // 그룹 생성
-                return new BaseResponse<>(followService.getMemberInviteList(searchWord));
-            } else { // 그룹 수정
-                return new BaseResponse<>(followService.getMemberInviteListEditView(groupIdx, searchWord));
-            }
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
+        if (groupIdx == null) { // 그룹 생성
+            return new BaseResponse<>(followService.getMemberInviteList(searchWord));
+        } else { // 그룹 수정
+            return new BaseResponse<>(followService.getMemberInviteListEditView(groupIdx, searchWord));
         }
     }
 
     // 팔로우/취소
     @PostMapping("")
     public BaseResponse<String> follow(@RequestBody FollowRequest followRequest) {
-        try {
-            followService.follow(followRequest);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        followService.follow(followRequest);
+        return new BaseResponse<>(SUCCESS);
     }
 }
