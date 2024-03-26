@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,266 +52,212 @@ public class GroupService {
     private final PostTagRepository postTagRepository;
 
     // 그룹 목록 조회
-    public GroupListResponse getGroupList() throws BaseException {
-        try {
-            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            List<Team> groupList = groupRepository.findByAdminAndStatusEquals(user, ACTIVE);
-            List<GroupListDto> groupListDto = groupList.stream()
-                    .map(group -> new GroupListDto(
-                            group.getTeamIdx(),
-                            group.getTeamImage(),
-                            group.getName(),
-                            group.getSubName())).collect(Collectors.toList());
-            return new GroupListResponse(groupListDto);
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+    public GroupListResponse getGroupList() {
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        List<Team> groupList = groupRepository.findByAdminAndStatusEquals(user, ACTIVE);
+        List<GroupListDto> groupListDto = groupList.stream()
+                .map(group -> new GroupListDto(
+                        group.getTeamIdx(),
+                        group.getTeamImage(),
+                        group.getName(),
+                        group.getSubName())).collect(Collectors.toList());
+        return new GroupListResponse(groupListDto);
     }
 
     // 그룹 피드 목록 조회
-    public GroupPostListResponse getGroupPostList(Long groupIdx) throws BaseException {
-        try {
-            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-            List<Post> groupPostList = postRepository.findByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
+    public GroupPostListResponse getGroupPostList(Long groupIdx) {
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        List<Post> groupPostList = postRepository.findByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
 
-            List<GroupPostDto> groupPostListDto = groupPostList.stream()
-                    .map(groupPost -> new GroupPostDto(
-                            groupPost.getTitle(),
-                            groupPost.getSubtitle(),
-                            groupPost.getPostImage(),
-                            groupPost.getUser().getProfile().getNickname())).collect(Collectors.toList());
-            return new GroupPostListResponse(group.getName(), groupPostListDto);
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        List<GroupPostDto> groupPostListDto = groupPostList.stream()
+                .map(groupPost -> new GroupPostDto(
+                        groupPost.getTitle(),
+                        groupPost.getSubtitle(),
+                        groupPost.getPostImage(),
+                        groupPost.getUser().getProfile().getNickname())).collect(Collectors.toList());
+        return new GroupPostListResponse(group.getName(), groupPostListDto);
     }
 
     // 그룹 피드 상세 조회
-    public GroupPostResponse getGroupPost(Long groupIdx, Long postIdx) throws BaseException {
-        try {
-            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-            Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
-            if (!post.getTeam().equals(group)) throw new BaseException(NO_GROUP_POST);
+    public GroupPostResponse getGroupPost(Long groupIdx, Long postIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
+        if (!post.getTeam().equals(group)) throw new BaseException(NO_GROUP_POST);
 
-            // 좋아요 여부 조회
-            Optional<Long> optionalUserIdx = Optional.ofNullable(authService.getUserIdx());
-            boolean isLike = false;
-            if (optionalUserIdx.isPresent()){
-                User user = userRepository.findById(optionalUserIdx.get()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-                isLike = postLikeRepository.existsByPostAndUserAndStatusEquals(post, user, ACTIVE);
-            }
-
-            // 댓글 조회
-            List<Comment> postComments = post.getComments();
-            List<CommentDto> comments = postComments.stream()
-                    .map(comment -> new CommentDto(
-                            comment.getCommentIdx(),
-                            comment.getUser().getProfile().getNickname(),
-                            comment.getUser().getProfile().getProfileImage(),
-                            comment.getCreatedDate(),
-                            comment.getContent()))
-                    .collect(Collectors.toList());
-
-            return new GroupPostResponse(post.getTitle(), post.getSubtitle(), post.getContent(), post.getCreatedDate(),
-                    post.getUser().getProfile().getNickname(), post.getBackgroundMusic(), post.getBackgroundMusicUrl(),
-                    post.getPostImage(), isLike, comments);
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+        // 좋아요 여부 조회
+        Optional<Long> optionalUserIdx = Optional.ofNullable(authService.getUserIdx());
+        boolean isLike = false;
+        if (optionalUserIdx.isPresent()){
+            User user = userRepository.findById(optionalUserIdx.get()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            isLike = postLikeRepository.existsByPostAndUserAndStatusEquals(post, user, ACTIVE);
         }
+
+        // 댓글 조회
+        List<Comment> postComments = post.getComments();
+        List<CommentDto> comments = postComments.stream()
+                .map(comment -> new CommentDto(
+                        comment.getCommentIdx(),
+                        comment.getUser().getProfile().getNickname(),
+                        comment.getUser().getProfile().getProfileImage(),
+                        comment.getCreatedDate(),
+                        comment.getContent()))
+                .collect(Collectors.toList());
+
+        return new GroupPostResponse(post.getTitle(), post.getSubtitle(), post.getContent(), post.getCreatedDate(),
+                post.getUser().getProfile().getNickname(), post.getBackgroundMusic(), post.getBackgroundMusicUrl(),
+                post.getPostImage(), isLike, comments);
     }
 
     // [관리자] 그룹 수정 화면 조회
-    public GroupEditViewResponse getGroupEditView(Long groupIdx) throws BaseException {
-        try {
-            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            validateAdmin(user, group);
+    public GroupEditViewResponse getGroupEditView(Long groupIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        validateAdmin(user, group);
 
-            return new GroupEditViewResponse(group.getName(), group.getSubName(), group.getTeamImage());
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        return new GroupEditViewResponse(group.getName(), group.getSubName(), group.getTeamImage());
     }
 
     // [관리자] 그룹 수정
     @Transactional(rollbackFor = Exception.class)
-    public void editGroup(Long groupIdx, MultipartFile image, EditGroupRequest editGroupRequest) throws BaseException {
-        try {
-            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            validateAdmin(user, group);
+    public void editGroup(Long groupIdx, MultipartFile image, EditGroupRequest editGroupRequest) throws IOException {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        validateAdmin(user, group);
 
-            if (editGroupRequest.name() != null) {
-                if (!editGroupRequest.name().equals("") && !editGroupRequest.name().equals(" "))
-                    group.modifyName(editGroupRequest.name());
-                else throw new BaseException(BLANK_GROUP_NAME);
-            }
-            if (editGroupRequest.subName() != null) {
-                if (!editGroupRequest.subName().equals("") && !editGroupRequest.subName().equals(" "))
-                    group.modifySubName(editGroupRequest.subName());
-                else throw new BaseException(BLANK_GROUP_SUB_NAME);
-            }
-            if (editGroupRequest.memberList() != null) {
-                List<UserTeam> originalMemberList = group.getUserTeams();
-                userTeamRepository.deleteAll(originalMemberList);
-
-                for(Long userIdx : editGroupRequest.memberList()) {
-                    User member = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-                    UserTeam userTeam = UserTeam.builder()
-                            .user(member)
-                            .team(group).build();
-                    userTeam.setUser(member);
-                    userTeam.setTeam(group);
-                    userTeamRepository.save(userTeam);
-                }
-            }
-
-            if (image != null) {//TODO: 이미지 삭제 및 업로드 설정 후 동작 확인하기
-                // delete previous image
-                imageService.deleteImage(group.getTeamImage());
-
-                // upload new image
-                String imagePath = imageService.uploadImage("group", image);
-                group.modifyImage(imagePath);
-            } else throw new BaseException(NULL_GROUP_IMAGE);
-            groupRepository.save(group);
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+        if (editGroupRequest.name() != null) {
+            if (!editGroupRequest.name().equals("") && !editGroupRequest.name().equals(" "))
+                group.modifyName(editGroupRequest.name());
+            else throw new BaseException(BLANK_GROUP_NAME);
         }
+        if (editGroupRequest.subName() != null) {
+            if (!editGroupRequest.subName().equals("") && !editGroupRequest.subName().equals(" "))
+                group.modifySubName(editGroupRequest.subName());
+            else throw new BaseException(BLANK_GROUP_SUB_NAME);
+        }
+        if (editGroupRequest.memberList() != null) {
+            List<UserTeam> originalMemberList = group.getUserTeams();
+            userTeamRepository.deleteAll(originalMemberList);
+
+            for(Long userIdx : editGroupRequest.memberList()) {
+                User member = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+                UserTeam userTeam = UserTeam.builder()
+                        .user(member)
+                        .team(group).build();
+                userTeam.setUser(member);
+                userTeam.setTeam(group);
+                userTeamRepository.save(userTeam);
+            }
+        }
+
+        if (image != null) {//TODO: 이미지 삭제 및 업로드 설정 후 동작 확인하기
+            // delete previous image
+            imageService.deleteImage(group.getTeamImage());
+
+            // upload new image
+            String imagePath = imageService.uploadImage("group", image);
+            group.modifyImage(imagePath);
+        } else throw new BaseException(NULL_GROUP_IMAGE);
+        groupRepository.save(group);
     }
 
     // [관리자] 그룹 삭제
     @Transactional(rollbackFor = Exception.class)
-    public void deleteGroup(Long groupIdx) throws BaseException {
-        try {
-            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            validateAdmin(user, group);
+    public void deleteGroup(Long groupIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        validateAdmin(user, group);
 
-            List<Post> groupPostList = postRepository.findByTeamAndStatusEquals(group, ACTIVE);
-            List<Comment> commentsSaveList = new ArrayList<>();
-            List<PostLike> postLikesSaveList = new ArrayList<>();
-            List<PostTag> postTagsSaveList = new ArrayList<>();
-            List<UserTeam> userTeamsSaveList = new ArrayList<>();
+        List<Post> groupPostList = postRepository.findByTeamAndStatusEquals(group, ACTIVE);
+        List<Comment> commentsSaveList = new ArrayList<>();
+        List<PostLike> postLikesSaveList = new ArrayList<>();
+        List<PostTag> postTagsSaveList = new ArrayList<>();
+        List<UserTeam> userTeamsSaveList = new ArrayList<>();
 
-            for (Post post : groupPostList) {
-                post.delete();
-                for(Comment comment : post.getComments()) {
-                    comment.delete();
-                    commentsSaveList.add(comment);
-                }
-                for(PostLike postLike : post.getPostLikes()) {
-                    postLike.delete();
-                    postLikesSaveList.add(postLike);
-                }
-                for(PostTag postTag : post.getPostTags()) {
-                    postTag.delete();
-                    postTagsSaveList.add(postTag);
-                }
+        for (Post post : groupPostList) {
+            post.delete();
+            for(Comment comment : post.getComments()) {
+                comment.delete();
+                commentsSaveList.add(comment);
             }
-            for (UserTeam userTeam : group.getUserTeams()) {
-                userTeam.delete();
-                userTeamsSaveList.add(userTeam);
+            for(PostLike postLike : post.getPostLikes()) {
+                postLike.delete();
+                postLikesSaveList.add(postLike);
             }
-            postRepository.saveAll(groupPostList);
-            commentRepository.saveAll(commentsSaveList);
-            postLikeRepository.saveAll(postLikesSaveList);
-            postTagRepository.saveAll(postTagsSaveList);
-            userTeamRepository.saveAll(userTeamsSaveList);
-
-            group.delete();
-            groupRepository.save(group);
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+            for(PostTag postTag : post.getPostTags()) {
+                postTag.delete();
+                postTagsSaveList.add(postTag);
+            }
         }
+        for (UserTeam userTeam : group.getUserTeams()) {
+            userTeam.delete();
+            userTeamsSaveList.add(userTeam);
+        }
+        postRepository.saveAll(groupPostList);
+        commentRepository.saveAll(commentsSaveList);
+        postLikeRepository.saveAll(postLikesSaveList);
+        postTagRepository.saveAll(postTagsSaveList);
+        userTeamRepository.saveAll(userTeamsSaveList);
+
+        group.delete();
+        groupRepository.save(group);
     }
 
     // 그룹 나가기
-    public void withdrawGroup(Long groupIdx) throws BaseException {
-        try {
-            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-            User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            if(user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
+    public void withdrawGroup(Long groupIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        if(user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
 
-            UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, group);
-            if (userTeam == null) throw new BaseException(NO_GROUP_MEMBER);
-            else {
-                userTeam.delete();
-                userTeamRepository.save(userTeam);
-            }
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, group);
+        if (userTeam == null) throw new BaseException(NO_GROUP_MEMBER);
+        else {
+            userTeam.delete();
+            userTeamRepository.save(userTeam);
         }
     }
 
     // 그룹 생성
     @Transactional(rollbackFor = Exception.class)
-    public void createGroup(MultipartFile image, CreateGroupRequest createGroupRequest) throws BaseException {
-        try {
-            User admin = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+    public void createGroup(MultipartFile image, CreateGroupRequest createGroupRequest) throws IOException {
+        User admin = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
-            // upload image
-            String imagePath = imageService.uploadImage("group", image);
+        // upload image
+        String imagePath = imageService.uploadImage("group", image);
 
-            Team group = new Team(admin, createGroupRequest.name(), createGroupRequest.subName(), imagePath);
-            groupRepository.save(group);
+        Team group = new Team(admin, createGroupRequest.name(), createGroupRequest.subName(), imagePath);
+        groupRepository.save(group);
 
-            UserTeam newUserTeam = new UserTeam(admin, group);
-            newUserTeam.setUser(admin);
-            newUserTeam.setTeam(group);
-            userTeamRepository.save(newUserTeam);
+        UserTeam newUserTeam = new UserTeam(admin, group);
+        newUserTeam.setUser(admin);
+        newUserTeam.setTeam(group);
+        userTeamRepository.save(newUserTeam);
 
-            for (Long memberIdx : createGroupRequest.memberList()) {
-                User member = userRepository.findById(memberIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-                UserTeam userTeam = new UserTeam(member, group);
-                userTeam.setUser(member);
-                userTeam.setTeam(group);
-                userTeamRepository.save(userTeam);
-            }
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+        for (Long memberIdx : createGroupRequest.memberList()) {
+            User member = userRepository.findById(memberIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            UserTeam userTeam = new UserTeam(member, group);
+            userTeam.setUser(member);
+            userTeam.setTeam(group);
+            userTeamRepository.save(userTeam);
         }
     }
 
     // 그룹 피드 등록
-    public void createGroupPost(Long groupIdx, MultipartFile image, CreateGroupPostRequest createGroupPostRequest) throws BaseException {
-        try {
-            Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-            User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+    public void createGroupPost(Long groupIdx, MultipartFile image, CreateGroupPostRequest createGroupPostRequest) throws IOException {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
-            // upload image
-            String imagePath = imageService.uploadImage("group", image);
+        // upload image
+        String imagePath = imageService.uploadImage("group", image);
 
-            Contents contentsType = Contents.getEnumByName(createGroupPostRequest.contentsType());
-            // TODO: gpt 활용한 태그 생성
-            Post post = new Post(writer, Source.USER, group, createGroupPostRequest.title(), createGroupPostRequest.subtitle(),
-                    contentsType, createGroupPostRequest.backgroundMusic(), createGroupPostRequest.backgroundMusicUrl(), imagePath, createGroupPostRequest.content());
-            postRepository.save(post);
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        Contents contentsType = Contents.getEnumByName(createGroupPostRequest.contentsType());
+        // TODO: gpt 활용한 태그 생성
+        Post post = new Post(writer, Source.USER, group, createGroupPostRequest.title(), createGroupPostRequest.subtitle(),
+                contentsType, createGroupPostRequest.backgroundMusic(), createGroupPostRequest.backgroundMusicUrl(), imagePath, createGroupPostRequest.content());
+        postRepository.save(post);
     }
 
-    private void validateAdmin(User user, Team group) throws BaseException {
+    private void validateAdmin(User user, Team group) {
         if (!group.getAdmin().equals(user)) throw new BaseException(NO_GROUP_ADMIN);
     }
 }

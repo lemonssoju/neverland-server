@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.group;
 
@@ -64,8 +66,8 @@ public class GroupController {
         try {
             groupService.editGroup(groupIdx, image, editGroupRequest);
             return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -97,8 +99,8 @@ public class GroupController {
         try {
             groupService.createGroup(image, createGroupRequest);
             return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -108,8 +110,8 @@ public class GroupController {
         try {
             groupService.createGroupPost(groupIdx, image, createGroupPostRequest);
             return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
