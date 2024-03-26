@@ -27,60 +27,42 @@ public class CommentService {
 
     // 댓글 등록
     @Transactional(rollbackFor = Exception.class)
-    public void postComment(PostCommentRequest postCommentRequest) throws BaseException {
-        try {
-            User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            Post post = postRepository.findById(postCommentRequest.postIdx()).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
+    public void postComment(PostCommentRequest postCommentRequest) {
+        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Post post = postRepository.findById(postCommentRequest.postIdx()).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
 
-            Comment comment = new Comment(post, writer, postCommentRequest.content());
-            comment.setPost(post);
-            comment.setUser(writer);
-            commentRepository.save(comment);
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        Comment comment = new Comment(post, writer, postCommentRequest.content());
+        comment.setPost(post);
+        comment.setUser(writer);
+        commentRepository.save(comment);
     }
 
     // [작성자] 댓글 수정
-    public void modifyComment(Long commentIdx, ModifyCommentRequest modifyCommentRequest) throws BaseException {
-        try {
-            User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            Comment comment = commentRepository.findById(commentIdx).orElseThrow(() -> new BaseException(INVALID_COMMENT_IDX));
-            validateWriter(writer, comment);
+    public void modifyComment(Long commentIdx, ModifyCommentRequest modifyCommentRequest) {
+        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Comment comment = commentRepository.findById(commentIdx).orElseThrow(() -> new BaseException(INVALID_COMMENT_IDX));
+        validateWriter(writer, comment);
 
-            if (modifyCommentRequest.content() != null) {
-                if (!modifyCommentRequest.content().equals("") && !modifyCommentRequest.content().equals(" "))
-                    comment.modifyContent(modifyCommentRequest.content());
-                else throw new BaseException(BLANK_COMMENT_CONTENT);
-            }
-            commentRepository.save(comment);
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+        if (modifyCommentRequest.content() != null) {
+            if (!modifyCommentRequest.content().equals("") && !modifyCommentRequest.content().equals(" "))
+                comment.modifyContent(modifyCommentRequest.content());
+            else throw new BaseException(BLANK_COMMENT_CONTENT);
         }
+        commentRepository.save(comment);
     }
 
     // [작성자] 댓글 삭제
-    public void deleteComment(Long commentIdx) throws BaseException {
-        try {
-            User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            Comment comment = commentRepository.findById(commentIdx).orElseThrow(() -> new BaseException(INVALID_COMMENT_IDX));
-            validateWriter(writer, comment);
+    public void deleteComment(Long commentIdx) {
+        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Comment comment = commentRepository.findById(commentIdx).orElseThrow(() -> new BaseException(INVALID_COMMENT_IDX));
+        validateWriter(writer, comment);
 
-            comment.delete();
-            commentRepository.save(comment);
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        comment.delete();
+        commentRepository.save(comment);
     }
 
     // 작성자 validation
-    private static void validateWriter(User user, Comment comment) throws BaseException {
+    private static void validateWriter(User user, Comment comment) {
         if (!comment.getUser().equals(user)) throw new BaseException(NO_COMMENT_WRITER);
         if (comment.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_COMMENT);
     }
