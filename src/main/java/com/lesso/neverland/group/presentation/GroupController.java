@@ -1,6 +1,5 @@
 package com.lesso.neverland.group.presentation;
 
-import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.group.application.GroupService;
 import com.lesso.neverland.group.dto.*;
@@ -23,41 +22,25 @@ public class GroupController {
     // 그룹 목록 조회
     @GetMapping("")
     public BaseResponse<GroupListResponse> getGroupList() {
-        try {
-            return new BaseResponse<>(groupService.getGroupList());
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(groupService.getGroupList());
     }
 
     // 그룹 피드 목록 조회
     @GetMapping("/{groupIdx}/posts")
     public BaseResponse<GroupPostListResponse> getGroupPostList(@PathVariable Long groupIdx) {
-        try {
-            return new BaseResponse<>(groupService.getGroupPostList(groupIdx));
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(groupService.getGroupPostList(groupIdx));
     }
 
     // 그룹 피드 상세 조회
     @GetMapping("/{groupIdx}/posts/{postIdx}")
     public BaseResponse<GroupPostResponse> getGroupPostList(@PathVariable Long groupIdx, @PathVariable Long postIdx) {
-        try {
-            return new BaseResponse<>(groupService.getGroupPost(groupIdx, postIdx));
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(groupService.getGroupPost(groupIdx, postIdx));
     }
 
     // [관리자] 그룹 수정 화면 조회
     @GetMapping("/{groupIdx}/editView")
     public BaseResponse<GroupEditViewResponse> getGroupEditView(@PathVariable Long groupIdx) {
-        try {
-            return new BaseResponse<>(groupService.getGroupEditView(groupIdx));
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        return new BaseResponse<>(groupService.getGroupEditView(groupIdx));
     }
 
     // [관리자] 그룹 수정
@@ -74,23 +57,15 @@ public class GroupController {
     // [관리자] 그룹 삭제
     @PatchMapping("/{groupIdx}/delete")
     public BaseResponse<String> deleteGroup(@PathVariable Long groupIdx) {
-        try {
-            groupService.deleteGroup(groupIdx);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        groupService.deleteGroup(groupIdx);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 그룹 나가기
     @PatchMapping("/{groupIdx}/withdraw")
     public BaseResponse<String> withdrawGroup(@PathVariable Long groupIdx) {
-        try {
-            groupService.withdrawGroup(groupIdx);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
+        groupService.withdrawGroup(groupIdx);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 그룹 생성
