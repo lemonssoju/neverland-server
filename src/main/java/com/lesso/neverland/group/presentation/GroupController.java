@@ -81,9 +81,9 @@ public class GroupController {
 
     // 그룹 피드 등록
     @PostMapping("/{groupIdx}")
-    public BaseResponse<String> createGroupPost(@PathVariable("groupIdx") Long groupIdx, @RequestPart MultipartFile image, @RequestPart CreateGroupPostRequest createGroupPostRequest) {
+    public BaseResponse<String> createGroupPost(@PathVariable("groupIdx") Long groupIdx, @RequestPart MultipartFile image, @RequestPart GroupPostRequest groupPostRequest) {
         try {
-            groupService.createGroupPost(groupIdx, image, createGroupPostRequest);
+            groupService.createGroupPost(groupIdx, image, groupPostRequest);
             return new BaseResponse<>(SUCCESS);
         } catch (IOException e) {
             throw new RuntimeException(e);
