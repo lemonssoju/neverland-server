@@ -243,17 +243,17 @@ public class GroupService {
     }
 
     // 그룹 피드 등록
-    public void createGroupPost(Long groupIdx, MultipartFile image, CreateGroupPostRequest createGroupPostRequest) throws IOException {
+    public void createGroupPost(Long groupIdx, MultipartFile image, GroupPostRequest groupPostRequest) throws IOException {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         // upload image
         String imagePath = imageService.uploadImage("group", image);
 
-        Contents contentsType = Contents.getEnumByName(createGroupPostRequest.contentsType());
+        Contents contentsType = Contents.getEnumByName(groupPostRequest.contentsType());
         // TODO: gpt 활용한 태그 생성
-        Post post = new Post(writer, Source.USER, group, createGroupPostRequest.title(), createGroupPostRequest.subtitle(),
-                contentsType, createGroupPostRequest.backgroundMusic(), createGroupPostRequest.backgroundMusicUrl(), imagePath, createGroupPostRequest.content());
+        Post post = new Post(writer, Source.USER, group, groupPostRequest.title(), groupPostRequest.subtitle(),
+                contentsType, groupPostRequest.backgroundMusic(), groupPostRequest.backgroundMusicUrl(), imagePath, groupPostRequest.content());
         postRepository.save(post);
     }
 
