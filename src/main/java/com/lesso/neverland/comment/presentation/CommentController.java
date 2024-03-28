@@ -7,7 +7,6 @@ import com.lesso.neverland.common.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.comment;
 
 @RestController
@@ -19,20 +18,17 @@ public class CommentController {
     // 댓글 등록
     @PostMapping("")
     public BaseResponse<String> postComment(@RequestBody PostCommentRequest commentPostRequest) {
-        commentService.postComment(commentPostRequest);
-        return new BaseResponse<>(SUCCESS);
+        return commentService.postComment(commentPostRequest);
     }
 
     // [작성자] 댓글 수정
     @PatchMapping("/{commentIdx}")
     public BaseResponse<String> modifyComment(@PathVariable Long commentIdx, @RequestBody ModifyCommentRequest modifyCommentRequest) {
-        commentService.modifyComment(commentIdx, modifyCommentRequest);
-        return new BaseResponse<>(SUCCESS);
+        return commentService.modifyComment(commentIdx, modifyCommentRequest);
     }
 
     @PatchMapping("/{commentIdx}/delete")
     public BaseResponse<?> deleteComment(@PathVariable Long commentIdx) {
-        commentService.deleteComment(commentIdx);
-        return new BaseResponse<>(SUCCESS);
+        return commentService.deleteComment(commentIdx);
     }
 }
