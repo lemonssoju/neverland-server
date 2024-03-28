@@ -5,6 +5,7 @@ import com.lesso.neverland.comment.dto.ModifyCommentRequest;
 import com.lesso.neverland.comment.dto.PostCommentRequest;
 import com.lesso.neverland.comment.repository.CommentRepository;
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.repository.PostRepository;
 import com.lesso.neverland.user.application.UserService;
@@ -27,7 +28,7 @@ public class CommentService {
 
     // 댓글 등록
     @Transactional(rollbackFor = Exception.class)
-    public void postComment(PostCommentRequest postCommentRequest) {
+    public BaseResponse<String> postComment(PostCommentRequest postCommentRequest) {
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Post post = postRepository.findById(postCommentRequest.postIdx()).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
 
@@ -35,10 +36,11 @@ public class CommentService {
         comment.setPost(post);
         comment.setUser(writer);
         commentRepository.save(comment);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // [작성자] 댓글 수정
-    public void modifyComment(Long commentIdx, ModifyCommentRequest modifyCommentRequest) {
+    public BaseResponse<String> modifyComment(Long commentIdx, ModifyCommentRequest modifyCommentRequest) {
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Comment comment = commentRepository.findById(commentIdx).orElseThrow(() -> new BaseException(INVALID_COMMENT_IDX));
         validateWriter(writer, comment);
@@ -49,16 +51,18 @@ public class CommentService {
             else throw new BaseException(BLANK_COMMENT_CONTENT);
         }
         commentRepository.save(comment);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // [작성자] 댓글 삭제
-    public void deleteComment(Long commentIdx) {
+    public BaseResponse<String> deleteComment(Long commentIdx) {
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Comment comment = commentRepository.findById(commentIdx).orElseThrow(() -> new BaseException(INVALID_COMMENT_IDX));
         validateWriter(writer, comment);
 
         comment.delete();
         commentRepository.save(comment);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 작성자 validation
