@@ -1,6 +1,7 @@
 package com.lesso.neverland.follow.application;
 
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.follow.domain.Follow;
 import com.lesso.neverland.follow.dto.*;
 import com.lesso.neverland.follow.repository.FollowRepository;
@@ -34,7 +35,7 @@ public class FollowService {
     UserTeamRepository userTeamRepository;
 
     // 팔로잉 목록 조회
-    public FollowingListResponse getFollowingList(String searchWord) {
+    public BaseResponse<FollowingListResponse> getFollowingList(String searchWord) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         List<FollowDto> followingList = Optional.ofNullable(searchWord)
@@ -42,11 +43,11 @@ public class FollowService {
                 .orElseGet(() -> followRepository.findByFollowingUserAndStatusEquals(user, ACTIVE))
                 .stream()
                 .map(this::convertToFollowDto).toList();
-        return new FollowingListResponse(followingList);
+        return new BaseResponse<>(new FollowingListResponse(followingList));
     }
 
     // 팔로워 목록 조회
-    public FollowerListResponse getFollowerList(String searchWord) {
+    public BaseResponse<FollowerListResponse> getFollowerList(String searchWord) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         List<FollowDto> followerList = Optional.ofNullable(searchWord)
@@ -54,7 +55,7 @@ public class FollowService {
                 .orElseGet(() -> followRepository.findByFollowedUserAndStatusEquals(user, ACTIVE))
                 .stream()
                 .map(this::convertToFollowDto).toList();
-        return new FollowerListResponse(followerList);
+        return new BaseResponse<>(new FollowerListResponse(followerList));
     }
 
     // FollowDto로 가공
@@ -66,17 +67,17 @@ public class FollowService {
     }
 
     // [그룹 생성] 맞팔로우 목록 조회
-    public MemberInviteListResponse getMemberInviteList(String searchWord) {
+    public BaseResponse<MemberInviteListResponse> getMemberInviteList(String searchWord) {
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        return new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> false, searchWord));
+        return new BaseResponse<>(new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> false, searchWord)));
     }
 
     // [그룹 수정] 맞팔로우 목록 조회
-    public MemberInviteListResponse getMemberInviteListEditView(Long groupIdx, String searchWord) {
+    public BaseResponse<MemberInviteListResponse> getMemberInviteListEditView(Long groupIdx, String searchWord) {
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
 
-        return new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> userTeamRepository.existsByUserAndTeam(follow.getFollowedUser(), group), searchWord));
+        return new BaseResponse<>(new MemberInviteListResponse(getMemberInviteDtoList(writer, follow -> userTeamRepository.existsByUserAndTeam(follow.getFollowedUser(), group), searchWord)));
     }
 
     private List<MemberInviteDto> getMemberInviteDtoList(User writer, Function<Follow, Boolean> isMemberFunction, String searchWord) {
@@ -93,7 +94,7 @@ public class FollowService {
     }
 
     // 팔로우/취소
-    public void follow(FollowRequest followRequest) {
+    public BaseResponse<String> follow(FollowRequest followRequest) {
         User followingUser = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         User followedUser = userRepository.findById(followRequest.userIdx()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
@@ -111,5 +112,6 @@ public class FollowService {
             follow = new Follow(followingUser, followedUser);
         }
         followRepository.save(follow);
+        return new BaseResponse<>(SUCCESS);
     }
 }

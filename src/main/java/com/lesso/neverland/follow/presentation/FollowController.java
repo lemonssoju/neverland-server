@@ -9,7 +9,6 @@ import com.lesso.neverland.profile.dto.MemberInviteListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.follow;
 
 @RestController
@@ -22,29 +21,28 @@ public class FollowController {
     // 팔로잉 목록 조회
     @GetMapping("/followingList")
     public BaseResponse<FollowingListResponse> getFollowingList(@RequestParam(required = false) String searchWord) {
-        return new BaseResponse<>(followService.getFollowingList(searchWord));
+        return followService.getFollowingList(searchWord);
     }
 
     // 팔로워 목록 조회
     @GetMapping("/followerList")
     public BaseResponse<FollowerListResponse> getFollowerList(@RequestParam(required = false) String searchWord) {
-        return new BaseResponse<>(followService.getFollowerList(searchWord));
+        return followService.getFollowerList(searchWord);
     }
 
     // 맞팔로우 목록 조회
     @GetMapping("/inviteList")
     public BaseResponse<MemberInviteListResponse> getMemberInviteList(@RequestParam(value = "groupIdx", required = false) Long groupIdx, @RequestParam(required = false) String searchWord) {
         if (groupIdx == null) { // 그룹 생성
-            return new BaseResponse<>(followService.getMemberInviteList(searchWord));
+            return followService.getMemberInviteList(searchWord);
         } else { // 그룹 수정
-            return new BaseResponse<>(followService.getMemberInviteListEditView(groupIdx, searchWord));
+            return followService.getMemberInviteListEditView(groupIdx, searchWord);
         }
     }
 
     // 팔로우/취소
     @PostMapping("")
     public BaseResponse<String> follow(@RequestBody FollowRequest followRequest) {
-        followService.follow(followRequest);
-        return new BaseResponse<>(SUCCESS);
+        return followService.follow(followRequest);
     }
 }

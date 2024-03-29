@@ -1,6 +1,7 @@
 package com.lesso.neverland.search.application;
 
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.interest.domain.Interest;
 import com.lesso.neverland.interest.repository.InterestRepository;
@@ -96,7 +97,7 @@ public class SearchService {
     }
 
     // 검색 화면 조회
-    public SearchViewResponse getSearchView() {
+    public BaseResponse<SearchViewResponse> getSearchView() {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         List<Interest> userInterests = interestRepository.findByUser(user);
@@ -104,21 +105,22 @@ public class SearchService {
                 .map(interest -> new RecommendedSearchDto(interest.getPreference().name())).toList();
         List<RecentSearchDto> recentSearchList = searchHistoryRepository.findByUserAndStatusEqualsOrderByCreatedDateDesc(user, ACTIVE).stream()
                 .map(history -> new RecentSearchDto(history.getSearchHistoryIdx(), history.getSearchWord())).toList();
-        return new SearchViewResponse(recommendedSearchList, recentSearchList);
+        return new BaseResponse<>(new SearchViewResponse(recommendedSearchList, recentSearchList));
     }
 
     // 최근 검색어 개별 삭제
-    public void deleteRecentSearch(Long historyIdx) {
+    public BaseResponse<String> deleteRecentSearch(Long historyIdx) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         SearchHistory history = searchHistoryRepository.findById(historyIdx).orElseThrow(() -> new BaseException(INVALID_HISTORY_IDX));
         if (!history.getUser().equals(user)) throw new BaseException(NO_HISTORY_OWNER);
 
         history.delete();
         searchHistoryRepository.save(history);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 최근 검색어 전체 삭제
-    public void deleteAllRecentSearch() {
+    public BaseResponse<String> deleteAllRecentSearch() {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         List<SearchHistory> historyList = searchHistoryRepository.findByUser(user);
 
@@ -126,5 +128,6 @@ public class SearchService {
             history.delete();
             searchHistoryRepository.save(history);
         }
+        return new BaseResponse<>(SUCCESS);
     }
 }

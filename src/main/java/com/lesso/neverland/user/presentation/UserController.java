@@ -7,7 +7,6 @@ import com.lesso.neverland.user.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.user;
 
 @RestController
@@ -21,53 +20,48 @@ public class UserController {
     // 회원가입
     @PostMapping(value = "/signup")
     public BaseResponse<JwtDto> signup(@RequestBody SignupRequest signupRequest) {
-        return new BaseResponse<>(userService.signup(signupRequest));
+        return userService.signup(signupRequest);
     }
 
     // 로그인
     @PostMapping("/login")
     public BaseResponse<JwtDto> login(@RequestBody LoginRequest loginRequest) {
-        return new BaseResponse<>(userService.login(loginRequest));
+        return userService.login(loginRequest);
     }
 
     // 로그아웃
     @PatchMapping("/logout")
     public BaseResponse<String> logout() {
-        userService.logout(authService.getUserIdx());
-        return new BaseResponse<>(SUCCESS);
+        return userService.logout(authService.getUserIdx());
     }
 
     // 회원 탈퇴
     @PatchMapping("/signout")
     public BaseResponse<String> signOut(@RequestBody SignoutRequest signoutRequest) {
-        userService.signout(authService.getUserIdx(), signoutRequest);
-        return new BaseResponse<>(SUCCESS);
+        return userService.signout(authService.getUserIdx(), signoutRequest);
     }
 
     // access token 재발급
     @PostMapping("/reissue-token")
     public BaseResponse<TokenResponse> reissueToken(@RequestBody ReissueTokenRequest reissueTokenRequest) {
-        return new BaseResponse<>(userService.reissueAccessToken(reissueTokenRequest));
+        return userService.reissueAccessToken(reissueTokenRequest);
     }
 
     // 닉네임 중복 체크
     @PostMapping("/nickname")
     public BaseResponse<String> validateNickname(@RequestBody NicknameRequest nicknameRequest) {
-        userService.validateNickname(nicknameRequest.nickname());
-        return new BaseResponse<>(SUCCESS);
+        return userService.validateNickname(nicknameRequest.nickname());
     }
 
     // 아이디 중복 체크
     @PostMapping("/loginId")
     public BaseResponse<String> validateLoginId(@RequestBody LoginIdRequest loginIdRequest) {
-        userService.validateLoginId(loginIdRequest.loginId());
-        return new BaseResponse<>(SUCCESS);
+        return userService.validateLoginId(loginIdRequest.loginId());
     }
 
     // 개인 정보 수정
     @PatchMapping("/modify")
     public BaseResponse<String> modifyUser(@RequestBody ModifyUserRequest modifyUserRequest) {
-        userService.modifyUser(authService.getUserIdx(), modifyUserRequest);
-        return new BaseResponse<>(SUCCESS);
+        return userService.modifyUser(authService.getUserIdx(), modifyUserRequest);
     }
 }

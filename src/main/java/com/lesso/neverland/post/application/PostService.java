@@ -3,6 +3,7 @@ package com.lesso.neverland.post.application;
 import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.comment.dto.CommentDto;
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostLike;
@@ -37,7 +38,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
 
     // 피드 상세 조회
-    public PostResponse getPost(Long postIdx) {
+    public BaseResponse<PostResponse> getPost(Long postIdx) {
         Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
         if (post.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_POST);
 
@@ -73,35 +74,36 @@ public class PostService {
                         comment.getContent()))
                 .collect(Collectors.toList());
 
-        return new PostResponse(post.getTitle(), post.getSubtitle(), post.getContent(), post.getCreatedDate(),
+        return new BaseResponse<>(new PostResponse(post.getTitle(), post.getSubtitle(), post.getContent(), post.getCreatedDate(),
                 post.getUser().getUserIdx(), post.getUser().getProfile().getNickname(), post.getBackgroundMusic(), post.getBackgroundMusicUrl(),
-                post.getPostImage(), isLike, posts, comments);
+                post.getPostImage(), isLike, posts, comments));
     }
 
     // [작성자] 피드 수정 화면 조회
-    public PostEditViewResponse getPostEditView(Long postIdx) {
+    public BaseResponse<PostEditViewResponse> getPostEditView(Long postIdx) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
         validateWriter(user, post);
 
-        return new PostEditViewResponse(post.getTitle(), post.getSubtitle(), post.getContentsType().getContentsName(),
-                post.getBackgroundMusic(), post.getBackgroundMusicUrl(), post.getPostImage(), post.getContent());
+        return new BaseResponse<>(new PostEditViewResponse(post.getTitle(), post.getSubtitle(), post.getContentsType().getContentsName(),
+                post.getBackgroundMusic(), post.getBackgroundMusicUrl(), post.getPostImage(), post.getContent()));
     }
 
     // [작성자] 피드 삭제
     @Transactional(rollbackFor = Exception.class)
-    public void deletePost(Long postIdx) {
+    public BaseResponse<String> deletePost(Long postIdx) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
         validateWriter(user, post);
 
         post.delete();
         postRepository.save(post);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 좋아요/취소
     @Transactional(rollbackFor = Exception.class)
-    public void likePost(Long postIdx) {
+    public BaseResponse<String> likePost(Long postIdx) {
         User user = userRepository.findById(authService.getUserIdx()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Post post = postRepository.findById(postIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
         PostLike postLike = postLikeRepository.findByPostAndUser(post, user);
@@ -118,24 +120,25 @@ public class PostService {
             }
         }
         postLikeRepository.save(postLike);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 작성한 글 목록 조회
-    public MyPostListResponse getMyPostList() {
+    public BaseResponse<MyPostListResponse> getMyPostList() {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         List<Post> myPosts = postRepository.findByUserAndStatusEquals(user, ACTIVE);
         List<MyPostDto> myPostDtoList = convertToMyPostDtoList(myPosts);
-        return new MyPostListResponse(myPostDtoList);
+        return new BaseResponse<>(new MyPostListResponse(myPostDtoList));
     }
 
     // 좋아요한 글 목록 조회
-    public MyLikeListResponse getMyLikeList() {
+    public BaseResponse<MyLikeListResponse> getMyLikeList() {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         List<Post> myLikes = user.getPostLikes().stream().map(PostLike::getPost).toList();
         List<MyPostDto> myLikeDtoList = convertToMyPostDtoList(myLikes);
-        return new MyLikeListResponse(myLikeDtoList);
+        return new BaseResponse<>(new MyLikeListResponse(myLikeDtoList));
     }
 
     // MyPostDto로 가공
