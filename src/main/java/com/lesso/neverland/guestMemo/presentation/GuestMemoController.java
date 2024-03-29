@@ -8,7 +8,6 @@ import com.lesso.neverland.guestMemo.dto.PostGuestMemoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.memo;
 
 @RestController
@@ -21,13 +20,12 @@ public class GuestMemoController {
     // 방명록 등록
     @PostMapping("")
     public BaseResponse<String> postGuestMemo(@RequestBody PostGuestMemoRequest postGuestMemoRequest) {
-        guestMemoService.postGuestMemo(postGuestMemoRequest);
-        return new BaseResponse<>(SUCCESS);
+        return guestMemoService.postGuestMemo(postGuestMemoRequest);
     }
 
     // 방명록 목록 조회
     @GetMapping("")
     public BaseResponse<GuestMemoListResponse> getGuestMemoList(@RequestBody GetGuestMemoListRequest getGuestMemoListRequest) {
-        return new BaseResponse<>(guestMemoService.getGuestMemoList(getGuestMemoListRequest));
+        return guestMemoService.getGuestMemoList(getGuestMemoListRequest);
     }
 }

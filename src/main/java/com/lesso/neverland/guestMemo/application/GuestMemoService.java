@@ -1,6 +1,7 @@
 package com.lesso.neverland.guestMemo.application;
 
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.guestMemo.domain.GuestMemo;
 import com.lesso.neverland.guestMemo.dto.GetGuestMemoListRequest;
 import com.lesso.neverland.guestMemo.dto.GuestMemoDto;
@@ -29,7 +30,7 @@ public class GuestMemoService {
 
     // 방명록 등록
     @Transactional(rollbackFor = Exception.class)
-    public void postGuestMemo(PostGuestMemoRequest postGuestMemoRequest) {
+    public BaseResponse<String> postGuestMemo(PostGuestMemoRequest postGuestMemoRequest) {
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         User profileOwner = userRepository.findById(postGuestMemoRequest.userIdx()).orElseThrow(() -> new BaseException(NO_MATCH_USER));
         if (postGuestMemoRequest.content().length() > 50) throw new BaseException(TOO_LONG_CONTENT);
@@ -37,10 +38,11 @@ public class GuestMemoService {
         GuestMemo memo = new GuestMemo(profileOwner, writer, postGuestMemoRequest.content());
         guestMemoRepository.save(memo);
         memo.setUser(profileOwner);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 방명록 목록 조회
-    public GuestMemoListResponse getGuestMemoList(GetGuestMemoListRequest getGuestMemoListRequest) {
+    public BaseResponse<GuestMemoListResponse> getGuestMemoList(GetGuestMemoListRequest getGuestMemoListRequest) {
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         User profileOwner = userRepository.findById(getGuestMemoListRequest.profileOwnerIdx()).orElseThrow(() -> new BaseException(NO_MATCH_USER));
 
@@ -51,6 +53,6 @@ public class GuestMemoService {
                         memo.getWriter().getProfile().getProfileImage(),
                         memo.getContent(),
                         memo.getCreatedDate())).collect(Collectors.toList());
-        return new GuestMemoListResponse(memoDtoList);
+        return new BaseResponse<>(new GuestMemoListResponse(memoDtoList));
     }
 }
