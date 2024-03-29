@@ -9,7 +9,6 @@ import com.lesso.neverland.post.dto.PostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.post;
 
 @RestController
@@ -21,38 +20,36 @@ public class PostController {
     // 피드 상세 조회
     @GetMapping("/{postIdx}")
     public BaseResponse<PostResponse> getPost(@PathVariable Long postIdx) {
-        return new BaseResponse<>(postService.getPost(postIdx));
+        return postService.getPost(postIdx);
     }
 
     // [작성자] 피드 수정 화면 조회
     @GetMapping("/{postIdx}/editView")
     public BaseResponse<PostEditViewResponse> getPostEditView(@PathVariable Long postIdx) {
-        return new BaseResponse<>(postService.getPostEditView(postIdx));
+        return postService.getPostEditView(postIdx);
     }
 
     // [작성자] 피드 삭제
     @PatchMapping("/{postIdx}/delete")
     public BaseResponse<String> deletePost(@PathVariable Long postIdx) {
-        postService.deletePost(postIdx);
-        return new BaseResponse<>(SUCCESS);
+        return postService.deletePost(postIdx);
     }
 
     // 좋아요/취소
     @PostMapping("/{postIdx}")
     public BaseResponse<String> likePost(@PathVariable("postIdx") Long postIdx) {
-        postService.likePost(postIdx);
-        return new BaseResponse<>(SUCCESS);
+        return postService.likePost(postIdx);
     }
 
     // [유저] 작성한 글 목록 조회
     @GetMapping("/myPosts")
     public BaseResponse<MyPostListResponse> getMyPostList() {
-        return new BaseResponse<>(postService.getMyPostList());
+        return postService.getMyPostList();
     }
 
     // [유저] 졸아요한 글 목록 조회
     @GetMapping("/myLikes")
     public BaseResponse<MyLikeListResponse> getMyLikeList() {
-        return new BaseResponse<>(postService.getMyLikeList());
+        return postService.getMyLikeList();
     }
 }

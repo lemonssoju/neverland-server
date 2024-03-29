@@ -1,6 +1,7 @@
 package com.lesso.neverland.user.application;
 
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.interest.application.InterestService;
 import com.lesso.neverland.user.domain.User;
@@ -28,7 +29,7 @@ public class UserService {
 
     // 회원가입
     @Transactional(rollbackFor = Exception.class)
-    public JwtDto signup(SignupRequest signupRequest) {
+    public BaseResponse<JwtDto> signup(SignupRequest signupRequest) {
         if(!signupRequest.password().equals(signupRequest.passwordCheck())) throw new BaseException(UNMATCHED_PASSWORD);
 
         User newUser = signupRequest.toUser(encoder.encode(signupRequest.password()));
@@ -39,12 +40,12 @@ public class UserService {
             Contents preference = Contents.getPreference(contents, contentsPreference.preference());
             interestService.createInterest(contents, preference, newUser);
         }
-        return authService.generateToken(newUser.getUserIdx());
+        return new BaseResponse<>(authService.generateToken(newUser.getUserIdx()));
     }
 
     // 로그인
     @Transactional(rollbackFor = Exception.class)
-    public JwtDto login(LoginRequest loginRequest) {
+    public BaseResponse<JwtDto> login(LoginRequest loginRequest) {
         User user = userRepository.findByLoginId(loginRequest.loginId()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         if(!encoder.matches(loginRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
 
@@ -52,38 +53,40 @@ public class UserService {
 
         user.login();
         userRepository.save(user);
-        return jwtDto;
+        return new BaseResponse<>(jwtDto);
     }
 
     // 로그아웃
     @Transactional(rollbackFor = Exception.class)
-    public void logout(Long userIdx) {
+    public BaseResponse<String> logout(Long userIdx) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         authService.logout(userIdx);
 
         user.logout();
         userRepository.save(user);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 회원 탈퇴
     @Transactional(rollbackFor = Exception.class)
-    public void signout(Long userIdx, SignoutRequest signoutRequest) {
+    public BaseResponse<String> signout(Long userIdx, SignoutRequest signoutRequest) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         if (!encoder.matches(signoutRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
         authService.signout(userIdx);
 
         user.signout();
         userRepository.save(user);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // Access Token 재발급
     @Transactional(rollbackFor = Exception.class)
-    public TokenResponse reissueAccessToken(ReissueTokenRequest reissueTokenRequest) {
+    public BaseResponse<TokenResponse> reissueAccessToken(ReissueTokenRequest reissueTokenRequest) {
         User user = userRepository.findByLoginIdAndStatusEquals(reissueTokenRequest.loginId(), ACTIVE).orElseThrow(() -> new BaseException(NO_MATCH_USER));
         validateRefreshToken(reissueTokenRequest, user.getUserIdx());
 
         // refresh token이 유효한 경우 access token 재발급
-        return new TokenResponse(authService.generateAccessToken(user.getUserIdx()));
+        return new BaseResponse<>(new TokenResponse(authService.generateAccessToken(user.getUserIdx())));
     }
 
     // refreshToken 유효성 체크
@@ -97,24 +100,27 @@ public class UserService {
     }
 
     // 닉네임 중복 체크
-    public void validateNickname(String nickname) {
+    public BaseResponse<String> validateNickname(String nickname) {
         if(userRepository.existsByProfile_Nickname(nickname)) throw new BaseException(DUPLICATED_NICKNAME);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 아이디 중복 체크
-    public void validateLoginId(String loginId) {
+    public BaseResponse<String> validateLoginId(String loginId) {
         if(userRepository.existsByLoginId(loginId)) throw new BaseException(DUPLICATED_LOGIN_ID);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 개인 정보 변경
     @Transactional(rollbackFor = Exception.class)
-    public void modifyUser(Long userIdx, ModifyUserRequest modifyUserRequest) {
+    public BaseResponse<String> modifyUser(Long userIdx, ModifyUserRequest modifyUserRequest) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         if(!encoder.matches(modifyUserRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
         if (modifyUserRequest.newPassword().equals("") || modifyUserRequest.newPassword().equals(" "))
             throw new BaseException(INVALID_PASSWORD);
         user.modifyPassword(modifyUserRequest.newPassword());
         userRepository.save(user);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 회원 validation

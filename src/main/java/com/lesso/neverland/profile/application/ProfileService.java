@@ -1,6 +1,7 @@
 package com.lesso.neverland.profile.application;
 
 import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.common.enums.ThumbnailOrder;
 import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.follow.repository.FollowRepository;
@@ -33,7 +34,7 @@ public class ProfileService {
     ThumbnailRepository thumbnailRepository;
 
     // 프로필 조회
-    public ProfileResponse getProfile(GetProfileRequest getProfileRequest) {
+    public BaseResponse<ProfileResponse> getProfile(GetProfileRequest getProfileRequest) {
         User profileOwner = userRepository.findById(getProfileRequest.userIdx()).orElseThrow(() -> new BaseException(NO_MATCH_USER));
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
@@ -46,8 +47,8 @@ public class ProfileService {
                         thumbnail.getThumbnailOrder().getOrder(),
                         thumbnail.getImageUrl())).collect(Collectors.toList());
 
-        return new ProfileResponse(profileOwner.getUserIdx(), profileOwner.getProfile().getNickname(), profileOwner.getProfile().getProfileImage(), profileOwner.getProfile().getProfileMessage(),
-                profileOwner.getProfile().getProfileMusic(), profileOwner.getProfile().getProfileMusicUrl(), followingNumber, followerNumber, isMyProfile(profileOwner, user), thumbnailList);
+        return new BaseResponse<>(new ProfileResponse(profileOwner.getUserIdx(), profileOwner.getProfile().getNickname(), profileOwner.getProfile().getProfileImage(), profileOwner.getProfile().getProfileMessage(),
+                profileOwner.getProfile().getProfileMusic(), profileOwner.getProfile().getProfileMusicUrl(), followingNumber, followerNumber, isMyProfile(profileOwner, user), thumbnailList));
     }
 
     // 유저가 해당 프로필의 주인인지 체크
@@ -56,15 +57,15 @@ public class ProfileService {
     }
 
     // [유저] 프로필 수정 화면 조회
-    public ProfileEditViewResponse getProfileEditView() {
+    public BaseResponse<ProfileEditViewResponse> getProfileEditView() {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        return new ProfileEditViewResponse(user.getProfile().getProfileImage(), user.getProfile().getNickname(), user.getProfile().getProfileMessage(),
-                user.getProfile().getProfileMusic(), user.getProfile().getProfileMusicUrl());
+        return new BaseResponse<>(new ProfileEditViewResponse(user.getProfile().getProfileImage(), user.getProfile().getNickname(), user.getProfile().getProfileMessage(),
+                user.getProfile().getProfileMusic(), user.getProfile().getProfileMusicUrl()));
     }
 
     // [유저] 프로필 수정
     @Transactional(rollbackFor = Exception.class)
-    public void editProfile(MultipartFile image, EditProfileRequest editProfileRequest) throws IOException {
+    public BaseResponse<String> editProfile(MultipartFile image, EditProfileRequest editProfileRequest) throws IOException {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         if (editProfileRequest.nickname() != null) { // nickname만 null 불가능
@@ -85,11 +86,12 @@ public class ProfileService {
             user.getProfile().modifyProfileImage(imagePath);
         }
         userRepository.save(user);
+        return new BaseResponse<>(SUCCESS);
     }
 
     // 대표 사진(Thumbnail) 등록 및 수정
     @Transactional(rollbackFor = Exception.class)
-    public void postThumbnail(MultipartFile image, PostThumbnailRequest postThumbnailRequest) throws IOException {
+    public BaseResponse<String> postThumbnail(MultipartFile image, PostThumbnailRequest postThumbnailRequest) throws IOException {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         // TODO: 동작 확인 필요
@@ -102,5 +104,6 @@ public class ProfileService {
 
         thumbnailRepository.save(thumbnail);
         thumbnail.setUser(user);
+        return new BaseResponse<>(SUCCESS);
     }
 }
