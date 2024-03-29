@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.lesso.neverland.common.BaseResponseStatus.SUCCESS;
 import static com.lesso.neverland.common.constants.RequestURI.profile;
 
 @RestController
@@ -22,21 +21,20 @@ public class ProfileController {
     // 프로필 조회
     @GetMapping("")
     public BaseResponse<ProfileResponse> getProfile(@RequestBody GetProfileRequest getProfileRequest) {
-        return new BaseResponse<>(profileService.getProfile(getProfileRequest));
+        return profileService.getProfile(getProfileRequest);
     }
 
     // [유저] 프로필 수정 화면 조회
     @GetMapping("/editView")
     public BaseResponse<ProfileEditViewResponse> getProfileEditView() {
-        return new BaseResponse<>(profileService.getProfileEditView());
+        return profileService.getProfileEditView();
     }
 
     // [유저] 프로필 수정
     @PatchMapping("/edit")
     public BaseResponse<String> editProfile(@RequestPart MultipartFile image, @RequestPart EditProfileRequest editProfileRequest) {
         try {
-            profileService.editProfile(image, editProfileRequest);
-            return new BaseResponse<>(SUCCESS);
+            return profileService.editProfile(image, editProfileRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -46,8 +44,7 @@ public class ProfileController {
     @PostMapping("/thumbnail")
     public BaseResponse<String> postThumbnail(@RequestPart MultipartFile image, @RequestPart PostThumbnailRequest postThumbnailRequest) {
         try {
-            profileService.postThumbnail(image, postThumbnailRequest);
-            return new BaseResponse<>(SUCCESS);
+            return profileService.postThumbnail(image, postThumbnailRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
