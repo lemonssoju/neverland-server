@@ -1,3 +1,4 @@
 package com.lesso.neverland.gpt.dto;
 
-public record CompletePuzzleResponse(String text) {}
+public record CompletePuzzleResponse(String prompt,
+                                     String description) {}

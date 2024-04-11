@@ -21,6 +21,6 @@ public class GptController {
     @PostMapping("/completePuzzle")
     public BaseResponse<CompletePuzzleResponse> completePuzzle(@RequestBody CompletePuzzleRequest completePuzzleRequest) {
         GptResponse response = gptService.completion(gptService.toText(completePuzzleRequest.puzzleTextList()));
-        return new BaseResponse<>(new CompletePuzzleResponse(response.messages().get(0).message()));
+        return new BaseResponse<>(gptService.parseResponse(response.messages().get(0).message()));
     }
 }
