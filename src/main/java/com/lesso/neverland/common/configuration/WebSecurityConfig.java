@@ -57,6 +57,7 @@ public class WebSecurityConfig {
                                 new AntPathRequestMatcher("/users/loginId"),
                                 new AntPathRequestMatcher("/users/reissue-token"),
                                 new AntPathRequestMatcher("/**", "GET"),
+                                new AntPathRequestMatcher("/gpt3/completePuzzle"),
                                 new AntPathRequestMatcher("/home", "GET")).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(authService, userService, redisTemplate), UsernamePasswordAuthenticationFilter.class)
