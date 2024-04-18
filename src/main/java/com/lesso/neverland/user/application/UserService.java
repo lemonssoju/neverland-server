@@ -5,6 +5,7 @@ import com.lesso.neverland.common.BaseResponse;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.interest.application.InterestService;
 import com.lesso.neverland.user.domain.User;
+import com.lesso.neverland.user.domain.UserProfile;
 import com.lesso.neverland.user.dto.*;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,11 @@ public class UserService {
     public BaseResponse<JwtDto> signup(SignupRequest signupRequest) {
         if(!signupRequest.password().equals(signupRequest.passwordCheck())) throw new BaseException(UNMATCHED_PASSWORD);
 
-        User newUser = signupRequest.toUser(encoder.encode(signupRequest.password()));
+        UserProfile newUserProfile = new UserProfile(signupRequest.nickname());
+        User newUser = new User(
+                signupRequest.loginId(),
+                encoder.encode(signupRequest.password()),
+                newUserProfile);
         userRepository.save(newUser);
 
         for (SignupRequest.ContentsPreference contentsPreference : signupRequest.contentsPreferences()) {
