@@ -88,5 +88,4 @@ public class User extends BaseEntity {
         this.setStatus(INACTIVE);
     }
     public void modifyPassword(String newPassword) { this.password = newPassword; }
-
 }
