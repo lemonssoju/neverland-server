@@ -2,7 +2,6 @@ package com.lesso.neverland.user.application;
 
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
-import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.interest.application.InterestService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.domain.UserProfile;
@@ -39,12 +38,6 @@ public class UserService {
                 encoder.encode(signupRequest.password()),
                 newUserProfile);
         userRepository.save(newUser);
-
-        for (SignupRequest.ContentsPreference contentsPreference : signupRequest.contentsPreferences()) {
-            Contents contents = Contents.getEnumByName(contentsPreference.contents());
-            Contents preference = Contents.getPreference(contents, contentsPreference.preference());
-            interestService.createInterest(contents, preference, newUser);
-        }
         return new BaseResponse<>(authService.generateToken(newUser.getUserIdx()));
     }
 
