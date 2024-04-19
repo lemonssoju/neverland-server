@@ -2,7 +2,6 @@ package com.lesso.neverland.user.application;
 
 import com.lesso.neverland.common.BaseException;
 import com.lesso.neverland.common.BaseResponse;
-import com.lesso.neverland.interest.application.InterestService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.domain.UserProfile;
 import com.lesso.neverland.user.dto.*;
@@ -24,7 +23,6 @@ public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final AuthService authService;
     private final UserRepository userRepository;
-    private final InterestService interestService;
     private final RedisService redisService;
 
     // 회원가입
