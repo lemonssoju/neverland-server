@@ -1,7 +1,7 @@
 package com.lesso.neverland.follow.application;
 
-import com.lesso.neverland.common.BaseException;
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseException;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.follow.domain.Follow;
 import com.lesso.neverland.follow.dto.*;
 import com.lesso.neverland.follow.repository.FollowRepository;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service

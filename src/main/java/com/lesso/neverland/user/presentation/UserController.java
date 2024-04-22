@@ -1,6 +1,6 @@
 package com.lesso.neverland.user.presentation;
 
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.user.application.AuthService;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.dto.*;

@@ -1,4 +1,4 @@
-package com.lesso.neverland.common;
+package com.lesso.neverland.common.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

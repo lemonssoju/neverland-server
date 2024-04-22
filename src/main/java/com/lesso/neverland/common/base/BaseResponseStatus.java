@@ -1,4 +1,4 @@
-package com.lesso.neverland.common;
+package com.lesso.neverland.common.base;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,7 @@
 package com.lesso.neverland.profile.application;
 
-import com.lesso.neverland.common.BaseException;
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseException;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.common.enums.ThumbnailOrder;
 import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.follow.repository.FollowRepository;
@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service

@@ -1,6 +1,6 @@
 package com.lesso.neverland.post.presentation;
 
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.post.application.PostService;
 import com.lesso.neverland.post.dto.MyLikeListResponse;
 import com.lesso.neverland.post.dto.PostEditViewResponse;

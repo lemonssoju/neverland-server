@@ -1,6 +1,6 @@
 package com.lesso.neverland.search.presentation;
 
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.search.application.SearchService;
 import com.lesso.neverland.search.dto.SearchResponse;
 import com.lesso.neverland.search.dto.SearchViewResponse;

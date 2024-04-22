@@ -1,6 +1,6 @@
 package com.lesso.neverland.comment.domain;
 
-import com.lesso.neverland.common.BaseEntity;
+import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;

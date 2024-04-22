@@ -1,6 +1,6 @@
 package com.lesso.neverland.gpt.presentation;
 
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.gpt.application.GptService;
 import com.lesso.neverland.gpt.dto.CompletePuzzleRequest;
 import com.lesso.neverland.gpt.dto.CompletePuzzleResponse;

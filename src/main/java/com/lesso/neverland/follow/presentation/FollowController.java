@@ -1,6 +1,6 @@
 package com.lesso.neverland.follow.presentation;
 
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.follow.application.FollowService;
 import com.lesso.neverland.follow.dto.FollowRequest;
 import com.lesso.neverland.follow.dto.FollowerListResponse;

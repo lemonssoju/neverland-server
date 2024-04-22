@@ -1,6 +1,6 @@
 package com.lesso.neverland.common.enums;
 
-import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.base.BaseException;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static com.lesso.neverland.common.BaseResponseStatus.WRONG_CONTENTS_NAME;
-import static com.lesso.neverland.common.BaseResponseStatus.WRONG_PREFERENCE_NAME;
+import static com.lesso.neverland.common.base.BaseResponseStatus.WRONG_CONTENTS_NAME;
+import static com.lesso.neverland.common.base.BaseResponseStatus.WRONG_PREFERENCE_NAME;
 
 @Getter
 public enum Contents {
