@@ -1,6 +1,6 @@
 package com.lesso.neverland.user.application;
 
-import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.base.BaseException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Date;
 
-import static com.lesso.neverland.common.BaseResponseStatus.EXPIRED_REFRESH_TOKEN;
+import static com.lesso.neverland.common.base.BaseResponseStatus.EXPIRED_REFRESH_TOKEN;
 
 @Service
 @RequiredArgsConstructor

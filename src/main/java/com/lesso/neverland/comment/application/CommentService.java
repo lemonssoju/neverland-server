@@ -4,8 +4,8 @@ import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.comment.dto.ModifyCommentRequest;
 import com.lesso.neverland.comment.dto.PostCommentRequest;
 import com.lesso.neverland.comment.repository.CommentRepository;
-import com.lesso.neverland.common.BaseException;
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseException;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.repository.PostRepository;
 import com.lesso.neverland.user.application.UserService;
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 
 @Service

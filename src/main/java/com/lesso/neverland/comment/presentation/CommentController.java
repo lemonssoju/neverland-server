@@ -3,7 +3,7 @@ package com.lesso.neverland.comment.presentation;
 import com.lesso.neverland.comment.application.CommentService;
 import com.lesso.neverland.comment.dto.ModifyCommentRequest;
 import com.lesso.neverland.comment.dto.PostCommentRequest;
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

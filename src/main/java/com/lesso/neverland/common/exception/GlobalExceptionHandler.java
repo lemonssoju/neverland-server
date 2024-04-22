@@ -1,7 +1,7 @@
 package com.lesso.neverland.common.exception;
 
-import com.lesso.neverland.common.BaseException;
-import com.lesso.neverland.common.ErrorResponse;
+import com.lesso.neverland.common.base.BaseException;
+import com.lesso.neverland.common.base.ErrorResponse;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static com.lesso.neverland.common.BaseResponseStatus.DUPLICATE_RESOURCE;
+import static com.lesso.neverland.common.base.BaseResponseStatus.DUPLICATE_RESOURCE;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {

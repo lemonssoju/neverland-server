@@ -1,7 +1,7 @@
 package com.lesso.neverland.user.domain;
 
 import com.lesso.neverland.comment.domain.Comment;
-import com.lesso.neverland.common.BaseEntity;
+import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.guestMemo.domain.GuestMemo;
 import com.lesso.neverland.search.domain.SearchHistory;
 import com.lesso.neverland.interest.domain.Interest;

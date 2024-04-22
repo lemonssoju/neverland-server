@@ -1,6 +1,6 @@
 package com.lesso.neverland.common.jwt;
 
-import com.lesso.neverland.common.BaseResponseStatus;
+import com.lesso.neverland.common.base.BaseResponseStatus;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 
 @Component
 @RequiredArgsConstructor

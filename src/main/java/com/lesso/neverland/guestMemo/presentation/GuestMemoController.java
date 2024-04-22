@@ -1,6 +1,6 @@
 package com.lesso.neverland.guestMemo.presentation;
 
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.guestMemo.application.GuestMemoService;
 import com.lesso.neverland.guestMemo.dto.GetGuestMemoListRequest;
 import com.lesso.neverland.guestMemo.dto.GuestMemoListResponse;

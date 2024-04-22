@@ -2,8 +2,8 @@ package com.lesso.neverland.post.application;
 
 import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.comment.dto.CommentDto;
-import com.lesso.neverland.common.BaseException;
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseException;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostLike;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 

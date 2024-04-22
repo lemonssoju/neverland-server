@@ -1,7 +1,7 @@
 package com.lesso.neverland.post.domain;
 
 import com.lesso.neverland.comment.domain.Comment;
-import com.lesso.neverland.common.BaseEntity;
+import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.common.enums.Source;
 import com.lesso.neverland.group.domain.Team;

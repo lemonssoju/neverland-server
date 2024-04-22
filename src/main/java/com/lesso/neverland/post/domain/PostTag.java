@@ -1,6 +1,6 @@
 package com.lesso.neverland.post.domain;
 
-import com.lesso.neverland.common.BaseEntity;
+import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.common.enums.Contents;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

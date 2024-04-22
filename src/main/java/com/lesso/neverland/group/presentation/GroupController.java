@@ -1,6 +1,6 @@
 package com.lesso.neverland.group.presentation;
 
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.group.application.GroupService;
 import com.lesso.neverland.group.dto.*;
 import lombok.RequiredArgsConstructor;

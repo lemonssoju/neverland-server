@@ -1,7 +1,7 @@
 package com.lesso.neverland.search.application;
 
-import com.lesso.neverland.common.BaseException;
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseException;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.common.enums.Contents;
 import com.lesso.neverland.interest.domain.Interest;
 import com.lesso.neverland.interest.repository.InterestRepository;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
-import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service

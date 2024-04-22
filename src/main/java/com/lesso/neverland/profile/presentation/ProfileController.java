@@ -1,6 +1,6 @@
 package com.lesso.neverland.profile.presentation;
 
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.profile.application.ProfileService;
 import com.lesso.neverland.profile.dto.*;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.lesso.neverland.guestMemo.application;
 
-import com.lesso.neverland.common.BaseException;
-import com.lesso.neverland.common.BaseResponse;
+import com.lesso.neverland.common.base.BaseException;
+import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.guestMemo.domain.GuestMemo;
 import com.lesso.neverland.guestMemo.dto.GetGuestMemoListRequest;
 import com.lesso.neverland.guestMemo.dto.GuestMemoDto;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
