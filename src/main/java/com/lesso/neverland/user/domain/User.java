@@ -6,7 +6,6 @@ import com.lesso.neverland.guestMemo.domain.GuestMemo;
 import com.lesso.neverland.search.domain.SearchHistory;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostLike;
-import com.lesso.neverland.profile.domain.Thumbnail;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -42,10 +41,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
     private List<Post> posts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    @Where(clause = "status = 'ACTIVE'")
-    private List<Thumbnail> thumbnails = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
