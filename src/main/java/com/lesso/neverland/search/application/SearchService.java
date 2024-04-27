@@ -3,8 +3,6 @@ package com.lesso.neverland.search.application;
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.common.enums.Contents;
-import com.lesso.neverland.interest.domain.Interest;
-import com.lesso.neverland.interest.repository.InterestRepository;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostTag;
 import com.lesso.neverland.post.repository.PostRepository;
@@ -22,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
-import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +30,6 @@ public class SearchService {
     PostTagRepository postTagRepository;
     SearchHistoryRepository searchHistoryRepository;
     UserService userService;
-    InterestRepository interestRepository;
 
     // user 검색
     public UserSearchResponse searchUser(String nickname) {
@@ -94,18 +90,6 @@ public class SearchService {
         SearchHistory searchHistory = new SearchHistory(user, searchWord);
         searchHistory.setUser(user);
         searchHistoryRepository.save(searchHistory);
-    }
-
-    // 검색 화면 조회
-    public BaseResponse<SearchViewResponse> getSearchView() {
-        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-
-        List<Interest> userInterests = interestRepository.findByUser(user);
-        List<RecommendedSearchDto> recommendedSearchList = userInterests.stream()
-                .map(interest -> new RecommendedSearchDto(interest.getPreference().name())).toList();
-        List<RecentSearchDto> recentSearchList = searchHistoryRepository.findByUserAndStatusEqualsOrderByCreatedDateDesc(user, ACTIVE).stream()
-                .map(history -> new RecentSearchDto(history.getSearchHistoryIdx(), history.getSearchWord())).toList();
-        return new BaseResponse<>(new SearchViewResponse(recommendedSearchList, recentSearchList));
     }
 
     // 최근 검색어 개별 삭제

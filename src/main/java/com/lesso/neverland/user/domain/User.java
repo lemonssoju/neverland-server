@@ -4,7 +4,6 @@ import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.guestMemo.domain.GuestMemo;
 import com.lesso.neverland.search.domain.SearchHistory;
-import com.lesso.neverland.interest.domain.Interest;
 import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.post.domain.PostLike;
 import com.lesso.neverland.profile.domain.Thumbnail;
@@ -39,10 +38,6 @@ public class User extends BaseEntity {
 
     @Embedded
     private UserProfile profile;
-
-    @OneToMany(mappedBy = "user")
-    @Where(clause = "status = 'ACTIVE'")
-    private List<Interest> interests = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
