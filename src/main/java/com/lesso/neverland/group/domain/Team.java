@@ -41,7 +41,7 @@ public class Team extends BaseEntity {
     private LocalDate startDate;
 
     @OneToMany(mappedBy = "team")
-    @Where(clause = "status = 'ACTIVE'")
+    //@Where(clause = "status = 'ACTIVE'")
     private List<UserTeam> userTeams = new ArrayList<>();
 
     @Builder
