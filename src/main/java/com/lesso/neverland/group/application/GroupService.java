@@ -60,8 +60,7 @@ public class GroupService {
                 .map(group -> new GroupListDto(
                         group.getTeamIdx(),
                         group.getTeamImage(),
-                        group.getName(),
-                        group.getSubName())).collect(Collectors.toList());
+                        group.getName())).collect(Collectors.toList());
         return new BaseResponse<>(new GroupListResponse(groupListDto));
     }
 
@@ -116,7 +115,7 @@ public class GroupService {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         validateAdmin(user, group);
 
-        return new BaseResponse<>(new GroupEditViewResponse(group.getName(), group.getSubName(), group.getTeamImage()));
+        return new BaseResponse<>(new GroupEditViewResponse(group.getName(), group.getTeamImage()));
     }
 
     // [관리자] 그룹 수정
@@ -130,13 +129,7 @@ public class GroupService {
             if (!editGroupRequest.name().equals("") && !editGroupRequest.name().equals(" "))
                 group.modifyName(editGroupRequest.name());
             else throw new BaseException(BLANK_GROUP_NAME);
-        }
-        if (editGroupRequest.subName() != null) {
-            if (!editGroupRequest.subName().equals("") && !editGroupRequest.subName().equals(" "))
-                group.modifySubName(editGroupRequest.subName());
-            else throw new BaseException(BLANK_GROUP_SUB_NAME);
-        }
-        if (editGroupRequest.memberList() != null) {
+        } if (editGroupRequest.memberList() != null) {
             List<UserTeam> originalMemberList = group.getUserTeams();
             userTeamRepository.deleteAll(originalMemberList);
 
@@ -229,7 +222,7 @@ public class GroupService {
         // upload image
         String imagePath = imageService.uploadImage("group", image);
 
-        Team group = new Team(admin, createGroupRequest.name(), createGroupRequest.subName(), imagePath);
+        Team group = new Team(admin, createGroupRequest.name(), imagePath);
         groupRepository.save(group);
 
         UserTeam newUserTeam = new UserTeam(admin, group);

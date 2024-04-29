@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,25 +35,23 @@ public class Team extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
-    private String subName;
-
-    @Column(nullable = false)
     private String teamImage;
 
+    @Column(nullable = false)
+    private LocalDate startDate;
+
     @OneToMany(mappedBy = "team")
-    @Where(clause = "status = 'ACTIVE'")
+    //@Where(clause = "status = 'ACTIVE'")
     private List<UserTeam> userTeams = new ArrayList<>();
 
     @Builder
-    public Team(User admin, String name, String subName, String teamImage) {
+    public Team(User admin, String name, String teamImage) {
         this.admin = admin;
         this.name = name;
-        this.subName = subName;
         this.teamImage = teamImage;
     }
 
     public void modifyName(String name) { this.name = name; }
-    public void modifySubName(String subName) { this.subName = subName; }
     public void modifyImage(String imageUrl) {this.teamImage = imageUrl; }
     public void delete() { this.setStatus(INACTIVE);}
 }
