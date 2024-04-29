@@ -2,8 +2,6 @@ package com.lesso.neverland.post.domain;
 
 import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.common.base.BaseEntity;
-import com.lesso.neverland.common.enums.Contents;
-import com.lesso.neverland.common.enums.Source;
 import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
@@ -14,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,19 +22,15 @@ import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 @Getter
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post extends BaseEntity {
+public class Puzzle extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postIdx;
+    private Long puzzleIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user")
     private User user; // 작성자
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Source source;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team")
@@ -44,25 +39,20 @@ public class Post extends BaseEntity {
     @Column(nullable = false, length = 30)
     private String title;
 
-    @Column(nullable = false, length = 50)
-    private String subtitle;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Contents contentsType; // 콘텐츠 종류
-
-    private String backgroundMusic; // 가수 - 제목
-    private String backgroundMusicUrl; // 유튜브 링크 url
-
-    @Column(nullable = false)
-    private String postImage;
-
     @Column(nullable = false)
     private String content;
 
-    @OneToMany(mappedBy = "post")
-    @Where(clause = "status = 'ACTIVE'")
-    private List<PostTag> postTags = new ArrayList<>(); // 취향 관련 태그
+    @Column(nullable = false)
+    private String puzzleImage;
+
+    @Column(nullable = false)
+    private LocalDate puzzleDate; // 추억 날짜
+
+    @Column(nullable = false)
+    private String location; // 추억 장소
+
+    private String backgroundMusic; // 가수 - 제목
+    private String backgroundMusicUrl; // 유튜브 링크 url
 
     @OneToMany(mappedBy = "post")
     @Where(clause = "status = 'ACTIVE'")
@@ -73,22 +63,21 @@ public class Post extends BaseEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public Post(User user, Source source, Team team, String title, String subtitle, Contents contentsType, String backgroundMusic, String backgroundMusicUrl, String postImage, String content) {
+    public Puzzle(User user, Team team, String title, String content, String puzzleImage, LocalDate puzzleDate, String location, String backgroundMusic, String backgroundMusicUrl) {
         this.user = user;
-        this.source = source;
         this.team = team;
         this.title = title;
-        this.subtitle = subtitle;
-        this.contentsType = contentsType;
+        this.content = content;
+        this.puzzleImage = puzzleImage;
+        this.puzzleDate = puzzleDate;
+        this.location = location;
         this.backgroundMusic = backgroundMusic;
         this.backgroundMusicUrl = backgroundMusicUrl;
-        this.postImage = postImage;
-        this.content = content;
     }
 
     public void setUser(User user) {
         this.user = user;
-        user.getPosts().add(this);
+        user.getPuzzles().add(this);
     }
 
     public void delete() {
