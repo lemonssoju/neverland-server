@@ -30,8 +30,8 @@ public class PuzzleService {
 
     // 퍼즐 상세 조회
     public BaseResponse<PuzzleResponse> getPuzzle(Long puzzleIdx) {
-        Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
-        if (puzzle.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_POST);
+        Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
+        if (puzzle.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_PUZZLE);
 
         return new BaseResponse<>(new PuzzleResponse(puzzle.getTitle(), puzzle.getContent(), puzzle.getCreatedDate(),
                 puzzle.getUser().getUserIdx(), puzzle.getUser().getProfile().getNickname(), puzzle.getBackgroundMusic(), puzzle.getBackgroundMusicUrl(),
@@ -41,7 +41,7 @@ public class PuzzleService {
     // [작성자] 피드 수정 화면 조회
     public BaseResponse<PuzzleEditViewResponse> getPuzzleEditView(Long puzzleIdx) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
+        Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         validateWriter(user, puzzle);
 
         return new BaseResponse<>(new PuzzleEditViewResponse(puzzle.getTitle(), puzzle.getBackgroundMusic(),
@@ -52,7 +52,7 @@ public class PuzzleService {
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<String> deletePuzzle(Long puzzleIdx) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_POST_IDX));
+        Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         validateWriter(user, puzzle);
 
         puzzle.delete();
@@ -80,7 +80,7 @@ public class PuzzleService {
 
     // 작성자 validation
     private static void validateWriter(User user, Puzzle puzzle) {
-        if (!puzzle.getUser().equals(user)) throw new BaseException(NO_POST_WRITER);
-        if (puzzle.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_POST);
+        if (!puzzle.getUser().equals(user)) throw new BaseException(NO_PUZZLE_WRITER);
+        if (puzzle.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_PUZZLE);
     }
 }
