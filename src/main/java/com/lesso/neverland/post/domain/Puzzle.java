@@ -1,6 +1,5 @@
 package com.lesso.neverland.post.domain;
 
-import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.user.domain.User;
@@ -10,11 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.Where;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 
@@ -53,14 +48,6 @@ public class Puzzle extends BaseEntity {
 
     private String backgroundMusic; // 가수 - 제목
     private String backgroundMusicUrl; // 유튜브 링크 url
-
-    @OneToMany(mappedBy = "post")
-    @Where(clause = "status = 'ACTIVE'")
-    private List<PostLike> postLikes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post")
-    @Where(clause = "status = 'ACTIVE'")
-    private List<Comment> comments = new ArrayList<>();
 
     @Builder
     public Puzzle(User user, Team team, String title, String content, String puzzleImage, LocalDate puzzleDate, String location, String backgroundMusic, String backgroundMusicUrl) {
