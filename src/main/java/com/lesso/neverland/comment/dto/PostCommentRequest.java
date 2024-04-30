@@ -1,4 +1,4 @@
 package com.lesso.neverland.comment.dto;
 
-public record PostCommentRequest(Long postIdx,
+public record PostCommentRequest(Long albumIdx,
                                  String content) {}
