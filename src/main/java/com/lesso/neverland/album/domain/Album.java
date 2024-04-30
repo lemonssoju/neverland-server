@@ -1,0 +1,39 @@
+package com.lesso.neverland.album.domain;
+
+import com.lesso.neverland.comment.domain.Comment;
+import com.lesso.neverland.common.base.BaseEntity;
+import com.lesso.neverland.puzzle.domain.Puzzle;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.Where;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Getter
+@DynamicInsert
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Album extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long albumIdx;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user")
+    private Puzzle puzzle;
+
+    @Column(nullable = false)
+    private String albumImage;
+
+    @Column(nullable = false)
+    private String content;
+
+    @OneToMany(mappedBy = "puzzle")
+    @Where(clause = "status = 'ACTIVE'")
+    private List<Comment> comments = new ArrayList<>();
+}
