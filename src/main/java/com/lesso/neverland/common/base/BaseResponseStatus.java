@@ -50,7 +50,7 @@ public enum BaseResponseStatus {
 
     // group(2300-2399)
     INVALID_GROUP_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 group idx 입니다."),
-    NO_GROUP_POST(false, HttpStatus.BAD_REQUEST, "이 글은 해당 그룹의 글이 아닙니다."),
+    NO_GROUP_PUZZLE(false, HttpStatus.BAD_REQUEST, "이 글은 해당 그룹의 글이 아닙니다."),
     BLANK_GROUP_NAME(false, HttpStatus.BAD_REQUEST, "그룹명이 비었습니다."),
     BLANK_GROUP_SUB_NAME(false, HttpStatus.BAD_REQUEST, "그룹 subname이 비었습니다."),
     NULL_GROUP_IMAGE(false, HttpStatus.BAD_REQUEST, "그룹 이미지가 비었습니다."),
