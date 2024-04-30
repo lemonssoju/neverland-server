@@ -42,10 +42,10 @@ public enum BaseResponseStatus {
     WRONG_CONTENTS_NAME(false, HttpStatus.BAD_REQUEST, "콘텐츠 이름이 잘못되었습니다."),
     WRONG_PREFERENCE_NAME(false, HttpStatus.BAD_REQUEST, "취향 이름이 잘못되었습니다."),
 
-    // post(2200-2299)
-    INVALID_POST_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 post idx 입니다."),
-    NO_POST_WRITER(false, HttpStatus.BAD_REQUEST, "해당 post의 작성자가 아닙니다."),
-    ALREADY_DELETED_POST(false, HttpStatus.CONFLICT, "이미 삭제된 post 입니다."),
+    // puzzle(2200-2299)
+    INVALID_PUZZLE_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 puzzle idx 입니다."),
+    NO_PUZZLE_WRITER(false, HttpStatus.BAD_REQUEST, "해당 post의 작성자가 아닙니다."),
+    ALREADY_DELETED_PUZZLE(false, HttpStatus.CONFLICT, "이미 삭제된 puzzle 입니다."),
 
 
     // group(2300-2399)
@@ -75,6 +75,8 @@ public enum BaseResponseStatus {
     INVALID_HISTORY_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 history idx 입니다."),
     NO_HISTORY_OWNER(false, HttpStatus.FORBIDDEN, "해당 user의 search history가 아닙니다."),
 
+    // album(2800-2899)
+    INVALID_ALBUM_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 album idx 입니다."),
 
 
     /**

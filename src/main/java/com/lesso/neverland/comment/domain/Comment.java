@@ -1,7 +1,7 @@
 package com.lesso.neverland.comment.domain;
 
+import com.lesso.neverland.album.domain.Album;
 import com.lesso.neverland.common.base.BaseEntity;
-import com.lesso.neverland.post.domain.Post;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,8 +23,8 @@ public class Comment extends BaseEntity {
     private Long commentIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post")
-    private Post post;
+    @JoinColumn(name = "puzzle")
+    private Album album;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user")
@@ -34,15 +34,15 @@ public class Comment extends BaseEntity {
     private String content;
 
     @Builder
-    public Comment(Post post, User user, String content) {
-        this.post = post;
+    public Comment(Album album, User user, String content) {
+        this.album = album;
         this.user = user;
         this.content = content;
     }
 
-    public void setPost(Post post) {
-        this.post = post;
-        post.getComments().add(this);
+    public void setAlbum(Album album) {
+        this.album = album;
+        album.getComments().add(this);
     }
 
     public void setUser(User user) {
