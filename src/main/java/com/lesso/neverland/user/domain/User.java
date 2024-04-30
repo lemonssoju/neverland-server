@@ -2,8 +2,7 @@ package com.lesso.neverland.user.domain;
 
 import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.common.base.BaseEntity;
-import com.lesso.neverland.post.domain.Post;
-import com.lesso.neverland.post.domain.PostLike;
+import com.lesso.neverland.puzzle.domain.Puzzle;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,15 +37,11 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
-    private List<Post> posts = new ArrayList<>();
+    private List<Puzzle> puzzles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
     private List<UserTeam> userTeams = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    @Where(clause = "status = 'ACTIVE'")
-    private List<PostLike> postLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
