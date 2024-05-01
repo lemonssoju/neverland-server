@@ -68,14 +68,7 @@ public enum BaseResponseStatus {
     NO_COMMENT_WRITER(false, HttpStatus.FORBIDDEN, "댓글 작성자가 아닙니다."),
     ALREADY_DELETED_COMMENT(false, HttpStatus.CONFLICT, "이미 삭제된 댓글입니다."),
 
-    // guest memo(2600-2699)
-    TOO_LONG_CONTENT(false, HttpStatus.BAD_REQUEST, "내용은 50자 이하여야 합니다."),
-
-    // history(2700-2799)
-    INVALID_HISTORY_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 history idx 입니다."),
-    NO_HISTORY_OWNER(false, HttpStatus.FORBIDDEN, "해당 user의 search history가 아닙니다."),
-
-    // album(2800-2899)
+    // album(2500-2599)
     INVALID_ALBUM_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 album idx 입니다."),
 
 
