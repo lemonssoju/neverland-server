@@ -3,6 +3,7 @@ package com.lesso.neverland.user.domain;
 import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.puzzle.domain.Puzzle;
+import com.lesso.neverland.puzzle.domain.PuzzlePiece;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,6 +47,9 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<PuzzlePiece> puzzlePieces = new ArrayList<>();
 
     @Builder
     public User(String loginId, String password, UserProfile profile) {
