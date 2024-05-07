@@ -8,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,6 @@ public class Album extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @OneToMany(mappedBy = "puzzle")
-    @Where(clause = "status = 'ACTIVE'")
+    @OneToMany(mappedBy = "album")
     private List<Comment> comments = new ArrayList<>();
 }

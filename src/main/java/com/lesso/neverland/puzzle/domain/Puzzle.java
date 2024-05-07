@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 
@@ -48,6 +50,9 @@ public class Puzzle extends BaseEntity {
 
     private String backgroundMusic; // 가수 - 제목
     private String backgroundMusicUrl; // 유튜브 링크 url
+
+    @OneToMany(mappedBy = "puzzle")
+    private List<PuzzlePiece> puzzlePieces = new ArrayList<>();
 
     @Builder
     public Puzzle(User user, Team team, String title, String content, String puzzleImage, LocalDate puzzleDate, String location, String backgroundMusic, String backgroundMusicUrl) {
