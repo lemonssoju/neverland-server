@@ -23,7 +23,7 @@ public class Comment extends BaseEntity {
     private Long commentIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "puzzle")
+    @JoinColumn(name = "album")
     private Album album;
 
     @ManyToOne(fetch = FetchType.LAZY)
