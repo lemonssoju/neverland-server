@@ -59,9 +59,9 @@ public class UserController {
         return userService.validateLoginId(loginIdRequest.loginId());
     }
 
-    // 개인 정보 수정
+    // 비밀번호 수정
     @PatchMapping("/modify")
-    public BaseResponse<String> modifyUser(@RequestBody ModifyUserRequest modifyUserRequest) {
-        return userService.modifyUser(authService.getUserIdx(), modifyUserRequest);
+    public BaseResponse<String> modifyPassword(@RequestBody ModifyPasswordRequest modifyPasswordRequest) {
+        return userService.modifyPassword(authService.getUserIdx(), modifyPasswordRequest);
     }
 }

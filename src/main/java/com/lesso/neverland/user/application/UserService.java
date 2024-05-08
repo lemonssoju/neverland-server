@@ -107,14 +107,14 @@ public class UserService {
         return new BaseResponse<>(SUCCESS);
     }
 
-    // 개인 정보 변경
+    // 비밀번호 변경
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<String> modifyUser(Long userIdx, ModifyUserRequest modifyUserRequest) {
+    public BaseResponse<String> modifyPassword(Long userIdx, ModifyPasswordRequest modifyPasswordRequest) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        if(!encoder.matches(modifyUserRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
-        if (modifyUserRequest.newPassword().equals("") || modifyUserRequest.newPassword().equals(" "))
+        if(!encoder.matches(modifyPasswordRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
+        if (modifyPasswordRequest.newPassword().equals("") || modifyPasswordRequest.newPassword().equals(" "))
             throw new BaseException(INVALID_PASSWORD);
-        user.modifyPassword(modifyUserRequest.newPassword());
+        user.modifyPassword(modifyPasswordRequest.newPassword());
         userRepository.save(user);
         return new BaseResponse<>(SUCCESS);
     }
