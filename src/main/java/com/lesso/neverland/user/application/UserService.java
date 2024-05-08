@@ -111,11 +111,25 @@ public class UserService {
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<String> modifyPassword(Long userIdx, ModifyPasswordRequest modifyPasswordRequest) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        if(!encoder.matches(modifyPasswordRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
+        if (!encoder.matches(modifyPasswordRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
         if (modifyPasswordRequest.newPassword().equals("") || modifyPasswordRequest.newPassword().equals(" "))
             throw new BaseException(INVALID_PASSWORD);
         user.modifyPassword(modifyPasswordRequest.newPassword());
         userRepository.save(user);
+
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    // 닉네임 변경
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<String> modifyNickname(Long userIdx, ModifyNicknameRequest modifyNicknameRequest) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        if (modifyNicknameRequest.nickname().equals("") || modifyNicknameRequest.nickname().equals(" "))
+            throw new BaseException(INVALID_NICKNAME);
+        validateNickname(modifyNicknameRequest.nickname());
+        user.getProfile().modifyNickname(modifyNicknameRequest.nickname());
+        userRepository.save(user);
+
         return new BaseResponse<>(SUCCESS);
     }
 

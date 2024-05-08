@@ -60,8 +60,15 @@ public class UserController {
     }
 
     // 비밀번호 수정
-    @PatchMapping("/modify")
+    @PatchMapping("/modifyPassword")
     public BaseResponse<String> modifyPassword(@RequestBody ModifyPasswordRequest modifyPasswordRequest) {
         return userService.modifyPassword(authService.getUserIdx(), modifyPasswordRequest);
     }
+
+    // 닉네임 수정
+    @PatchMapping("/modifyNickname")
+    public BaseResponse<String> modifyNickname(@RequestBody ModifyNicknameRequest modifyNicknameRequest) {
+        return userService.modifyNickname(authService.getUserIdx(), modifyNicknameRequest);
+    }
+
 }
