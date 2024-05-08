@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ public class Team extends BaseEntity {
     private LocalDate startDate;
 
     @OneToMany(mappedBy = "team")
-    //@Where(clause = "status = 'ACTIVE'")
     private List<UserTeam> userTeams = new ArrayList<>();
 
     @Builder
