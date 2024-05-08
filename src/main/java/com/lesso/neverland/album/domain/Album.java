@@ -23,7 +23,7 @@ public class Album extends BaseEntity {
     private Long albumIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user")
+    @JoinColumn(name = "puzzle")
     private Puzzle puzzle;
 
     @Column(nullable = false)
