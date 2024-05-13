@@ -137,11 +137,13 @@ public class UserService {
         return new BaseResponse<>(SUCCESS);
     }
 
-    // 프로필 이미지 수정
+    // 프로필 이미지 등록 및 수정
     public BaseResponse<String> modifyImage(Long userIdx, MultipartFile newImage) throws IOException {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        imageService.deleteImage(user.getProfile().getProfileImage());
-
+        // 이미 등록된 프로필 이미지가 있는 경우
+        if (user.getProfile().getProfileImage() != null && !user.getProfile().getProfileImage().isEmpty()) {
+            imageService.deleteImage(user.getProfile().getProfileImage());
+        }
         String newImagePath = imageService.uploadImage("user", newImage);
         user.getProfile().modifyProfileImage(newImagePath);
         userRepository.save(user);
