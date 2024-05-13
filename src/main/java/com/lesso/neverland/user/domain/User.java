@@ -1,13 +1,9 @@
 package com.lesso.neverland.user.domain;
 
 import com.lesso.neverland.comment.domain.Comment;
-import com.lesso.neverland.common.BaseEntity;
-import com.lesso.neverland.guestMemo.domain.GuestMemo;
-import com.lesso.neverland.search.domain.SearchHistory;
-import com.lesso.neverland.interest.domain.Interest;
-import com.lesso.neverland.post.domain.Post;
-import com.lesso.neverland.post.domain.PostLike;
-import com.lesso.neverland.profile.domain.Thumbnail;
+import com.lesso.neverland.common.base.BaseEntity;
+import com.lesso.neverland.puzzle.domain.Puzzle;
+import com.lesso.neverland.puzzle.domain.PuzzlePiece;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -42,15 +38,7 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
-    private List<Interest> interests = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    @Where(clause = "status = 'ACTIVE'")
-    private List<Post> posts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    @Where(clause = "status = 'ACTIVE'")
-    private List<Thumbnail> thumbnails = new ArrayList<>();
+    private List<Puzzle> puzzles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
@@ -58,18 +46,10 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "status = 'ACTIVE'")
-    private List<GuestMemo> memos = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    @Where(clause = "status = 'ACTIVE'")
-    private List<PostLike> postLikes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    @Where(clause = "status = 'ACTIVE'")
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<SearchHistory> searchHistories = new ArrayList<>();
+    private List<PuzzlePiece> puzzlePieces = new ArrayList<>();
 
     @Builder
     public User(String loginId, String password, UserProfile profile) {
@@ -88,5 +68,4 @@ public class User extends BaseEntity {
         this.setStatus(INACTIVE);
     }
     public void modifyPassword(String newPassword) { this.password = newPassword; }
-
 }

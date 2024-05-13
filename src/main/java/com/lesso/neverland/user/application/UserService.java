@@ -1,20 +1,22 @@
 package com.lesso.neverland.user.application;
 
-import com.lesso.neverland.common.BaseException;
-import com.lesso.neverland.common.BaseResponse;
-import com.lesso.neverland.common.enums.Contents;
-import com.lesso.neverland.interest.application.InterestService;
+import com.lesso.neverland.common.base.BaseException;
+import com.lesso.neverland.common.base.BaseResponse;
+import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.user.domain.User;
+import com.lesso.neverland.user.domain.UserProfile;
 import com.lesso.neverland.user.dto.*;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
-import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service
@@ -24,22 +26,20 @@ public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final AuthService authService;
     private final UserRepository userRepository;
-    private final InterestService interestService;
     private final RedisService redisService;
+    private final ImageService imageService;
 
     // 회원가입
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<JwtDto> signup(SignupRequest signupRequest) {
         if(!signupRequest.password().equals(signupRequest.passwordCheck())) throw new BaseException(UNMATCHED_PASSWORD);
 
-        User newUser = signupRequest.toUser(encoder.encode(signupRequest.password()));
+        UserProfile newUserProfile = new UserProfile(signupRequest.nickname());
+        User newUser = new User(
+                signupRequest.loginId(),
+                encoder.encode(signupRequest.password()),
+                newUserProfile);
         userRepository.save(newUser);
-
-        for (SignupRequest.ContentsPreference contentsPreference : signupRequest.contentsPreferences()) {
-            Contents contents = Contents.getEnumByName(contentsPreference.contents());
-            Contents preference = Contents.getPreference(contents, contentsPreference.preference());
-            interestService.createInterest(contents, preference, newUser);
-        }
         return new BaseResponse<>(authService.generateToken(newUser.getUserIdx()));
     }
 
@@ -111,16 +111,52 @@ public class UserService {
         return new BaseResponse<>(SUCCESS);
     }
 
-    // 개인 정보 변경
+    // 비밀번호 변경
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<String> modifyUser(Long userIdx, ModifyUserRequest modifyUserRequest) {
+    public BaseResponse<String> modifyPassword(Long userIdx, ModifyPasswordRequest modifyPasswordRequest) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        if(!encoder.matches(modifyUserRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
-        if (modifyUserRequest.newPassword().equals("") || modifyUserRequest.newPassword().equals(" "))
+        if (!encoder.matches(modifyPasswordRequest.password(), user.getPassword())) throw new BaseException(WRONG_PASSWORD);
+        if (modifyPasswordRequest.newPassword().equals("") || modifyPasswordRequest.newPassword().equals(" "))
             throw new BaseException(INVALID_PASSWORD);
-        user.modifyPassword(modifyUserRequest.newPassword());
+        user.modifyPassword(modifyPasswordRequest.newPassword());
         userRepository.save(user);
+
         return new BaseResponse<>(SUCCESS);
+    }
+
+    // 닉네임 수정
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<String> modifyNickname(Long userIdx, ModifyNicknameRequest modifyNicknameRequest) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        if (modifyNicknameRequest.nickname().equals("") || modifyNicknameRequest.nickname().equals(" "))
+            throw new BaseException(INVALID_NICKNAME);
+        validateNickname(modifyNicknameRequest.nickname());
+        user.getProfile().modifyNickname(modifyNicknameRequest.nickname());
+        userRepository.save(user);
+
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    // 프로필 이미지 등록 및 수정
+    public BaseResponse<String> modifyImage(Long userIdx, MultipartFile newImage) throws IOException {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        // 이미 등록된 프로필 이미지가 있는 경우
+        if (user.getProfile().getProfileImage() != null && !user.getProfile().getProfileImage().isEmpty()) {
+            imageService.deleteImage(user.getProfile().getProfileImage());
+        }
+        String newImagePath = imageService.uploadImage("user", newImage);
+        user.getProfile().modifyProfileImage(newImagePath);
+        userRepository.save(user);
+
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    // 마이페이지 조회
+    public BaseResponse<MyPageResponse> getMyPage(Long userIdx) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+        MyPageResponse myPageResponse = new MyPageResponse(user.getProfile().getProfileImage(), user.getProfile().getNickname());
+        return new BaseResponse<>(myPageResponse);
     }
 
     // 회원 validation

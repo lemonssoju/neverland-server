@@ -1,6 +1,6 @@
 package com.lesso.neverland.user.application;
 
-import com.lesso.neverland.common.BaseException;
+import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.user.dto.JwtDto;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Date;
 
-import static com.lesso.neverland.common.BaseResponseStatus.*;
+import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 import static com.lesso.neverland.common.constants.Constants.LOGOUT;
 

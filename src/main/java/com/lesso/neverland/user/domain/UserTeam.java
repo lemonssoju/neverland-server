@@ -1,6 +1,6 @@
 package com.lesso.neverland.user.domain;
 
-import com.lesso.neverland.common.BaseEntity;
+import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.group.domain.Team;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -1,6 +1,6 @@
 package com.lesso.neverland.group.domain;
 
-import com.lesso.neverland.common.BaseEntity;
+import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.domain.UserTeam;
 import jakarta.persistence.*;
@@ -9,8 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.Where;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,25 +34,22 @@ public class Team extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
-    private String subName;
-
-    @Column(nullable = false)
     private String teamImage;
 
+    @Column(nullable = false)
+    private LocalDate startDate;
+
     @OneToMany(mappedBy = "team")
-    @Where(clause = "status = 'ACTIVE'")
     private List<UserTeam> userTeams = new ArrayList<>();
 
     @Builder
-    public Team(User admin, String name, String subName, String teamImage) {
+    public Team(User admin, String name, String teamImage) {
         this.admin = admin;
         this.name = name;
-        this.subName = subName;
         this.teamImage = teamImage;
     }
 
     public void modifyName(String name) { this.name = name; }
-    public void modifySubName(String subName) { this.subName = subName; }
     public void modifyImage(String imageUrl) {this.teamImage = imageUrl; }
     public void delete() { this.setStatus(INACTIVE);}
 }

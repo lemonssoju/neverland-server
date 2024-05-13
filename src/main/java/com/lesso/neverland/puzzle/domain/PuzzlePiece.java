@@ -1,6 +1,5 @@
-package com.lesso.neverland.comment.domain;
+package com.lesso.neverland.puzzle.domain;
 
-import com.lesso.neverland.album.domain.Album;
 import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.user.domain.User;
 import jakarta.persistence.*;
@@ -10,48 +9,41 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
-import static com.lesso.neverland.common.constants.Constants.INACTIVE;
-
 @Entity
 @Getter
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseEntity {
+public class PuzzlePiece extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long commentIdx;
+    private Long puzzlePieceIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "album")
-    private Album album;
+    @JoinColumn(name = "puzzle")
+    private Puzzle puzzle;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user")
-    private User user;
+    private User user; // 작성자
 
     @Column(nullable = false)
     private String content;
 
     @Builder
-    public Comment(Album album, User user, String content) {
-        this.album = album;
+    public PuzzlePiece(Puzzle puzzle, User user, String content) {
+        this.puzzle = puzzle;
         this.user = user;
         this.content = content;
     }
 
-    public void setAlbum(Album album) {
-        this.album = album;
-        album.getComments().add(this);
+    public void setPuzzle(Puzzle puzzle) {
+        this.puzzle = puzzle;
+        puzzle.getPuzzlePieces().add(this);
     }
 
     public void setUser(User user) {
         this.user = user;
-        user.getComments().add(this);
+        user.getPuzzlePieces().add(this);
     }
-
-    public void delete() {
-        this.setStatus(INACTIVE);
-    }
-    public void modifyContent(String content) { this.content = content; }
 }
