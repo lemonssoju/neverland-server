@@ -2,6 +2,7 @@ package com.lesso.neverland.user.application;
 
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
+import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.domain.UserProfile;
 import com.lesso.neverland.user.dto.*;
@@ -10,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
@@ -24,6 +27,7 @@ public class UserService {
     private final AuthService authService;
     private final UserRepository userRepository;
     private final RedisService redisService;
+    private final ImageService imageService;
 
     // 회원가입
     @Transactional(rollbackFor = Exception.class)
@@ -120,7 +124,7 @@ public class UserService {
         return new BaseResponse<>(SUCCESS);
     }
 
-    // 닉네임 변경
+    // 닉네임 수정
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<String> modifyNickname(Long userIdx, ModifyNicknameRequest modifyNicknameRequest) {
         User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
@@ -128,6 +132,18 @@ public class UserService {
             throw new BaseException(INVALID_NICKNAME);
         validateNickname(modifyNicknameRequest.nickname());
         user.getProfile().modifyNickname(modifyNicknameRequest.nickname());
+        userRepository.save(user);
+
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    // 프로필 이미지 수정
+    public BaseResponse<String> modifyImage(Long userIdx, MultipartFile newImage) throws IOException {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        imageService.deleteImage(user.getProfile().getProfileImage());
+
+        String newImagePath = imageService.uploadImage("user", newImage);
+        user.getProfile().modifyProfileImage(newImagePath);
         userRepository.save(user);
 
         return new BaseResponse<>(SUCCESS);

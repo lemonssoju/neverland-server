@@ -61,6 +61,7 @@ public enum BaseResponseStatus {
 
     // image(2400-2499)
     IMAGE_DELETE_FAIL(false, HttpStatus.CONFLICT, "이미지 삭제에 실패했습니다."),
+    IMAGE_UPLOAD_FAIL(false, HttpStatus.CONFLICT, "이미지 업로드에 실패했습니다."),
 
     // comment(2500-2599)
     INVALID_COMMENT_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 comment idx 입니다."),
