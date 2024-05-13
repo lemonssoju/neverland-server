@@ -76,8 +76,8 @@ public class UserController {
         return userService.modifyNickname(authService.getUserIdx(), modifyNicknameRequest);
     }
 
-    // 프로필 이미지 수정
-    @PatchMapping("/modifyProfileImage")
+    // 프로필 이미지 등록 및 수정
+    @PatchMapping("/profileImage")
     public BaseResponse<String> modifyProfileImage(@RequestPart MultipartFile newImage) {
         try {
             return userService.modifyImage(authService.getUserIdx(), newImage);
