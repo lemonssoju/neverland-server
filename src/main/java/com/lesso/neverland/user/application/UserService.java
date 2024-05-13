@@ -151,6 +151,14 @@ public class UserService {
         return new BaseResponse<>(SUCCESS);
     }
 
+    // 마이페이지 조회
+    public BaseResponse<MyPageResponse> getMyPage(Long userIdx) {
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+        MyPageResponse myPageResponse = new MyPageResponse(user.getProfile().getProfileImage(), user.getProfile().getNickname());
+        return new BaseResponse<>(myPageResponse);
+    }
+
     // 회원 validation
     public Long getUserIdxWithValidation() {
         Long userIdx = authService.getUserIdx();
