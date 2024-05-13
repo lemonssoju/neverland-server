@@ -1,5 +1,6 @@
 package com.lesso.neverland.group.presentation;
 
+import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.group.application.GroupService;
 import com.lesso.neverland.group.dto.*;
@@ -9,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import static com.lesso.neverland.common.base.BaseResponseStatus.IMAGE_UPLOAD_FAIL;
 import static com.lesso.neverland.common.constants.RequestURI.group;
 
 @RestController
@@ -70,7 +72,7 @@ public class GroupController {
         try {
             return groupService.createGroup(image, createGroupRequest);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BaseException(IMAGE_UPLOAD_FAIL);
         }
     }
 
@@ -80,7 +82,7 @@ public class GroupController {
         try {
             return groupService.createGroupPuzzle(groupIdx, image, groupPuzzleRequest);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BaseException(IMAGE_UPLOAD_FAIL);
         }
     }
 }
