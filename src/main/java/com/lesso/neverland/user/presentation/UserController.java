@@ -85,4 +85,10 @@ public class UserController {
             throw new BaseException(IMAGE_UPLOAD_FAIL);
         }
     }
+
+    // 마이페이지 조회
+    @GetMapping("/myPage")
+    public BaseResponse<MyPageResponse> getMyPage() {
+        return userService.getMyPage(authService.getUserIdx());
+    }
 }
