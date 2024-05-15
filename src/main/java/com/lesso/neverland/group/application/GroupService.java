@@ -47,11 +47,19 @@ public class GroupService {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         List<Team> groupList = groupRepository.findByAdminAndStatusEquals(user, ACTIVE);
         List<GroupListDto> groupListDto = groupList.stream()
-                .map(group -> new GroupListDto(
-                        group.getTeamIdx(),
-                        group.getTeamImage(),
-                        group.getName())).collect(Collectors.toList());
+                .map(group -> {
+                    String startYear = group.getStartDate().format(DateTimeFormatter.ofPattern("yyyy"));
+                    int memberCount = group.getUserTeams().size();
+                    String recentUpdate = calculateRecentUpdate(group);
+
+                    return new GroupListDto(group.getTeamIdx(), group.getTeamImage(), startYear, group.getName(),
+                            memberCount, group.getAdmin().getProfile().getNickname(), recentUpdate);
+                }).collect(Collectors.toList());
         return new BaseResponse<>(new GroupListResponse(groupListDto));
+    }
+
+    private String calculateRecentUpdate(Team group) { //TODO: recentUpdate 필드 계산 메서드 추가 구현 필요
+        return "5일 전";
     }
 
     // 그룹 퍼즐 목록 조회
