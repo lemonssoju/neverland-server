@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class Team extends BaseEntity {
     private String teamImage;
 
     @Column(nullable = false)
-    private LocalDate startDate;
+    private YearMonth startDate;
 
     @OneToMany(mappedBy = "team")
     private List<UserTeam> userTeams = new ArrayList<>();
