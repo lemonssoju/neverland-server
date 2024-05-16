@@ -22,7 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,17 +51,20 @@ public class GroupService {
         List<GroupListDto> groupListDto = groupList.stream()
                 .map(group -> {
                     String startYear = group.getStartDate().format(DateTimeFormatter.ofPattern("yyyy"));
-                    int memberCount = group.getUserTeams().size();
-                    String recentUpdate = calculateRecentUpdate(group);
-
                     return new GroupListDto(group.getTeamIdx(), group.getTeamImage(), startYear, group.getName(),
-                            memberCount, group.getAdmin().getProfile().getNickname(), recentUpdate);
+                            group.getUserTeams().size(), group.getAdmin().getProfile().getNickname(), calculateRecentUpdate(group));
                 }).collect(Collectors.toList());
         return new BaseResponse<>(new GroupListResponse(groupListDto));
     }
 
-    private String calculateRecentUpdate(Team group) { //TODO: recentUpdate 필드 계산 메서드 추가 구현 필요
-        return "5일 전";
+    private String calculateRecentUpdate(Team group) {
+        Puzzle recentPuzzle = puzzleRepository.findTopByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
+
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        LocalDate puzzleCreatedDate = recentPuzzle.getCreatedDate();
+        long daysBetween = ChronoUnit.DAYS.between(puzzleCreatedDate, today);
+
+        return daysBetween + "일 전";
     }
 
     // 그룹 퍼즐 목록 조회
