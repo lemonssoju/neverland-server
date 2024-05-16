@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface PuzzleRepository extends JpaRepository<Puzzle, Long> {
     List<Puzzle> findByTeamAndStatusEqualsOrderByCreatedDateDesc(Team group, String status);
+    Puzzle findTopByTeamAndStatusEqualsOrderByCreatedDateDesc(Team group, String status);
     List<Puzzle> findByTeamAndStatusEquals(Team group, String status);
     List<Puzzle> findByUserAndStatusEquals(User user, String status);
     @Query("SELECT p FROM Puzzle p WHERE p.title LIKE CONCAT('%', :keyword, '%') OR p.content LIKE CONCAT('%', :keyword, '%')")

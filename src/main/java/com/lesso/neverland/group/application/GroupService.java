@@ -22,7 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,11 +49,22 @@ public class GroupService {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         List<Team> groupList = groupRepository.findByAdminAndStatusEquals(user, ACTIVE);
         List<GroupListDto> groupListDto = groupList.stream()
-                .map(group -> new GroupListDto(
-                        group.getTeamIdx(),
-                        group.getTeamImage(),
-                        group.getName())).collect(Collectors.toList());
+                .map(group -> {
+                    String startYear = group.getStartDate().format(DateTimeFormatter.ofPattern("yyyy"));
+                    return new GroupListDto(group.getTeamIdx(), group.getTeamImage(), startYear, group.getName(),
+                            group.getUserTeams().size(), group.getAdmin().getProfile().getNickname(), calculateRecentUpdate(group));
+                }).collect(Collectors.toList());
         return new BaseResponse<>(new GroupListResponse(groupListDto));
+    }
+
+    private String calculateRecentUpdate(Team group) {
+        Puzzle recentPuzzle = puzzleRepository.findTopByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
+
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        LocalDate puzzleCreatedDate = recentPuzzle.getCreatedDate();
+        long daysBetween = ChronoUnit.DAYS.between(puzzleCreatedDate, today);
+
+        return daysBetween + "일 전";
     }
 
     // 그룹 퍼즐 목록 조회
