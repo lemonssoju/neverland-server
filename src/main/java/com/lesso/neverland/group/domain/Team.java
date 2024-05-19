@@ -39,6 +39,9 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private YearMonth startDate;
 
+    @Column(nullable = false)
+    private Integer joinCode;
+
     @OneToMany(mappedBy = "team")
     private List<UserTeam> userTeams = new ArrayList<>();
 
