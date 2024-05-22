@@ -26,7 +26,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
@@ -53,7 +52,7 @@ public class GroupService {
                     String startYear = group.getStartDate().format(DateTimeFormatter.ofPattern("yyyy"));
                     return new GroupListDto(group.getTeamIdx(), group.getTeamImage(), startYear, group.getName(),
                             group.getUserTeams().size(), group.getAdmin().getProfile().getNickname(), calculateRecentUpdate(group));
-                }).collect(Collectors.toList());
+                }).toList();
         return new BaseResponse<>(new GroupListResponse(groupListDto));
     }
 
@@ -67,20 +66,48 @@ public class GroupService {
         return daysBetween + "일 전";
     }
 
-    // 그룹 퍼즐 목록 조회
-    public BaseResponse<GroupPuzzleListResponse> getGroupPuzzleList(Long groupIdx) {
-        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+    // 그룹 프로필 조회
+    public BaseResponse<GroupProfileResponse> getGroupProfile(Long groupIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-        List<Puzzle> groupPuzzleList = puzzleRepository.findByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
+        List<String> memberImageList = group.getUserTeams().stream()
+                .map(userTeam -> userTeam.getUser().getProfile().getProfileImage())
+                .limit(3)
+                .toList();
 
-        List<GroupPuzzleDto> groupPuzzleListDto = groupPuzzleList.stream()
-                .map(groupPuzzle -> new GroupPuzzleDto(
-                        groupPuzzle.getTitle(),
-                        groupPuzzle.getPuzzleImage(),
-                        groupPuzzle.getUser().getProfile().getNickname())).collect(Collectors.toList());
-        return new BaseResponse<>(new GroupPuzzleListResponse(group.getName(), groupPuzzleListDto));
+        Integer puzzleCount = puzzleRepository.countByTeam(group);
+
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        long dayCount = ChronoUnit.DAYS.between(group.getStartDate(), today);
+
+        GroupProfileResponse profile = new GroupProfileResponse(group.getName(), group.getStartDate().getYear(), memberImageList,
+                group.getUserTeams().size(), puzzleCount, dayCount);
+        return new BaseResponse<>(profile);
     }
 
+
+    //TODO: 퍼즐 도메인 하위로 이동
+//    // 그룹 상세 조회
+//    public BaseResponse<GroupProfileResponse> getGroupDetail() {
+//
+//    }
+//
+//    // 그룹 퍼즐 목록 조회
+//    public BaseResponse<GroupPuzzleListResponse> getGroupPuzzleList(Long groupIdx) {
+//        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+//        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+//        List<Puzzle> groupPuzzleList = puzzleRepository.findByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
+//
+//        List<GroupPuzzleDto> groupPuzzleListDto = groupPuzzleList.stream()
+//                .map(groupPuzzle -> new GroupPuzzleDto(
+//                        groupPuzzle.getTitle(),
+//                        groupPuzzle.getPuzzleImage(),
+//                        groupPuzzle.getUser().getProfile().getNickname(),
+//                        groupPuzzle.getCreatedDate().toString(),
+//                        groupPuzzle.getLocation())).collect(Collectors.toList());
+//        return new BaseResponse<>(new GroupPuzzleListResponse(group.getName(), groupPuzzleListDto));
+//    }
+
+    // TODO: 퍼즐 도메인 하위로 이동
     // 그룹 퍼즐 상세 조회
     public BaseResponse<GroupPuzzleResponse> getGroupPuzzle(Long groupIdx, Long puzzleIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
@@ -202,6 +229,7 @@ public class GroupService {
         return new BaseResponse<>(SUCCESS);
     }
 
+    // TODO: 퍼즐 도메인 하위로 이동
     // 그룹 피드 등록
     public BaseResponse<String> createGroupPuzzle(Long groupIdx, MultipartFile image, GroupPuzzleRequest groupPuzzleRequest) throws IOException {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));

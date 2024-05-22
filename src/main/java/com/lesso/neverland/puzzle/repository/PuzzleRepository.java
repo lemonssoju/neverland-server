@@ -16,4 +16,6 @@ public interface PuzzleRepository extends JpaRepository<Puzzle, Long> {
     List<Puzzle> findByUserAndStatusEquals(User user, String status);
     @Query("SELECT p FROM Puzzle p WHERE p.title LIKE CONCAT('%', :keyword, '%') OR p.content LIKE CONCAT('%', :keyword, '%')")
     List<Puzzle> searchTitleAndContentByKeyword(@Param("keyword") String keyword);
+
+    Integer countByTeam(Team team);
 }
