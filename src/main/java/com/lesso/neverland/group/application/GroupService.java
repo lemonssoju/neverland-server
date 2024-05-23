@@ -1,6 +1,5 @@
 package com.lesso.neverland.group.application;
 
-import com.lesso.neverland.comment.repository.CommentRepository;
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.common.image.ImageService;
@@ -9,7 +8,6 @@ import com.lesso.neverland.group.dto.*;
 import com.lesso.neverland.group.repository.GroupRepository;
 import com.lesso.neverland.puzzle.domain.Puzzle;
 import com.lesso.neverland.puzzle.repository.PuzzleRepository;
-import com.lesso.neverland.user.application.AuthService;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.domain.UserTeam;
@@ -22,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -38,10 +37,8 @@ public class GroupService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final PuzzleRepository puzzleRepository;
-    private final AuthService authService;
     private final ImageService imageService;
     private final UserTeamRepository userTeamRepository;
-    private final CommentRepository commentRepository;
 
     // 그룹 목록 조회
     public BaseResponse<GroupListResponse> getGroupList() {
@@ -139,6 +136,11 @@ public class GroupService {
             if (!editGroupRequest.name().equals("") && !editGroupRequest.name().equals(" "))
                 group.modifyName(editGroupRequest.name());
             else throw new BaseException(BLANK_GROUP_NAME);
+        } if (editGroupRequest.startDate() != null) {
+            if (!editGroupRequest.startDate().equals("") && !editGroupRequest.startDate().equals(" ")) {
+                YearMonth startDate = YearMonth.parse(editGroupRequest.startDate(), DateTimeFormatter.ofPattern("yyyy-MM"));
+                group.modifyStartDate(startDate);
+            } else throw new BaseException(BLANK_GROUP_START_DATE);
         } if (editGroupRequest.memberList() != null) {
             List<UserTeam> originalMemberList = group.getUserTeams();
             userTeamRepository.deleteAll(originalMemberList);
