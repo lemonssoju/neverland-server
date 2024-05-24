@@ -26,17 +26,29 @@ public class GroupController {
         return groupService.getGroupList();
     }
 
-    // 그룹 피드 목록 조회
-    @GetMapping("/{groupIdx}/posts")
-    public BaseResponse<GroupPuzzleListResponse> getGroupPostList(@PathVariable Long groupIdx) {
-        return groupService.getGroupPuzzleList(groupIdx);
+    // 그룹 프로필 조회
+    @GetMapping("/{groupIdx}/profile")
+    public BaseResponse<GroupProfileResponse> getGroupProfile(@PathVariable Long groupIdx) {
+        return groupService.getGroupProfile(groupIdx);
     }
 
-    // 그룹 피드 상세 조회
-    @GetMapping("/{groupIdx}/posts/{postIdx}")
-    public BaseResponse<GroupPuzzleResponse> getGroupPostList(@PathVariable Long groupIdx, @PathVariable Long postIdx) {
-        return groupService.getGroupPuzzle(groupIdx, postIdx);
-    }
+//    // 그룹 상세 조회
+//    @GetMapping("")
+//    public BaseResponse<GroupProfileResponse> getGroupDetail() {
+//        return groupService.getGroupDetail();
+//    }
+
+//    // 퍼즐 목록 조회
+//    @GetMapping("/{groupIdx}/posts")
+//    public BaseResponse<GroupPuzzleListResponse> getGroupPostList(@PathVariable Long groupIdx) {
+//        return groupService.getGroupPuzzleList(groupIdx);
+//    }
+
+//    // 퍼즐 상세 조회
+//    @GetMapping("/{groupIdx}/posts/{postIdx}")
+//    public BaseResponse<GroupPuzzleResponse> getGroupPostList(@PathVariable Long groupIdx, @PathVariable Long postIdx) {
+//        return groupService.getGroupPuzzle(groupIdx, postIdx);
+//    }
 
     // [관리자] 그룹 수정 화면 조회
     @GetMapping("/{groupIdx}/editView")
@@ -45,7 +57,7 @@ public class GroupController {
     }
 
     // [관리자] 그룹 수정
-    @PatchMapping("/{groupIdx}")
+    @PatchMapping("/{groupIdx}/edit")
     public BaseResponse<String> editGroup(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart EditGroupRequest editGroupRequest) {
         try {
             return groupService.editGroup(groupIdx, image, editGroupRequest);

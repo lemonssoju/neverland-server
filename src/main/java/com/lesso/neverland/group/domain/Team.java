@@ -39,6 +39,9 @@ public class Team extends BaseEntity {
     @Column(nullable = false)
     private YearMonth startDate;
 
+    @Column(nullable = false)
+    private Integer joinCode;
+
     @OneToMany(mappedBy = "team")
     private List<UserTeam> userTeams = new ArrayList<>();
 
@@ -51,5 +54,6 @@ public class Team extends BaseEntity {
 
     public void modifyName(String name) { this.name = name; }
     public void modifyImage(String imageUrl) {this.teamImage = imageUrl; }
+    public void modifyStartDate(YearMonth startDate) {this.startDate = startDate;}
     public void delete() { this.setStatus(INACTIVE);}
 }
