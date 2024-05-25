@@ -79,7 +79,7 @@ public class GroupController {
     }
 
     // 그룹 생성
-    @PostMapping("")
+    @PostMapping("/create")
     public BaseResponse<String> createGroup(@RequestPart MultipartFile image, @RequestPart CreateGroupRequest createGroupRequest) {
         try {
             return groupService.createGroup(image, createGroupRequest);
@@ -88,13 +88,13 @@ public class GroupController {
         }
     }
 
-    // 그룹 피드 등록
-    @PostMapping("/{groupIdx}")
-    public BaseResponse<String> createGroupPuzzle(@PathVariable("groupIdx") Long groupIdx, @RequestPart MultipartFile image, @RequestPart GroupPuzzleRequest groupPuzzleRequest) {
-        try {
-            return groupService.createGroupPuzzle(groupIdx, image, groupPuzzleRequest);
-        } catch (IOException e) {
-            throw new BaseException(IMAGE_UPLOAD_FAIL);
-        }
-    }
+//    // 그룹 피드 등록
+//    @PostMapping("/{groupIdx}")
+//    public BaseResponse<String> createGroupPuzzle(@PathVariable("groupIdx") Long groupIdx, @RequestPart MultipartFile image, @RequestPart GroupPuzzleRequest groupPuzzleRequest) {
+//        try {
+//            return groupService.createGroupPuzzle(groupIdx, image, groupPuzzleRequest);
+//        } catch (IOException e) {
+//            throw new BaseException(IMAGE_UPLOAD_FAIL);
+//        }
+//    }
 }

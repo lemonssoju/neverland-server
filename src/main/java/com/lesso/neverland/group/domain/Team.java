@@ -46,10 +46,12 @@ public class Team extends BaseEntity {
     private List<UserTeam> userTeams = new ArrayList<>();
 
     @Builder
-    public Team(User admin, String name, String teamImage) {
+    public Team(User admin, String name, String teamImage, YearMonth startDate, Integer joinCode) {
         this.admin = admin;
         this.name = name;
         this.teamImage = teamImage;
+        this.startDate = startDate;
+        this.joinCode = joinCode;
     }
 
     public void modifyName(String name) { this.name = name; }

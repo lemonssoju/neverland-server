@@ -213,7 +213,15 @@ public class GroupService {
         // upload image
         String imagePath = imageService.uploadImage("group", image);
 
-        Team group = new Team(admin, createGroupRequest.name(), imagePath);
+        YearMonth startDate = YearMonth.parse(createGroupRequest.startDate(), DateTimeFormatter.ofPattern("yyyy-MM"));
+
+        // create random joinCode
+        Integer joinCode;
+        do {
+            joinCode = new Random().nextInt(10000); // 100000(포함)부터 999999(포함) 사이의 랜덤한 숫자 생성
+        } while (groupRepository.existsByJoinCode(joinCode));
+
+        Team group = new Team(admin, createGroupRequest.name(), imagePath, startDate, joinCode);
         groupRepository.save(group);
 
         UserTeam newUserTeam = new UserTeam(admin, group);
@@ -221,34 +229,34 @@ public class GroupService {
         newUserTeam.setTeam(group);
         userTeamRepository.save(newUserTeam);
 
-        for (Long memberIdx : createGroupRequest.memberList()) {
-            User member = userRepository.findById(memberIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            UserTeam userTeam = new UserTeam(member, group);
-            userTeam.setUser(member);
-            userTeam.setTeam(group);
-            userTeamRepository.save(userTeam);
-        }
+//        for (Long memberIdx : createGroupRequest.memberList()) {
+//            User member = userRepository.findById(memberIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+//            UserTeam userTeam = new UserTeam(member, group);
+//            userTeam.setUser(member);
+//            userTeam.setTeam(group);
+//            userTeamRepository.save(userTeam);
+//        }
         return new BaseResponse<>(SUCCESS);
     }
 
     // TODO: 퍼즐 도메인 하위로 이동
-    // 그룹 피드 등록
-    public BaseResponse<String> createGroupPuzzle(Long groupIdx, MultipartFile image, GroupPuzzleRequest groupPuzzleRequest) throws IOException {
-        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-
-        // upload image
-        String imagePath = imageService.uploadImage("group", image);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd");
-        formatter = formatter.withLocale(Locale.KOREA);
-        LocalDate puzzleDate = LocalDate.parse(groupPuzzleRequest.puzzleDate(), formatter);
-
-        Puzzle puzzle = new Puzzle(writer, group, groupPuzzleRequest.title(), groupPuzzleRequest.content(),
-                imagePath, puzzleDate, groupPuzzleRequest.location(), groupPuzzleRequest.backgroundMusic(), groupPuzzleRequest.backgroundMusicUrl());
-        puzzleRepository.save(puzzle);
-        return new BaseResponse<>(SUCCESS);
-    }
+//    // 그룹 피드 등록
+//    public BaseResponse<String> createGroupPuzzle(Long groupIdx, MultipartFile image, GroupPuzzleRequest groupPuzzleRequest) throws IOException {
+//        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+//        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+//
+//        // upload image
+//        String imagePath = imageService.uploadImage("group", image);
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd");
+//        formatter = formatter.withLocale(Locale.KOREA);
+//        LocalDate puzzleDate = LocalDate.parse(groupPuzzleRequest.puzzleDate(), formatter);
+//
+//        Puzzle puzzle = new Puzzle(writer, group, groupPuzzleRequest.title(), groupPuzzleRequest.content(),
+//                imagePath, puzzleDate, groupPuzzleRequest.location(), groupPuzzleRequest.backgroundMusic(), groupPuzzleRequest.backgroundMusicUrl());
+//        puzzleRepository.save(puzzle);
+//        return new BaseResponse<>(SUCCESS);
+//    }
 
     private void validateAdmin(User user, Team group) {
         if (!group.getAdmin().equals(user)) throw new BaseException(NO_GROUP_ADMIN);
