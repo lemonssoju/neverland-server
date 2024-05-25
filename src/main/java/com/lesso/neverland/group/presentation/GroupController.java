@@ -72,7 +72,7 @@ public class GroupController {
         return groupService.deleteGroup(groupIdx);
     }
 
-    // 그룹 나가기
+    // [멤버] 그룹 나가기
     @PatchMapping("/{groupIdx}/withdraw")
     public BaseResponse<String> withdrawGroup(@PathVariable Long groupIdx) {
         return groupService.withdrawGroup(groupIdx);

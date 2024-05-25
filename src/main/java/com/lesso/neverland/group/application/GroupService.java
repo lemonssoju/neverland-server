@@ -190,7 +190,7 @@ public class GroupService {
         return new BaseResponse<>(SUCCESS);
     }
 
-    // 그룹 나가기
+    // [멤버] 그룹 나가기
     public BaseResponse<String> withdrawGroup(Long groupIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
