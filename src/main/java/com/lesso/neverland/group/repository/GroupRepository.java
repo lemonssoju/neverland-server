@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Team, Long> {
     List<Team> findByAdminAndStatusEquals(User admin, String status);
+    boolean existsByJoinCode(Integer joinCode);
 }
