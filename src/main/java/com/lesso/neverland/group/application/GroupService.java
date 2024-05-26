@@ -215,7 +215,7 @@ public class GroupService {
         // create random joinCode
         Integer joinCode;
         do {
-            joinCode = new Random().nextInt(10000); // 100000(포함)부터 999999(포함) 사이의 랜덤한 숫자 생성
+            joinCode = new Random().nextInt(10000);
         } while (groupRepository.existsByJoinCode(joinCode));
 
         Team group = new Team(admin, createGroupRequest.name(), imagePath, startDate, joinCode);
@@ -245,6 +245,20 @@ public class GroupService {
         return new BaseResponse<>(new GroupInviteResponse(group.getJoinCode()));
     }
 
+    // [멤버] 그룹 입장하기
+    public BaseResponse<String> joinGroup(JoinGroupRequest joinGroupRequest) {
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+        Team group = groupRepository.findByJoinCode(joinGroupRequest.joinCode()).orElseThrow(() -> new BaseException(NO_MATCH_GROUP));
+        if (user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
+
+        UserTeam newUserTeam = new UserTeam(user, group);
+        newUserTeam.setUser(user);
+        newUserTeam.setTeam(group);
+        userTeamRepository.save(newUserTeam);
+
+        return new BaseResponse<>(SUCCESS);
+    }
 
     // TODO: 퍼즐 도메인 하위로 이동
 //    // 그룹 피드 등록

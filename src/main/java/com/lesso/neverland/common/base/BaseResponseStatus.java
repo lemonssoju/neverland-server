@@ -59,6 +59,7 @@ public enum BaseResponseStatus {
     NO_GROUP_MEMBER(false, HttpStatus.FORBIDDEN, "그룹 멤버가 아닙니다."),
     NO_GROUP_ADMIN(false, HttpStatus.FORBIDDEN, "해당 그룹의 관리자가 아닙니다."),
     BLANK_GROUP_START_DATE(false, HttpStatus.BAD_REQUEST, "시작 일자가 비었습니다."),
+    NO_MATCH_GROUP(false, HttpStatus.BAD_REQUEST, "참여 코드와 일치하는 그룹이 없습니다."),
 
     // image(2400-2499)
     IMAGE_DELETE_FAIL(false, HttpStatus.CONFLICT, "이미지 삭제에 실패했습니다."),

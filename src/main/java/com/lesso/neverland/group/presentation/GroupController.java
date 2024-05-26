@@ -94,6 +94,12 @@ public class GroupController {
         return groupService.inviteGroup(groupIdx);
     }
 
+    // [멤버] 그룹 입장하기
+    @PostMapping("/join")
+    public BaseResponse<String> joinGroup(@RequestBody JoinGroupRequest joinGroupRequest) {
+        return groupService.joinGroup(joinGroupRequest);
+    }
+
 //    // 그룹 피드 등록
 //    @PostMapping("/{groupIdx}")
 //    public BaseResponse<String> createGroupPuzzle(@PathVariable("groupIdx") Long groupIdx, @RequestPart MultipartFile image, @RequestPart GroupPuzzleRequest groupPuzzleRequest) {
