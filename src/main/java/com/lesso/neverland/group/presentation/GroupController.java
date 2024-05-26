@@ -88,6 +88,12 @@ public class GroupController {
         }
     }
 
+    // [관리자] 그룹 초대하기
+    @PostMapping("/{groupIdx}/invite")
+    public BaseResponse<GroupInviteResponse> inviteGroup(@PathVariable Long groupIdx) {
+        return groupService.inviteGroup(groupIdx);
+    }
+
 //    // 그룹 피드 등록
 //    @PostMapping("/{groupIdx}")
 //    public BaseResponse<String> createGroupPuzzle(@PathVariable("groupIdx") Long groupIdx, @RequestPart MultipartFile image, @RequestPart GroupPuzzleRequest groupPuzzleRequest) {

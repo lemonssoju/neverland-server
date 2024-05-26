@@ -239,6 +239,16 @@ public class GroupService {
         return new BaseResponse<>(SUCCESS);
     }
 
+    // [관리자] 그룹 초대하기
+    public BaseResponse<GroupInviteResponse> inviteGroup(Long groupIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        validateAdmin(user, group);
+
+        return new BaseResponse<>(new GroupInviteResponse(group.getJoinCode()));
+    }
+
+
     // TODO: 퍼즐 도메인 하위로 이동
 //    // 그룹 피드 등록
 //    public BaseResponse<String> createGroupPuzzle(Long groupIdx, MultipartFile image, GroupPuzzleRequest groupPuzzleRequest) throws IOException {
