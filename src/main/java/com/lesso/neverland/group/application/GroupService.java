@@ -194,14 +194,11 @@ public class GroupService {
     public BaseResponse<String> withdrawGroup(Long groupIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        if(user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
 
-        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, group);
-        if (userTeam == null) throw new BaseException(NO_GROUP_MEMBER);
-        else {
-            userTeam.delete();
-            userTeamRepository.save(userTeam);
-        }
+        UserTeam userTeam = validateMember(user, group);
+        userTeam.delete();
+        userTeamRepository.save(userTeam);
+
         return new BaseResponse<>(SUCCESS);
     }
 
@@ -270,5 +267,12 @@ public class GroupService {
 
     private void validateAdmin(User user, Team group) {
         if (!group.getAdmin().equals(user)) throw new BaseException(NO_GROUP_ADMIN);
+    }
+
+    private UserTeam validateMember(User user, Team group) {
+        if (user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
+
+        return Optional.ofNullable(userTeamRepository.findByUserAndTeam(user, group))
+                .orElseThrow(() -> new BaseException(NO_GROUP_MEMBER));
     }
 }
