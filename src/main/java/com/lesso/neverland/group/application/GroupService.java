@@ -190,18 +190,15 @@ public class GroupService {
         return new BaseResponse<>(SUCCESS);
     }
 
-    // 그룹 나가기
+    // [멤버] 그룹 나가기
     public BaseResponse<String> withdrawGroup(Long groupIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        if(user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
 
-        UserTeam userTeam = userTeamRepository.findByUserAndTeam(user, group);
-        if (userTeam == null) throw new BaseException(NO_GROUP_MEMBER);
-        else {
-            userTeam.delete();
-            userTeamRepository.save(userTeam);
-        }
+        UserTeam userTeam = validateMember(user, group);
+        userTeam.delete();
+        userTeamRepository.save(userTeam);
+
         return new BaseResponse<>(SUCCESS);
     }
 
@@ -213,7 +210,15 @@ public class GroupService {
         // upload image
         String imagePath = imageService.uploadImage("group", image);
 
-        Team group = new Team(admin, createGroupRequest.name(), imagePath);
+        YearMonth startDate = YearMonth.parse(createGroupRequest.startDate(), DateTimeFormatter.ofPattern("yyyy-MM"));
+
+        // create random joinCode
+        Integer joinCode;
+        do {
+            joinCode = new Random().nextInt(10000);
+        } while (groupRepository.existsByJoinCode(joinCode));
+
+        Team group = new Team(admin, createGroupRequest.name(), imagePath, startDate, joinCode);
         groupRepository.save(group);
 
         UserTeam newUserTeam = new UserTeam(admin, group);
@@ -221,36 +226,67 @@ public class GroupService {
         newUserTeam.setTeam(group);
         userTeamRepository.save(newUserTeam);
 
-        for (Long memberIdx : createGroupRequest.memberList()) {
-            User member = userRepository.findById(memberIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-            UserTeam userTeam = new UserTeam(member, group);
-            userTeam.setUser(member);
-            userTeam.setTeam(group);
-            userTeamRepository.save(userTeam);
-        }
+//        for (Long memberIdx : createGroupRequest.memberList()) {
+//            User member = userRepository.findById(memberIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+//            UserTeam userTeam = new UserTeam(member, group);
+//            userTeam.setUser(member);
+//            userTeam.setTeam(group);
+//            userTeamRepository.save(userTeam);
+//        }
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    // [관리자] 그룹 초대하기
+    public BaseResponse<GroupInviteResponse> inviteGroup(Long groupIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        validateAdmin(user, group);
+
+        return new BaseResponse<>(new GroupInviteResponse(group.getJoinCode()));
+    }
+
+    // [멤버] 그룹 입장하기
+    public BaseResponse<String> joinGroup(JoinGroupRequest joinGroupRequest) {
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+        Team group = groupRepository.findByJoinCode(joinGroupRequest.joinCode()).orElseThrow(() -> new BaseException(NO_MATCH_GROUP));
+        if (user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
+
+        UserTeam newUserTeam = new UserTeam(user, group);
+        newUserTeam.setUser(user);
+        newUserTeam.setTeam(group);
+        userTeamRepository.save(newUserTeam);
+
         return new BaseResponse<>(SUCCESS);
     }
 
     // TODO: 퍼즐 도메인 하위로 이동
-    // 그룹 피드 등록
-    public BaseResponse<String> createGroupPuzzle(Long groupIdx, MultipartFile image, GroupPuzzleRequest groupPuzzleRequest) throws IOException {
-        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-
-        // upload image
-        String imagePath = imageService.uploadImage("group", image);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd");
-        formatter = formatter.withLocale(Locale.KOREA);
-        LocalDate puzzleDate = LocalDate.parse(groupPuzzleRequest.puzzleDate(), formatter);
-
-        Puzzle puzzle = new Puzzle(writer, group, groupPuzzleRequest.title(), groupPuzzleRequest.content(),
-                imagePath, puzzleDate, groupPuzzleRequest.location(), groupPuzzleRequest.backgroundMusic(), groupPuzzleRequest.backgroundMusicUrl());
-        puzzleRepository.save(puzzle);
-        return new BaseResponse<>(SUCCESS);
-    }
+//    // 그룹 피드 등록
+//    public BaseResponse<String> createGroupPuzzle(Long groupIdx, MultipartFile image, GroupPuzzleRequest groupPuzzleRequest) throws IOException {
+//        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+//        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+//
+//        // upload image
+//        String imagePath = imageService.uploadImage("group", image);
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd");
+//        formatter = formatter.withLocale(Locale.KOREA);
+//        LocalDate puzzleDate = LocalDate.parse(groupPuzzleRequest.puzzleDate(), formatter);
+//
+//        Puzzle puzzle = new Puzzle(writer, group, groupPuzzleRequest.title(), groupPuzzleRequest.content(),
+//                imagePath, puzzleDate, groupPuzzleRequest.location(), groupPuzzleRequest.backgroundMusic(), groupPuzzleRequest.backgroundMusicUrl());
+//        puzzleRepository.save(puzzle);
+//        return new BaseResponse<>(SUCCESS);
+//    }
 
     private void validateAdmin(User user, Team group) {
         if (!group.getAdmin().equals(user)) throw new BaseException(NO_GROUP_ADMIN);
+    }
+
+    private UserTeam validateMember(User user, Team group) {
+        if (user.equals(group.getAdmin())) throw new BaseException(GROUP_ADMIN);
+
+        return Optional.ofNullable(userTeamRepository.findByUserAndTeam(user, group))
+                .orElseThrow(() -> new BaseException(NO_GROUP_MEMBER));
     }
 }
