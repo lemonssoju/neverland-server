@@ -25,8 +25,8 @@ public class PuzzleController {
 
     // 퍼즐 상세 조회
     @GetMapping("/{puzzleIdx}")
-    public BaseResponse<PuzzleDetailResponse> getPuzzle(@PathVariable Long groupIdx, @PathVariable Long puzzleIdx) {
-        return puzzleService.getPuzzle(groupIdx, puzzleIdx);
+    public BaseResponse<PuzzleDetailResponse> getPuzzleDetail(@PathVariable Long groupIdx, @PathVariable Long puzzleIdx) {
+        return puzzleService.getPuzzleDetail(groupIdx, puzzleIdx);
     }
 
     // [작성자] 피드 수정 화면 조회

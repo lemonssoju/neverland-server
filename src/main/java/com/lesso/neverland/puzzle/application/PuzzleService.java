@@ -9,7 +9,6 @@ import com.lesso.neverland.group.repository.GroupRepository;
 import com.lesso.neverland.puzzle.domain.Puzzle;
 import com.lesso.neverland.puzzle.dto.*;
 import com.lesso.neverland.puzzle.repository.PuzzleRepository;
-import com.lesso.neverland.user.application.AuthService;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
@@ -27,8 +26,6 @@ import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 @Service
 @RequiredArgsConstructor
 public class PuzzleService {
-
-    private final AuthService authService;
     private final UserService userService;
     private final PuzzleRepository puzzleRepository;
     private final UserRepository userRepository;
@@ -58,7 +55,7 @@ public class PuzzleService {
     }
 
     // 퍼즐 상세 조회
-    public BaseResponse<PuzzleDetailResponse> getPuzzle(Long groupIdx, Long puzzleIdx) {
+    public BaseResponse<PuzzleDetailResponse> getPuzzleDetail(Long groupIdx, Long puzzleIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         if (!puzzle.getTeam().equals(group)) throw new BaseException(NO_GROUP_PUZZLE);
