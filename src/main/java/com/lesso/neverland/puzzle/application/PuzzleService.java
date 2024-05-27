@@ -168,15 +168,6 @@ public class PuzzleService {
         return new BaseResponse<>(SUCCESS);
     }
 
-    // 작성한 글 목록 조회
-    public BaseResponse<MyPuzzleListResponse> getMyPuzzleList() {
-        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-
-        List<Puzzle> myPuzzles = puzzleRepository.findByUserAndStatusEquals(user, ACTIVE);
-        List<MyPuzzleDto> myPuzzleDtoList = convertToMyPuzzleDtoList(myPuzzles);
-        return new BaseResponse<>(new MyPuzzleListResponse(myPuzzleDtoList));
-    }
-
     // MyPuzzleDto로 가공
     private List<MyPuzzleDto> convertToMyPuzzleDtoList(List<Puzzle> puzzleList) {
         return puzzleList.stream()
@@ -190,5 +181,19 @@ public class PuzzleService {
     private static void validateWriter(User user, Puzzle puzzle) {
         if (!puzzle.getUser().equals(user)) throw new BaseException(NO_PUZZLE_WRITER);
         if (puzzle.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_PUZZLE);
+    }
+
+    // 퍼즐러 목록 조회
+    public BaseResponse<PuzzlerListResponse> getPuzzlerList(Long groupIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+
+        PuzzlerListResponse puzzlerList = new PuzzlerListResponse(
+                group.getUserTeams().stream()
+                        .map(userTeam -> new PuzzlerDto(
+                                userTeam.getUser().getUserIdx(),
+                                userTeam.getUser().getProfile().getProfileImage(),
+                                userTeam.getUser().getProfile().getNickname()))
+                        .toList());
+        return new BaseResponse<>(puzzlerList);
     }
 }
