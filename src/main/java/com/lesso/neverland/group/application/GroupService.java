@@ -82,36 +82,6 @@ public class GroupService {
     }
 
 
-    //TODO: 퍼즐 도메인 하위로 이동
-//
-//    // 그룹 퍼즐 목록 조회
-//    public BaseResponse<GroupPuzzleListResponse> getGroupPuzzleList(Long groupIdx) {
-//        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-//        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-//        List<Puzzle> groupPuzzleList = puzzleRepository.findByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
-//
-//        List<GroupPuzzleDto> groupPuzzleListDto = groupPuzzleList.stream()
-//                .map(groupPuzzle -> new GroupPuzzleDto(
-//                        groupPuzzle.getTitle(),
-//                        groupPuzzle.getPuzzleImage(),
-//                        groupPuzzle.getUser().getProfile().getNickname(),
-//                        groupPuzzle.getCreatedDate().toString(),
-//                        groupPuzzle.getLocation())).collect(Collectors.toList());
-//        return new BaseResponse<>(new GroupPuzzleListResponse(group.getName(), groupPuzzleListDto));
-//    }
-//
-//    // TODO: 퍼즐 도메인 하위로 이동
-//    // 그룹 퍼즐 상세 조회
-//    public BaseResponse<GroupPuzzleResponse> getGroupPuzzle(Long groupIdx, Long puzzleIdx) {
-//        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-//        Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
-//        if (!puzzle.getTeam().equals(group)) throw new BaseException(NO_GROUP_PUZZLE);
-//
-//        return new BaseResponse<>(new GroupPuzzleResponse(puzzle.getTitle(), puzzle.getContent(), puzzle.getCreatedDate(),
-//                puzzle.getUser().getProfile().getNickname(), puzzle.getBackgroundMusic(), puzzle.getBackgroundMusicUrl(),
-//                puzzle.getPuzzleImage()));
-//    }
-
     // [관리자] 그룹 수정 화면 조회
     public BaseResponse<GroupEditViewResponse> getGroupEditView(Long groupIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
