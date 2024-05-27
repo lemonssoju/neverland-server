@@ -2,12 +2,15 @@ package com.lesso.neverland.puzzle.application;
 
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
+import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.group.dto.GroupPuzzleDto;
 import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
 import com.lesso.neverland.group.repository.GroupRepository;
 import com.lesso.neverland.puzzle.domain.Puzzle;
+import com.lesso.neverland.puzzle.domain.PuzzleMember;
 import com.lesso.neverland.puzzle.dto.*;
+import com.lesso.neverland.puzzle.repository.PuzzleMemberRepository;
 import com.lesso.neverland.puzzle.repository.PuzzleRepository;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
@@ -16,8 +19,13 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
@@ -30,6 +38,8 @@ public class PuzzleService {
     private final PuzzleRepository puzzleRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
+    private final ImageService imageService;
+    private final PuzzleMemberRepository puzzleMemberRepository;
 
     // 퍼즐 목록 조회
     public BaseResponse<GroupPuzzleListResponse> getGroupPuzzleList(Long groupIdx) {
@@ -83,6 +93,58 @@ public class PuzzleService {
                 .map(puzzleMember -> puzzleMember.getUser().getProfile().getProfileImage())
                 .limit(3)
                 .toList();
+    }
+
+    // 퍼즐 생성
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<String> createPuzzle(Long groupIdx, MultipartFile image, CreatePuzzleRequest createPuzzleRequest) throws IOException {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+        String imagePath = imageService.uploadImage("group", image);
+        LocalDate puzzleDate = convertToLocalDate(createPuzzleRequest.puzzleDate());
+
+        Puzzle newPuzzle = createPuzzle(createPuzzleRequest, group, writer, imagePath, puzzleDate);
+        addPuzzleMember(createPuzzleRequest, newPuzzle);
+
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    // Puzzle 생성 시 PuzzleMember entity 함께 생성
+    private void addPuzzleMember(CreatePuzzleRequest createPuzzleRequest, Puzzle newPuzzle) {
+        for (Long userIdx : createPuzzleRequest.puzzlerList()) {
+            User member = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            PuzzleMember puzzleMember = PuzzleMember.builder()
+                    .user(member)
+                    .puzzle(newPuzzle).build();
+            puzzleMember.setUser(member);
+            puzzleMember.setPuzzle(newPuzzle);
+
+            puzzleMemberRepository.save(puzzleMember);
+        }
+    }
+
+    // String -> LocalDate
+    private static LocalDate convertToLocalDate(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        formatter = formatter.withLocale(Locale.KOREA);
+
+        return LocalDate.parse(date, formatter);
+    }
+
+    // puzzle entity 생성
+    private Puzzle createPuzzle(CreatePuzzleRequest createPuzzleRequest, Team group, User writer, String imagePath, LocalDate puzzleDate) {
+        Puzzle puzzle = Puzzle.builder()
+                .user(writer)
+                .team(group)
+                .title(createPuzzleRequest.title())
+                .content(createPuzzleRequest.content())
+                .puzzleImage(imagePath)
+                .puzzleDate(puzzleDate)
+                .location(createPuzzleRequest.location()).build();
+        puzzleRepository.save(puzzle);
+
+        return puzzle;
     }
 
     // [작성자] 피드 수정 화면 조회

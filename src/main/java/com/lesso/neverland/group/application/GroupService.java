@@ -226,25 +226,6 @@ public class GroupService {
         return new BaseResponse<>(SUCCESS);
     }
 
-    // TODO: 퍼즐 도메인 하위로 이동
-//    // 그룹 피드 등록
-//    public BaseResponse<String> createGroupPuzzle(Long groupIdx, MultipartFile image, GroupPuzzleRequest groupPuzzleRequest) throws IOException {
-//        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-//        User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-//
-//        // upload image
-//        String imagePath = imageService.uploadImage("group", image);
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd");
-//        formatter = formatter.withLocale(Locale.KOREA);
-//        LocalDate puzzleDate = LocalDate.parse(groupPuzzleRequest.puzzleDate(), formatter);
-//
-//        Puzzle puzzle = new Puzzle(writer, group, groupPuzzleRequest.title(), groupPuzzleRequest.content(),
-//                imagePath, puzzleDate, groupPuzzleRequest.location(), groupPuzzleRequest.backgroundMusic(), groupPuzzleRequest.backgroundMusicUrl());
-//        puzzleRepository.save(puzzle);
-//        return new BaseResponse<>(SUCCESS);
-//    }
-
     private void validateAdmin(User user, Team group) {
         if (!group.getAdmin().equals(user)) throw new BaseException(NO_GROUP_ADMIN);
     }

@@ -1,14 +1,20 @@
 package com.lesso.neverland.puzzle.presentation;
 
+import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
 import com.lesso.neverland.puzzle.application.PuzzleService;
+import com.lesso.neverland.puzzle.dto.CreatePuzzleRequest;
 import com.lesso.neverland.puzzle.dto.PuzzleEditViewResponse;
 import com.lesso.neverland.puzzle.dto.MyPuzzleListResponse;
 import com.lesso.neverland.puzzle.dto.PuzzleDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
+import static com.lesso.neverland.common.base.BaseResponseStatus.IMAGE_UPLOAD_FAIL;
 import static com.lesso.neverland.common.constants.RequestURI.puzzle;
 
 @RestController
@@ -25,8 +31,18 @@ public class PuzzleController {
 
     // 퍼즐 상세 조회
     @GetMapping("/{puzzleIdx}")
-    public BaseResponse<PuzzleDetailResponse> getPuzzleDetail(@PathVariable Long groupIdx, @PathVariable Long puzzleIdx) {
+    public BaseResponse<PuzzleDetailResponse> getPuzzleDetail(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx) {
         return puzzleService.getPuzzleDetail(groupIdx, puzzleIdx);
+    }
+
+    // 퍼즐 생성
+    @PostMapping("")
+    public BaseResponse<String> createPuzzle(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart CreatePuzzleRequest createPuzzleRequest) {
+        try {
+            return puzzleService.createPuzzle(groupIdx, image, createPuzzleRequest);
+        } catch (IOException e) {
+            throw new BaseException(IMAGE_UPLOAD_FAIL);
+        }
     }
 
     // [작성자] 피드 수정 화면 조회
