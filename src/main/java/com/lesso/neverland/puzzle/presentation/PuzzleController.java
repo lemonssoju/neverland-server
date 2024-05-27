@@ -5,7 +5,7 @@ import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
 import com.lesso.neverland.puzzle.application.PuzzleService;
 import com.lesso.neverland.puzzle.dto.PuzzleEditViewResponse;
 import com.lesso.neverland.puzzle.dto.MyPuzzleListResponse;
-import com.lesso.neverland.puzzle.dto.PuzzleResponse;
+import com.lesso.neverland.puzzle.dto.PuzzleDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +25,8 @@ public class PuzzleController {
 
     // 퍼즐 상세 조회
     @GetMapping("/{puzzleIdx}")
-    public BaseResponse<PuzzleResponse> getPuzzle(@PathVariable Long puzzleIdx) {
-        return puzzleService.getPuzzle(puzzleIdx);
+    public BaseResponse<PuzzleDetailResponse> getPuzzle(@PathVariable Long groupIdx, @PathVariable Long puzzleIdx) {
+        return puzzleService.getPuzzle(groupIdx, puzzleIdx);
     }
 
     // [작성자] 피드 수정 화면 조회
