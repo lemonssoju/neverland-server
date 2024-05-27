@@ -9,6 +9,7 @@ import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
 import com.lesso.neverland.group.repository.GroupRepository;
 import com.lesso.neverland.puzzle.domain.Puzzle;
 import com.lesso.neverland.puzzle.domain.PuzzleMember;
+import com.lesso.neverland.puzzle.domain.PuzzlePiece;
 import com.lesso.neverland.puzzle.dto.*;
 import com.lesso.neverland.puzzle.repository.PuzzleMemberRepository;
 import com.lesso.neverland.puzzle.repository.PuzzleRepository;
@@ -156,14 +157,16 @@ public class PuzzleService {
         return new BaseResponse<>(new PuzzleEditViewResponse(puzzle.getTitle(), puzzle.getPuzzleImage(), puzzle.getContent()));
     }
 
-    // [작성자] 피드 삭제
+    // [작성자] 퍼즐 삭제
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<String> deletePuzzle(Long puzzleIdx) {
+    public BaseResponse<String> deletePuzzle(Long groupIdx, Long puzzleIdx) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         validateWriter(user, puzzle);
 
+        puzzle.getPuzzlePieces().forEach(PuzzlePiece::delete);
         puzzle.delete();
+
         puzzleRepository.save(puzzle);
         return new BaseResponse<>(SUCCESS);
     }
