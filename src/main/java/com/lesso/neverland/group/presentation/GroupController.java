@@ -81,14 +81,4 @@ public class GroupController {
     public BaseResponse<String> joinGroup(@RequestBody JoinGroupRequest joinGroupRequest) {
         return groupService.joinGroup(joinGroupRequest);
     }
-
-//    // 그룹 피드 등록
-//    @PostMapping("/{groupIdx}")
-//    public BaseResponse<String> createGroupPuzzle(@PathVariable("groupIdx") Long groupIdx, @RequestPart MultipartFile image, @RequestPart GroupPuzzleRequest groupPuzzleRequest) {
-//        try {
-//            return groupService.createGroupPuzzle(groupIdx, image, groupPuzzleRequest);
-//        } catch (IOException e) {
-//            throw new BaseException(IMAGE_UPLOAD_FAIL);
-//        }
-//    }
 }
