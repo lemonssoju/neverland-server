@@ -83,10 +83,6 @@ public class GroupService {
 
 
     //TODO: 퍼즐 도메인 하위로 이동
-//    // 그룹 상세 조회
-//    public BaseResponse<GroupProfileResponse> getGroupDetail() {
-//
-//    }
 //
 //    // 그룹 퍼즐 목록 조회
 //    public BaseResponse<GroupPuzzleListResponse> getGroupPuzzleList(Long groupIdx) {

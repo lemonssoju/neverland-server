@@ -1,6 +1,7 @@
 package com.lesso.neverland.puzzle.presentation;
 
 import com.lesso.neverland.common.base.BaseResponse;
+import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
 import com.lesso.neverland.puzzle.application.PuzzleService;
 import com.lesso.neverland.puzzle.dto.PuzzleEditViewResponse;
 import com.lesso.neverland.puzzle.dto.MyPuzzleListResponse;
@@ -16,10 +17,16 @@ import static com.lesso.neverland.common.constants.RequestURI.puzzle;
 public class PuzzleController {
     private final PuzzleService puzzleService;
 
-    // 피드 상세 조회
+    // 퍼즐 목록 조회
+    @GetMapping("")
+    public BaseResponse<GroupPuzzleListResponse> getGroupPuzzles(@PathVariable Long groupIdx) {
+        return puzzleService.getGroupPuzzleList(groupIdx);
+    }
+
+    // 퍼즐 상세 조회
     @GetMapping("/{puzzleIdx}")
-    public BaseResponse<PuzzleResponse> getPuzzle(@PathVariable Long postIdx) {
-        return puzzleService.getPuzzle(postIdx);
+    public BaseResponse<PuzzleResponse> getPuzzle(@PathVariable Long puzzleIdx) {
+        return puzzleService.getPuzzle(puzzleIdx);
     }
 
     // [작성자] 피드 수정 화면 조회
