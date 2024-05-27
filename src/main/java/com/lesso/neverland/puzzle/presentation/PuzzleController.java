@@ -4,10 +4,7 @@ import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
 import com.lesso.neverland.puzzle.application.PuzzleService;
-import com.lesso.neverland.puzzle.dto.CreatePuzzleRequest;
-import com.lesso.neverland.puzzle.dto.PuzzleEditViewResponse;
-import com.lesso.neverland.puzzle.dto.MyPuzzleListResponse;
-import com.lesso.neverland.puzzle.dto.PuzzleDetailResponse;
+import com.lesso.neverland.puzzle.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,9 +54,10 @@ public class PuzzleController {
         return puzzleService.deletePuzzle(puzzleIdx);
     }
 
-    // [유저] 작성한 글 목록 조회
-    @GetMapping("/myPuzzles")
-    public BaseResponse<MyPuzzleListResponse> getMyPuzzleList() {
-        return puzzleService.getMyPuzzleList();
+    // 퍼즐러 목록 조회
+    @GetMapping("/puzzlerList")
+    public BaseResponse<PuzzlerListResponse> getPuzzlerList(@PathVariable Long groupIdx) {
+        return puzzleService.getPuzzlerList(groupIdx);
     }
+
 }
