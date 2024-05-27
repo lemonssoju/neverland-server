@@ -9,11 +9,11 @@ import com.lesso.neverland.group.repository.GroupRepository;
 import com.lesso.neverland.puzzle.domain.Puzzle;
 import com.lesso.neverland.puzzle.dto.*;
 import com.lesso.neverland.puzzle.repository.PuzzleRepository;
-import com.lesso.neverland.user.application.AuthService;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +26,6 @@ import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 @Service
 @RequiredArgsConstructor
 public class PuzzleService {
-
-    private final AuthService authService;
     private final UserService userService;
     private final PuzzleRepository puzzleRepository;
     private final UserRepository userRepository;
@@ -39,7 +37,14 @@ public class PuzzleService {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
 
         List<Puzzle> groupPuzzleList = puzzleRepository.findByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
-        List<GroupPuzzleDto> groupPuzzleListDto = groupPuzzleList.stream()
+        List<GroupPuzzleDto> groupPuzzleListDto = getGroupPuzzleDtos(groupPuzzleList);
+
+        return new BaseResponse<>(new GroupPuzzleListResponse(groupPuzzleListDto));
+    }
+
+    @NotNull
+    private static List<GroupPuzzleDto> getGroupPuzzleDtos(List<Puzzle> groupPuzzleList) {
+        return groupPuzzleList.stream()
                 .map(puzzle -> new GroupPuzzleDto(
                         puzzle.getPuzzleIdx(),
                         puzzle.getTitle(),
@@ -47,18 +52,37 @@ public class PuzzleService {
                         puzzle.getUser().getProfile().getNickname(),
                         puzzle.getCreatedDate().toString(),
                         puzzle.getLocation())).toList();
-
-        return new BaseResponse<>(new GroupPuzzleListResponse(groupPuzzleListDto));
     }
 
     // 퍼즐 상세 조회
-    public BaseResponse<PuzzleResponse> getPuzzle(Long puzzleIdx) {
+    public BaseResponse<PuzzleDetailResponse> getPuzzleDetail(Long groupIdx, Long puzzleIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
+        if (!puzzle.getTeam().equals(group)) throw new BaseException(NO_GROUP_PUZZLE);
         if (puzzle.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_PUZZLE);
 
-        return new BaseResponse<>(new PuzzleResponse(puzzle.getTitle(), puzzle.getContent(), puzzle.getCreatedDate(),
-                puzzle.getUser().getUserIdx(), puzzle.getUser().getProfile().getNickname(), puzzle.getBackgroundMusic(), puzzle.getBackgroundMusicUrl(),
-                puzzle.getPuzzleImage()));
+        PuzzleDetailResponse puzzleDetail = new PuzzleDetailResponse(puzzle.getLocation(), puzzle.getPuzzleImage(),
+                puzzle.getPuzzleDate().toString(), puzzle.getUser().getProfile().getNickname(), puzzle.getTitle(), puzzle.getContent(),
+                getMemberImageList(puzzle), puzzle.getPuzzleMembers().size(), getPuzzlePieceList(puzzle));
+        return new BaseResponse<>(puzzleDetail);
+    }
+
+    // 퍼즐피스 목록 조회
+    private List<PuzzlePieceDto> getPuzzlePieceList(Puzzle puzzle) {
+        return puzzle.getPuzzlePieces().stream()
+                .map(puzzlePiece -> new PuzzlePieceDto(
+                        puzzlePiece.getUser().getProfile().getNickname(),
+                        puzzlePiece.getUser().getProfile().getProfileImage(),
+                        puzzlePiece.getContent()
+                )).toList();
+    }
+
+    // puzzleMember 3명의 프로필 이미지 조회
+    private List<String> getMemberImageList(Puzzle puzzle) {
+        return puzzle.getPuzzleMembers().stream()
+                .map(puzzleMember -> puzzleMember.getUser().getProfile().getProfileImage())
+                .limit(3)
+                .toList();
     }
 
     // [작성자] 피드 수정 화면 조회
@@ -67,8 +91,7 @@ public class PuzzleService {
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         validateWriter(user, puzzle);
 
-        return new BaseResponse<>(new PuzzleEditViewResponse(puzzle.getTitle(), puzzle.getBackgroundMusic(),
-                puzzle.getBackgroundMusicUrl(), puzzle.getPuzzleImage(), puzzle.getContent()));
+        return new BaseResponse<>(new PuzzleEditViewResponse(puzzle.getTitle(), puzzle.getPuzzleImage(), puzzle.getContent()));
     }
 
     // [작성자] 피드 삭제
