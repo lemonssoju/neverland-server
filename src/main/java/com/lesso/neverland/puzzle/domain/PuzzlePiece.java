@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
+import static com.lesso.neverland.common.constants.Constants.INACTIVE;
+
 @Entity
 @Getter
 @DynamicInsert
@@ -45,5 +47,9 @@ public class PuzzlePiece extends BaseEntity {
     public void setUser(User user) {
         this.user = user;
         user.getPuzzlePieces().add(this);
+    }
+
+    public void delete() {
+        this.setStatus(INACTIVE);
     }
 }

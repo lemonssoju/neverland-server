@@ -48,10 +48,10 @@ public class PuzzleController {
         return puzzleService.getPuzzleEditView(puzzleIdx);
     }
 
-    // [작성자] 피드 삭제
+    // [작성자] 퍼즐 삭제
     @PatchMapping("/{puzzleIdx}/delete")
-    public BaseResponse<String> deletePuzzle(@PathVariable Long puzzleIdx) {
-        return puzzleService.deletePuzzle(puzzleIdx);
+    public BaseResponse<String> deletePuzzle(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx) {
+        return puzzleService.deletePuzzle(groupIdx, puzzleIdx);
     }
 
     // 퍼즐러 목록 조회
