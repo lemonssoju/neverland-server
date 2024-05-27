@@ -2,6 +2,10 @@ package com.lesso.neverland.puzzle.application;
 
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
+import com.lesso.neverland.group.domain.Team;
+import com.lesso.neverland.group.dto.GroupPuzzleDto;
+import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
+import com.lesso.neverland.group.repository.GroupRepository;
 import com.lesso.neverland.puzzle.domain.Puzzle;
 import com.lesso.neverland.puzzle.dto.*;
 import com.lesso.neverland.puzzle.repository.PuzzleRepository;
@@ -27,6 +31,25 @@ public class PuzzleService {
     private final UserService userService;
     private final PuzzleRepository puzzleRepository;
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
+
+    // 퍼즐 목록 조회
+    public BaseResponse<GroupPuzzleListResponse> getGroupPuzzleList(Long groupIdx) {
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+
+        List<Puzzle> groupPuzzleList = puzzleRepository.findByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
+        List<GroupPuzzleDto> groupPuzzleListDto = groupPuzzleList.stream()
+                .map(puzzle -> new GroupPuzzleDto(
+                        puzzle.getPuzzleIdx(),
+                        puzzle.getTitle(),
+                        puzzle.getPuzzleImage(),
+                        puzzle.getUser().getProfile().getNickname(),
+                        puzzle.getCreatedDate().toString(),
+                        puzzle.getLocation())).toList();
+
+        return new BaseResponse<>(new GroupPuzzleListResponse(groupPuzzleListDto));
+    }
 
     // 퍼즐 상세 조회
     public BaseResponse<PuzzleResponse> getPuzzle(Long puzzleIdx) {
