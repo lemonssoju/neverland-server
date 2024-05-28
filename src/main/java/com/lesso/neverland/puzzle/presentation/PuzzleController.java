@@ -42,10 +42,10 @@ public class PuzzleController {
         }
     }
 
-    // [작성자] 피드 수정 화면 조회
-    @GetMapping("/{puzzleIdx}/editView")
-    public BaseResponse<PuzzleEditViewResponse> getPuzzleEditView(@PathVariable Long puzzleIdx) {
-        return puzzleService.getPuzzleEditView(puzzleIdx);
+    // [작성자] 퍼즐 수정
+    @GetMapping("/{puzzleIdx}/edit")
+    public BaseResponse<String> editPuzzle(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx, @RequestPart MultipartFile image, @RequestPart EditPuzzleRequest editPuzzleRequest) {
+        return puzzleService.editPuzzle(groupIdx, puzzleIdx, image, editPuzzleRequest);
     }
 
     // [작성자] 퍼즐 삭제
@@ -58,6 +58,12 @@ public class PuzzleController {
     @GetMapping("/puzzlerList")
     public BaseResponse<PuzzlerListResponse> getPuzzlerList(@PathVariable Long groupIdx) {
         return puzzleService.getPuzzlerList(groupIdx);
+    }
+
+    // [멤버] 퍼즐피스 추가
+    @PostMapping("/{puzzleIdx}/puzzlePiece")
+    public BaseResponse<String> addPuzzlePiece(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx, @RequestBody PuzzlePieceRequest puzzlePieceRequest) {
+        return puzzleService.addPuzzlePiece(groupIdx, puzzleIdx, puzzlePieceRequest);
     }
 
 }

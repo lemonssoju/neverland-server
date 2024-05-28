@@ -46,6 +46,8 @@ public enum BaseResponseStatus {
     INVALID_PUZZLE_IDX(false, HttpStatus.BAD_REQUEST, "잘못된 puzzle idx 입니다."),
     NO_PUZZLE_WRITER(false, HttpStatus.BAD_REQUEST, "해당 post의 작성자가 아닙니다."),
     ALREADY_DELETED_PUZZLE(false, HttpStatus.CONFLICT, "이미 삭제된 puzzle 입니다."),
+    NO_PUZZLER(false, HttpStatus.FORBIDDEN, "해당 퍼즐의 퍼즐러가 아닙니다."),
+    TOO_LONG_CONTENT(false, HttpStatus.BAD_REQUEST, "퍼즐피스의 길이는 100자 이하여야 합니다."),
 
 
     // group(2300-2399)
