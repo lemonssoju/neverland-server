@@ -9,47 +9,38 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
-import static com.lesso.neverland.common.constants.Constants.INACTIVE;
-
 @Entity
 @Getter
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PuzzlePiece extends BaseEntity {
+public class PuzzleMember extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long puzzlePieceIdx;
+    private Long puzzleMemberIdx;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "puzzle")
     private Puzzle puzzle;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user")
-    private User user; // 작성자
-
-    @Column(nullable = false)
-    private String content;
-
-    @Builder
-    public PuzzlePiece(Puzzle puzzle, User user, String content) {
-        this.puzzle = puzzle;
+    public void setUser(User user) {
         this.user = user;
-        this.content = content;
+        user.getPuzzleMembers().add(this);
     }
 
     public void setPuzzle(Puzzle puzzle) {
         this.puzzle = puzzle;
-        puzzle.getPuzzlePieces().add(this);
+        puzzle.getPuzzleMembers().add(this);
     }
 
-    public void setUser(User user) {
+    @Builder
+    public PuzzleMember(User user, Puzzle puzzle) {
         this.user = user;
-        user.getPuzzlePieces().add(this);
-    }
-
-    public void delete() {
-        this.setStatus(INACTIVE);
+        this.puzzle = puzzle;
     }
 }
+

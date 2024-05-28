@@ -1,13 +1,17 @@
 package com.lesso.neverland.puzzle.presentation;
 
+import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
+import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
 import com.lesso.neverland.puzzle.application.PuzzleService;
-import com.lesso.neverland.puzzle.dto.PuzzleEditViewResponse;
-import com.lesso.neverland.puzzle.dto.MyPuzzleListResponse;
-import com.lesso.neverland.puzzle.dto.PuzzleResponse;
+import com.lesso.neverland.puzzle.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
+import static com.lesso.neverland.common.base.BaseResponseStatus.IMAGE_UPLOAD_FAIL;
 import static com.lesso.neverland.common.constants.RequestURI.puzzle;
 
 @RestController
@@ -16,10 +20,26 @@ import static com.lesso.neverland.common.constants.RequestURI.puzzle;
 public class PuzzleController {
     private final PuzzleService puzzleService;
 
-    // 피드 상세 조회
+    // 퍼즐 목록 조회
+    @GetMapping("")
+    public BaseResponse<GroupPuzzleListResponse> getGroupPuzzles(@PathVariable Long groupIdx) {
+        return puzzleService.getGroupPuzzleList(groupIdx);
+    }
+
+    // 퍼즐 상세 조회
     @GetMapping("/{puzzleIdx}")
-    public BaseResponse<PuzzleResponse> getPuzzle(@PathVariable Long postIdx) {
-        return puzzleService.getPuzzle(postIdx);
+    public BaseResponse<PuzzleDetailResponse> getPuzzleDetail(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx) {
+        return puzzleService.getPuzzleDetail(groupIdx, puzzleIdx);
+    }
+
+    // 퍼즐 생성
+    @PostMapping("")
+    public BaseResponse<String> createPuzzle(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart CreatePuzzleRequest createPuzzleRequest) {
+        try {
+            return puzzleService.createPuzzle(groupIdx, image, createPuzzleRequest);
+        } catch (IOException e) {
+            throw new BaseException(IMAGE_UPLOAD_FAIL);
+        }
     }
 
     // [작성자] 피드 수정 화면 조회
@@ -28,15 +48,16 @@ public class PuzzleController {
         return puzzleService.getPuzzleEditView(puzzleIdx);
     }
 
-    // [작성자] 피드 삭제
+    // [작성자] 퍼즐 삭제
     @PatchMapping("/{puzzleIdx}/delete")
-    public BaseResponse<String> deletePuzzle(@PathVariable Long puzzleIdx) {
-        return puzzleService.deletePuzzle(puzzleIdx);
+    public BaseResponse<String> deletePuzzle(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx) {
+        return puzzleService.deletePuzzle(groupIdx, puzzleIdx);
     }
 
-    // [유저] 작성한 글 목록 조회
-    @GetMapping("/myPuzzles")
-    public BaseResponse<MyPuzzleListResponse> getMyPuzzleList() {
-        return puzzleService.getMyPuzzleList();
+    // 퍼즐러 목록 조회
+    @GetMapping("/puzzlerList")
+    public BaseResponse<PuzzlerListResponse> getPuzzlerList(@PathVariable Long groupIdx) {
+        return puzzleService.getPuzzlerList(groupIdx);
     }
+
 }

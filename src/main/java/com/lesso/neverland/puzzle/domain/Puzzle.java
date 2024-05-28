@@ -48,11 +48,11 @@ public class Puzzle extends BaseEntity {
     @Column(nullable = false)
     private String location; // 추억 장소
 
-    private String backgroundMusic; // 가수 - 제목
-    private String backgroundMusicUrl; // 유튜브 링크 url
-
     @OneToMany(mappedBy = "puzzle")
     private List<PuzzlePiece> puzzlePieces = new ArrayList<>();
+
+    @OneToMany(mappedBy = "puzzle")
+    private List<PuzzleMember> puzzleMembers = new ArrayList<>(); // 해당 퍼즐에 참여한 멤버 목록
 
     @Builder
     public Puzzle(User user, Team team, String title, String content, String puzzleImage, LocalDate puzzleDate, String location, String backgroundMusic, String backgroundMusicUrl) {
@@ -63,8 +63,6 @@ public class Puzzle extends BaseEntity {
         this.puzzleImage = puzzleImage;
         this.puzzleDate = puzzleDate;
         this.location = location;
-        this.backgroundMusic = backgroundMusic;
-        this.backgroundMusicUrl = backgroundMusicUrl;
     }
 
     public void setUser(User user) {

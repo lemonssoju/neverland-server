@@ -1,6 +1,7 @@
 package com.lesso.neverland.group.dto;
 
-public record GroupPuzzleDto(String title,
+public record GroupPuzzleDto(Long puzzleIdx,
+                             String title,
                              String puzzleImage,
                              String writer,
                              String createdDate,
