@@ -45,8 +45,8 @@ public class Puzzle extends BaseEntity {
     @Column(nullable = false)
     private LocalDate puzzleDate; // 추억 날짜
 
-    @Column(nullable = false)
-    private String location; // 추억 장소
+    @Embedded
+    private PuzzleLocation location; // 추억 장소
 
     @OneToMany(mappedBy = "puzzle")
     private List<PuzzlePiece> puzzlePieces = new ArrayList<>();
@@ -55,7 +55,7 @@ public class Puzzle extends BaseEntity {
     private List<PuzzleMember> puzzleMembers = new ArrayList<>(); // 해당 퍼즐에 참여한 멤버 목록
 
     @Builder
-    public Puzzle(User user, Team team, String title, String content, String puzzleImage, LocalDate puzzleDate, String location, String backgroundMusic, String backgroundMusicUrl) {
+    public Puzzle(User user, Team team, String title, String content, String puzzleImage, LocalDate puzzleDate, PuzzleLocation location) {
         this.user = user;
         this.team = team;
         this.title = title;
