@@ -31,7 +31,6 @@ public class AlbumController {
     // 앨범 목록 조회
     @GetMapping("")
     public BaseResponse<?> getAlbumList(@PathVariable("groupIdx") Long groupIdx, @RequestParam String sortType) {
-        if (sortType.equals("time")) return albumService.getAlbumListByTime(groupIdx);
-        else return albumService.getAlbumListByLocation(groupIdx);
+        return albumService.getAlbumList(groupIdx, sortType);
     }
 }

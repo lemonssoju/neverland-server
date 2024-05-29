@@ -50,21 +50,21 @@ public class AlbumService {
                         comment.getContent())).toList();
 
         AlbumDetailResponse albumDetailResponse = new AlbumDetailResponse(album.getPuzzle().getTitle(), album.getPuzzle().getPuzzleDate().toString(),
-                album.getPuzzle().getLocation(), memberList, album.getAlbumImage(), album.getContent(), album.getPuzzle().getPuzzleIdx(), commentList);
+                album.getPuzzle().getLocation().getLocation(), memberList, album.getAlbumImage(), album.getContent(), album.getPuzzle().getPuzzleIdx(), commentList);
         return new BaseResponse<>(albumDetailResponse);
     }
 
-    // [시간 기준] 앨범 목록 조회
-    public BaseResponse<AlbumListByTimeResponse> getAlbumListByTime(Long groupIdx) {
+    // 앨범 목록 조회(sortType="time", "location")
+    public BaseResponse<?> getAlbumList(Long groupIdx, String sortType) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         List<Album> albumList = albumRepository.findByTeamOrderByCreatedDateDesc(group);
 
-        List<AlbumByTimeDto> albumDtoList = albumList.stream().map(AlbumByTimeDto::from).toList();
-        return new BaseResponse<>(new AlbumListByTimeResponse(albumDtoList));
-    }
-
-    // [공간 기준] 앨범 목록 조회
-    public BaseResponse<AlbumListByLocationResponse> getAlbumListByLocation(Long groupIdx) {
-
+        if (sortType.equals("time")) {
+            List<AlbumByTimeDto> albumDtoList = albumList.stream().map(AlbumByTimeDto::from).toList();
+            return new BaseResponse<>(new AlbumListByTimeResponse(albumDtoList));
+        } else {
+            List<AlbumByLocationDto> albumDtoList = albumList.stream().map(AlbumByLocationDto::from).toList();
+            return new BaseResponse<>(new AlbumListByLocationResponse(albumDtoList));
+        }
     }
 }
