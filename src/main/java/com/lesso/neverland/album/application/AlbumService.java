@@ -1,8 +1,7 @@
 package com.lesso.neverland.album.application;
 
 import com.lesso.neverland.album.domain.Album;
-import com.lesso.neverland.album.dto.AlbumDetailResponse;
-import com.lesso.neverland.album.dto.AlbumImageRequest;
+import com.lesso.neverland.album.dto.*;
 import com.lesso.neverland.album.repository.AlbumRepository;
 import com.lesso.neverland.comment.dto.CommentDto;
 import com.lesso.neverland.common.base.BaseException;
@@ -53,5 +52,19 @@ public class AlbumService {
         AlbumDetailResponse albumDetailResponse = new AlbumDetailResponse(album.getPuzzle().getTitle(), album.getPuzzle().getPuzzleDate().toString(),
                 album.getPuzzle().getLocation(), memberList, album.getAlbumImage(), album.getContent(), album.getPuzzle().getPuzzleIdx(), commentList);
         return new BaseResponse<>(albumDetailResponse);
+    }
+
+    // [시간 기준] 앨범 목록 조회
+    public BaseResponse<AlbumListByTimeResponse> getAlbumListByTime(Long groupIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        List<Album> albumList = albumRepository.findByTeamOrderByCreatedDateDesc(group);
+
+        List<AlbumByTimeDto> albumDtoList = albumList.stream().map(AlbumByTimeDto::from).toList();
+        return new BaseResponse<>(new AlbumListByTimeResponse(albumDtoList));
+    }
+
+    // [공간 기준] 앨범 목록 조회
+    public BaseResponse<AlbumListByLocationResponse> getAlbumListByLocation(Long groupIdx) {
+
     }
 }
