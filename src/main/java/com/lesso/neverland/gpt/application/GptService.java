@@ -1,6 +1,6 @@
 package com.lesso.neverland.gpt.application;
 
-import com.lesso.neverland.gpt.dto.CompletePuzzleResponse;
+import com.lesso.neverland.gpt.dto.GptResponseDto;
 import com.lesso.neverland.gpt.dto.GptRequest;
 import com.lesso.neverland.gpt.dto.GptResponse;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
@@ -39,7 +39,7 @@ public class GptService {
         return result.toString();
     }
 
-    public CompletePuzzleResponse parseResponse(String response) {
+    public GptResponseDto parseResponse(String response) {
         // 영어 부분 추출을 위한 정규 표현식 패턴 (괄호로 묶인 부분)
         Pattern pattern = Pattern.compile("\\((.*?)\\)");
         Matcher matcher = pattern.matcher(response);
@@ -54,6 +54,6 @@ public class GptService {
         String koreanPart = response.replace("(" + englishPart + ")", "").trim();
 
         // 추출된 한글 부분과 영어 부분으로 CompletePuzzleResponse 객체 생성
-        return new CompletePuzzleResponse(englishPart, koreanPart);
+        return new GptResponseDto(englishPart, koreanPart);
     }
 }

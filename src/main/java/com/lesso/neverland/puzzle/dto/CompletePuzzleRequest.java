@@ -1,4 +1,4 @@
-package com.lesso.neverland.gpt.dto;
+package com.lesso.neverland.puzzle.dto;
 
 import java.util.List;
 

@@ -1,8 +1,15 @@
 package com.lesso.neverland.puzzle.application;
 
+import com.lesso.neverland.album.domain.Album;
+import com.lesso.neverland.album.repository.AlbumRepository;
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.common.image.ImageService;
+import com.lesso.neverland.gpt.application.GptService;
+import com.lesso.neverland.gpt.dto.GptResponseDto;
+import com.lesso.neverland.puzzle.dto.CompletePuzzleRequest;
+import com.lesso.neverland.puzzle.dto.CompletePuzzleResponse;
+import com.lesso.neverland.gpt.dto.GptResponse;
 import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.group.dto.GroupPuzzleDto;
 import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
@@ -12,6 +19,7 @@ import com.lesso.neverland.puzzle.domain.PuzzleMember;
 import com.lesso.neverland.puzzle.domain.PuzzlePiece;
 import com.lesso.neverland.puzzle.dto.*;
 import com.lesso.neverland.puzzle.repository.PuzzleMemberRepository;
+import com.lesso.neverland.puzzle.repository.PuzzlePieceRepository;
 import com.lesso.neverland.puzzle.repository.PuzzleRepository;
 import com.lesso.neverland.user.application.UserService;
 import com.lesso.neverland.user.domain.User;
@@ -41,6 +49,9 @@ public class PuzzleService {
     private final GroupRepository groupRepository;
     private final ImageService imageService;
     private final PuzzleMemberRepository puzzleMemberRepository;
+    private final PuzzlePieceRepository puzzlePieceRepository;
+    private final GptService gptService;
+    private final AlbumRepository albumRepository;
 
     // 퍼즐 목록 조회
     public BaseResponse<GroupPuzzleListResponse> getGroupPuzzleList(Long groupIdx) {
@@ -148,13 +159,15 @@ public class PuzzleService {
         return puzzle;
     }
 
-    // [작성자] 피드 수정 화면 조회
-    public BaseResponse<PuzzleEditViewResponse> getPuzzleEditView(Long puzzleIdx) {
+    // [작성자] 퍼즐 수정
+    public BaseResponse<String> editPuzzle(Long groupIdx, Long puzzleIdx, MultipartFile image, EditPuzzleRequest editPuzzleRequest) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         validateWriter(user, puzzle);
 
-        return new BaseResponse<>(new PuzzleEditViewResponse(puzzle.getTitle(), puzzle.getPuzzleImage(), puzzle.getContent()));
+
+
+        return new BaseResponse<>(SUCCESS);
     }
 
     // [작성자] 퍼즐 삭제
@@ -198,5 +211,51 @@ public class PuzzleService {
                                 userTeam.getUser().getProfile().getNickname()))
                         .toList());
         return new BaseResponse<>(puzzlerList);
+    }
+
+    // 퍼즐피스 추가
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<String> addPuzzlePiece(Long groupIdx, Long puzzleIdx, PuzzlePieceRequest puzzlePieceRequest) {
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
+        validatePuzzler(user, puzzle);
+
+        if (puzzlePieceRequest.content().length() > 100) throw new BaseException(TOO_LONG_CONTENT);
+        PuzzlePiece puzzlePiece = PuzzlePiece.builder()
+                .puzzle(puzzle)
+                .user(user)
+                .content(puzzlePieceRequest.content()).build();
+        puzzlePiece.setPuzzle(puzzle);
+        puzzlePiece.setUser(user);
+        puzzlePieceRepository.save(puzzlePiece);
+
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    // 퍼즐러 validation
+    private void validatePuzzler(User user, Puzzle puzzle) {
+        if (!puzzleMemberRepository.existsByUserAndPuzzle(user, puzzle)) throw new BaseException(NO_PUZZLER);
+        if (puzzle.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_PUZZLE);
+    }
+
+    // [작성자] 퍼즐 완성하기
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<CompletePuzzleResponse> completePuzzle(Long groupIdx, Long puzzleIdx, CompletePuzzleRequest completePuzzleRequest) {
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
+        validateWriter(user, puzzle);
+
+        // GPT 요약 수행
+        GptResponse response = gptService.completion(gptService.toText(completePuzzleRequest.puzzleTextList()));
+        GptResponseDto gptResponseDto = gptService.parseResponse(response.messages().get(0).message());
+
+        // Album 생성
+        Album newAlbum = Album.builder()
+                .puzzle(puzzle)
+                .content(gptResponseDto.description()).build();
+        albumRepository.save(newAlbum);
+
+        CompletePuzzleResponse completePuzzleResponse = new CompletePuzzleResponse(gptResponseDto.prompt(), gptResponseDto.description(), newAlbum.getAlbumIdx());
+        return new BaseResponse<>(completePuzzleResponse);
     }
 }

@@ -2,6 +2,9 @@ package com.lesso.neverland.puzzle.presentation;
 
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
+import com.lesso.neverland.gpt.application.GptService;
+import com.lesso.neverland.puzzle.dto.CompletePuzzleRequest;
+import com.lesso.neverland.puzzle.dto.CompletePuzzleResponse;
 import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
 import com.lesso.neverland.puzzle.application.PuzzleService;
 import com.lesso.neverland.puzzle.dto.*;
@@ -19,6 +22,7 @@ import static com.lesso.neverland.common.constants.RequestURI.puzzle;
 @RequestMapping(puzzle)
 public class PuzzleController {
     private final PuzzleService puzzleService;
+    private final GptService gptService;
 
     // 퍼즐 목록 조회
     @GetMapping("")
@@ -42,10 +46,10 @@ public class PuzzleController {
         }
     }
 
-    // [작성자] 피드 수정 화면 조회
-    @GetMapping("/{puzzleIdx}/editView")
-    public BaseResponse<PuzzleEditViewResponse> getPuzzleEditView(@PathVariable Long puzzleIdx) {
-        return puzzleService.getPuzzleEditView(puzzleIdx);
+    // [작성자] 퍼즐 수정
+    @GetMapping("/{puzzleIdx}/edit")
+    public BaseResponse<String> editPuzzle(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx, @RequestPart MultipartFile image, @RequestPart EditPuzzleRequest editPuzzleRequest) {
+        return puzzleService.editPuzzle(groupIdx, puzzleIdx, image, editPuzzleRequest);
     }
 
     // [작성자] 퍼즐 삭제
@@ -58,6 +62,21 @@ public class PuzzleController {
     @GetMapping("/puzzlerList")
     public BaseResponse<PuzzlerListResponse> getPuzzlerList(@PathVariable Long groupIdx) {
         return puzzleService.getPuzzlerList(groupIdx);
+    }
+
+    // [멤버] 퍼즐피스 추가
+    @PostMapping("/{puzzleIdx}/puzzlePiece")
+    public BaseResponse<String> addPuzzlePiece(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx, @RequestBody PuzzlePieceRequest puzzlePieceRequest) {
+        return puzzleService.addPuzzlePiece(groupIdx, puzzleIdx, puzzlePieceRequest);
+    }
+
+    // [작성자] 퍼즐 완성하기
+    @PostMapping("/{puzzleIdx}}")
+    public BaseResponse<CompletePuzzleResponse> completePuzzle(@PathVariable("groupIdx") Long groupIdx,
+                                                               @PathVariable("puzzleIdx") Long puzzleIdx,
+                                                               @RequestBody CompletePuzzleRequest completePuzzleRequest)
+    {
+        return puzzleService.completePuzzle(groupIdx, puzzleIdx, completePuzzleRequest);
     }
 
 }
