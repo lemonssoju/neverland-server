@@ -1,14 +1,17 @@
 package com.lesso.neverland.album.application;
 
 import com.lesso.neverland.album.domain.Album;
+import com.lesso.neverland.album.dto.AlbumDetailResponse;
 import com.lesso.neverland.album.dto.AlbumImageRequest;
 import com.lesso.neverland.album.repository.AlbumRepository;
+import com.lesso.neverland.comment.dto.CommentDto;
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.group.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 
@@ -28,5 +31,27 @@ public class AlbumService {
         albumRepository.save(album);
 
         return new BaseResponse<>(SUCCESS);
+    }
+
+    // 앨범 상세 조회
+    public BaseResponse<AlbumDetailResponse> getAlbumDetail(Long groupIdx, Long albumIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        Album album = albumRepository.findById(albumIdx).orElseThrow(() -> new BaseException(INVALID_ALBUM_IDX));
+        if (!album.getPuzzle().getTeam().equals(group)) throw new BaseException(NO_GROUP_ALBUM);
+
+        List<String> memberList = album.getPuzzle().getPuzzleMembers().stream()
+                .map(puzzleMember -> puzzleMember.getUser().getProfile().getNickname()).toList();
+
+        List<CommentDto> commentList = album.getComments().stream()
+                .map(comment -> new CommentDto(
+                        comment.getCommentIdx(),
+                        comment.getUser().getProfile().getNickname(),
+                        comment.getUser().getProfile().getProfileImage(),
+                        comment.getCreatedDate().toString(),
+                        comment.getContent())).toList();
+
+        AlbumDetailResponse albumDetailResponse = new AlbumDetailResponse(album.getPuzzle().getTitle(), album.getPuzzle().getPuzzleDate().toString(),
+                album.getPuzzle().getLocation(), memberList, album.getAlbumImage(), album.getContent(), album.getPuzzle().getPuzzleIdx(), commentList);
+        return new BaseResponse<>(albumDetailResponse);
     }
 }
