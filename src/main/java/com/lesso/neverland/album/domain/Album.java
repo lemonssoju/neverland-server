@@ -5,6 +5,7 @@ import com.lesso.neverland.common.base.BaseEntity;
 import com.lesso.neverland.puzzle.domain.Puzzle;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -25,8 +26,6 @@ public class Album extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "puzzle")
     private Puzzle puzzle;
-
-    @Column(nullable = false)
     private String albumImage;
 
     @Column(nullable = false)
@@ -34,4 +33,10 @@ public class Album extends BaseEntity {
 
     @OneToMany(mappedBy = "album")
     private List<Comment> comments = new ArrayList<>();
+
+    @Builder
+    public Album(Puzzle puzzle, String content) {
+        this.puzzle = puzzle;
+        this.content = content;
+    }
 }
