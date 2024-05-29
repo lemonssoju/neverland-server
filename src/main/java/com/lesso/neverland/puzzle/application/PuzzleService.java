@@ -79,13 +79,19 @@ public class PuzzleService {
     // 퍼즐 상세 조회
     public BaseResponse<PuzzleDetailResponse> getPuzzleDetail(Long groupIdx, Long puzzleIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
+
         if (!puzzle.getTeam().equals(group)) throw new BaseException(NO_GROUP_PUZZLE);
         if (puzzle.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_PUZZLE);
 
+        boolean isWriter = puzzle.getUser().equals(user);
+        boolean hasWrite = puzzlePieceRepository.existsByPuzzleAndUser(puzzle, user);
+
         PuzzleDetailResponse puzzleDetail = new PuzzleDetailResponse(puzzle.getLocation(), puzzle.getPuzzleImage(),
                 puzzle.getPuzzleDate().toString(), puzzle.getUser().getProfile().getNickname(), puzzle.getTitle(), puzzle.getContent(),
-                getMemberImageList(puzzle), puzzle.getPuzzleMembers().size(), getPuzzlePieceList(puzzle));
+                getMemberImageList(puzzle), puzzle.getPuzzleMembers().size(), puzzle.getPuzzlePieces().size()+1, isWriter, hasWrite,
+                getPuzzlePieceList(puzzle));
         return new BaseResponse<>(puzzleDetail);
     }
 
@@ -160,11 +166,10 @@ public class PuzzleService {
     }
 
     // [작성자] 퍼즐 수정
-    public BaseResponse<String> editPuzzle(Long groupIdx, Long puzzleIdx, MultipartFile image, EditPuzzleRequest editPuzzleRequest) {
+    public BaseResponse<String> editPuzzle(Long groupIdx, Long puzzleIdx, MultipartFile newImage, EditPuzzleRequest editPuzzleRequest) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         validateWriter(user, puzzle);
-
 
 
         return new BaseResponse<>(SUCCESS);
