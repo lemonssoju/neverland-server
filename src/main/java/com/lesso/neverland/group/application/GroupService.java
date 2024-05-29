@@ -170,7 +170,7 @@ public class GroupService {
 
     // 그룹 생성
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<String> createGroup(MultipartFile image, CreateGroupRequest createGroupRequest) throws IOException {
+    public BaseResponse<CreateGroupResponse> createGroup(MultipartFile image, CreateGroupRequest createGroupRequest) throws IOException {
         User admin = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         // upload image
@@ -192,14 +192,8 @@ public class GroupService {
         newUserTeam.setTeam(group);
         userTeamRepository.save(newUserTeam);
 
-//        for (Long memberIdx : createGroupRequest.memberList()) {
-//            User member = userRepository.findById(memberIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-//            UserTeam userTeam = new UserTeam(member, group);
-//            userTeam.setUser(member);
-//            userTeam.setTeam(group);
-//            userTeamRepository.save(userTeam);
-//        }
-        return new BaseResponse<>(SUCCESS);
+        CreateGroupResponse createGroupResponse = new CreateGroupResponse(joinCode);
+        return new BaseResponse<>(createGroupResponse);
     }
 
     // [관리자] 그룹 초대하기

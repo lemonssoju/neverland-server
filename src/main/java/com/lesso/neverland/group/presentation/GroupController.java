@@ -62,7 +62,7 @@ public class GroupController {
 
     // 그룹 생성
     @PostMapping("/create")
-    public BaseResponse<String> createGroup(@RequestPart MultipartFile image, @RequestPart CreateGroupRequest createGroupRequest) {
+    public BaseResponse<CreateGroupResponse> createGroup(@RequestPart MultipartFile image, @RequestPart CreateGroupRequest createGroupRequest) {
         try {
             return groupService.createGroup(image, createGroupRequest);
         } catch (IOException e) {
