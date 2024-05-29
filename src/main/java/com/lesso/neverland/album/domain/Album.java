@@ -39,4 +39,8 @@ public class Album extends BaseEntity {
         this.puzzle = puzzle;
         this.content = content;
     }
+
+    public void saveAlbumImage(String albumImage) {
+        this.albumImage = albumImage;
+    }
 }
