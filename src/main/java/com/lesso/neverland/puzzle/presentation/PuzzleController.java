@@ -48,8 +48,8 @@ public class PuzzleController {
 
     // [작성자] 퍼즐 수정
     @GetMapping("/{puzzleIdx}/edit")
-    public BaseResponse<String> editPuzzle(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx, @RequestPart MultipartFile image, @RequestPart EditPuzzleRequest editPuzzleRequest) {
-        return puzzleService.editPuzzle(groupIdx, puzzleIdx, image, editPuzzleRequest);
+    public BaseResponse<String> editPuzzle(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx, @RequestPart MultipartFile newImage, @RequestPart EditPuzzleRequest editPuzzleRequest) {
+        return puzzleService.editPuzzle(groupIdx, puzzleIdx, newImage, editPuzzleRequest);
     }
 
     // [작성자] 퍼즐 삭제
@@ -71,7 +71,7 @@ public class PuzzleController {
     }
 
     // [작성자] 퍼즐 완성하기
-    @PostMapping("/{puzzleIdx}}")
+    @PostMapping("/{puzzleIdx}")
     public BaseResponse<CompletePuzzleResponse> completePuzzle(@PathVariable("groupIdx") Long groupIdx,
                                                                @PathVariable("puzzleIdx") Long puzzleIdx,
                                                                @RequestBody CompletePuzzleRequest completePuzzleRequest)
