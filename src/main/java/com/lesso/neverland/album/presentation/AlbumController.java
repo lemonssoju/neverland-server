@@ -27,4 +27,10 @@ public class AlbumController {
     public BaseResponse<AlbumDetailResponse> getAlbumDetail(@PathVariable("groupIdx") Long groupIdx, @PathVariable("albumIdx") Long albumIdx) {
         return albumService.getAlbumDetail(groupIdx, albumIdx);
     }
+
+    // 앨범 목록 조회
+    @GetMapping("")
+    public BaseResponse<?> getAlbumList(@PathVariable("groupIdx") Long groupIdx, @RequestParam String sortType) {
+        return albumService.getAlbumList(groupIdx, sortType);
+    }
 }

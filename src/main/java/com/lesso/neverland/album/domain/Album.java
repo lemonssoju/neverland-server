@@ -2,6 +2,7 @@ package com.lesso.neverland.album.domain;
 
 import com.lesso.neverland.comment.domain.Comment;
 import com.lesso.neverland.common.base.BaseEntity;
+import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.puzzle.domain.Puzzle;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -26,6 +27,11 @@ public class Album extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "puzzle")
     private Puzzle puzzle;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team")
+    private Team team;
+
     private String albumImage;
 
     @Column(nullable = false)

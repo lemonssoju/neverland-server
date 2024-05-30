@@ -1,8 +1,7 @@
 package com.lesso.neverland.album.application;
 
 import com.lesso.neverland.album.domain.Album;
-import com.lesso.neverland.album.dto.AlbumDetailResponse;
-import com.lesso.neverland.album.dto.AlbumImageRequest;
+import com.lesso.neverland.album.dto.*;
 import com.lesso.neverland.album.repository.AlbumRepository;
 import com.lesso.neverland.comment.dto.CommentDto;
 import com.lesso.neverland.common.base.BaseException;
@@ -51,7 +50,21 @@ public class AlbumService {
                         comment.getContent())).toList();
 
         AlbumDetailResponse albumDetailResponse = new AlbumDetailResponse(album.getPuzzle().getTitle(), album.getPuzzle().getPuzzleDate().toString(),
-                album.getPuzzle().getLocation(), memberList, album.getAlbumImage(), album.getContent(), album.getPuzzle().getPuzzleIdx(), commentList);
+                album.getPuzzle().getLocation().getLocation(), memberList, album.getAlbumImage(), album.getContent(), album.getPuzzle().getPuzzleIdx(), commentList);
         return new BaseResponse<>(albumDetailResponse);
+    }
+
+    // 앨범 목록 조회(sortType="time", "location")
+    public BaseResponse<?> getAlbumList(Long groupIdx, String sortType) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        List<Album> albumList = albumRepository.findByTeamOrderByCreatedDateDesc(group);
+
+        if (sortType.equals("time")) {
+            List<AlbumByTimeDto> albumDtoList = albumList.stream().map(AlbumByTimeDto::from).toList();
+            return new BaseResponse<>(new AlbumListByTimeResponse(albumDtoList));
+        } else {
+            List<AlbumByLocationDto> albumDtoList = albumList.stream().map(AlbumByLocationDto::from).toList();
+            return new BaseResponse<>(new AlbumListByLocationResponse(albumDtoList));
+        }
     }
 }

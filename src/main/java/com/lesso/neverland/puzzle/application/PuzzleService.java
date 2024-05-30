@@ -7,6 +7,7 @@ import com.lesso.neverland.common.base.BaseResponse;
 import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.gpt.application.GptService;
 import com.lesso.neverland.gpt.dto.GptResponseDto;
+import com.lesso.neverland.puzzle.domain.PuzzleLocation;
 import com.lesso.neverland.puzzle.dto.CompletePuzzleRequest;
 import com.lesso.neverland.puzzle.dto.CompletePuzzleResponse;
 import com.lesso.neverland.gpt.dto.GptResponse;
@@ -73,7 +74,7 @@ public class PuzzleService {
                         puzzle.getPuzzleImage(),
                         puzzle.getUser().getProfile().getNickname(),
                         puzzle.getCreatedDate().toString(),
-                        puzzle.getLocation())).toList();
+                        puzzle.getLocation().getLocation())).toList();
     }
 
     // 퍼즐 상세 조회
@@ -88,7 +89,7 @@ public class PuzzleService {
         boolean isWriter = puzzle.getUser().equals(user);
         boolean hasWrite = puzzlePieceRepository.existsByPuzzleAndUser(puzzle, user);
 
-        PuzzleDetailResponse puzzleDetail = new PuzzleDetailResponse(puzzle.getLocation(), puzzle.getPuzzleImage(),
+        PuzzleDetailResponse puzzleDetail = new PuzzleDetailResponse(puzzle.getLocation().getLocation(), puzzle.getPuzzleImage(),
                 puzzle.getPuzzleDate().toString(), puzzle.getUser().getProfile().getNickname(), puzzle.getTitle(), puzzle.getContent(),
                 getMemberImageList(puzzle), puzzle.getPuzzleMembers().size(), puzzle.getPuzzlePieces().size()+1, isWriter, hasWrite,
                 getPuzzlePieceList(puzzle));
@@ -159,11 +160,12 @@ public class PuzzleService {
                 .content(createPuzzleRequest.content())
                 .puzzleImage(imagePath)
                 .puzzleDate(puzzleDate)
-                .location(createPuzzleRequest.location()).build();
+                .location(new PuzzleLocation(createPuzzleRequest.location())).build();
         puzzleRepository.save(puzzle);
-
         return puzzle;
     }
+
+    //TODO: 퍼즐 생성 시, String으로 받은 location값을 x, y 좌표로 변환해 함께 저장
 
     // [작성자] 퍼즐 수정
     public BaseResponse<String> editPuzzle(Long groupIdx, Long puzzleIdx, MultipartFile newImage, EditPuzzleRequest editPuzzleRequest) {
