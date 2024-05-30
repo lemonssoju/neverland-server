@@ -55,7 +55,7 @@ public class GroupService {
 
     private String calculateRecentUpdate(Team group) {
         Puzzle recentPuzzle = puzzleRepository.findTopByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
-
+        if (recentPuzzle == null) return "";
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         LocalDate puzzleCreatedDate = recentPuzzle.getCreatedDate();
         long daysBetween = ChronoUnit.DAYS.between(puzzleCreatedDate, today);
