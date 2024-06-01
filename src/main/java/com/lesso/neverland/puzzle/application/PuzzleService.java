@@ -27,8 +27,14 @@ import com.lesso.neverland.user.domain.User;
 import com.lesso.neverland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -44,6 +50,11 @@ import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 @Service
 @RequiredArgsConstructor
 public class PuzzleService {
+
+    private static final String API_URL = "https://dapi.kakao.com/v2/local/search/address.json?query=";
+    @Value("${kakao.maps.api-key}")
+    private final String API_KEY;
+
     private final UserService userService;
     private final PuzzleRepository puzzleRepository;
     private final UserRepository userRepository;
@@ -160,12 +171,31 @@ public class PuzzleService {
                 .content(createPuzzleRequest.content())
                 .puzzleImage(imagePath)
                 .puzzleDate(puzzleDate)
-                .location(new PuzzleLocation(createPuzzleRequest.location())).build();
+                .location(convertAddressToCoordinates(createPuzzleRequest.location())).build();
         puzzleRepository.save(puzzle);
         return puzzle;
     }
 
-    //TODO: 퍼즐 생성 시, String으로 받은 location값을 x, y 좌표로 변환해 함께 저장
+    //TODO: API KEY 수정 필요
+    private PuzzleLocation convertAddressToCoordinates(String address) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + API_KEY);
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+
+        String url = API_URL + address;
+        ResponseEntity<KakaoApiResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, KakaoApiResponse.class);
+        KakaoApiResponse responseBody = response.getBody();
+
+        PuzzleLocation puzzleLocation = null;
+        if (responseBody != null && responseBody.documents().length > 0) {
+            String x = responseBody.documents()[0].x();
+            String y = responseBody.documents()[0].y();
+            puzzleLocation = new PuzzleLocation(address, x, y);
+        }
+        return puzzleLocation;
+    }
 
     // [작성자] 퍼즐 수정
     public BaseResponse<String> editPuzzle(Long groupIdx, Long puzzleIdx, MultipartFile newImage, EditPuzzleRequest editPuzzleRequest) {
