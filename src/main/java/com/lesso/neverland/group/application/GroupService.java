@@ -25,6 +25,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
@@ -43,14 +44,33 @@ public class GroupService {
     // 그룹 목록 조회
     public BaseResponse<GroupListResponse> getGroupList() {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-        List<Team> groupList = groupRepository.findByAdminAndStatusEquals(user, ACTIVE);
-        List<GroupListDto> groupListDto = groupList.stream()
-                .map(group -> {
-                    String startYear = group.getStartDate().format(DateTimeFormatter.ofPattern("yyyy"));
-                    return new GroupListDto(group.getTeamIdx(), group.getTeamImage(), startYear, group.getName(),
-                            group.getUserTeams().size(), group.getAdmin().getProfile().getNickname(), calculateRecentUpdate(group));
-                }).toList();
+
+        List<Team> groupList_admin = groupRepository.findByAdminAndStatusEquals(user, ACTIVE);
+        List<Team> groupList_member = user.getUserTeams().stream().map(UserTeam::getTeam).toList();
+        List<Team> combinedGroupList = Stream.concat(groupList_admin.stream(), groupList_member.stream()).distinct().toList();
+
+        List<GroupListDto> groupListDto = combinedGroupList.stream()
+                .map(group -> new GroupListDto(
+                        group.getTeamIdx(),
+                        group.getTeamImage(),
+                        group.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")),
+                        group.getName(),
+                        group.getUserTeams().size(),
+                        group.getAdmin().getProfile().getNickname(),
+                        calculateRecentUpdate(group)))
+                .sorted(Comparator.comparing(groupDto -> calculateDaysSinceRecentUpdate(groupDto.groupIdx())))
+                .toList();
         return new BaseResponse<>(new GroupListResponse(groupListDto));
+    }
+
+    // GroupListDto 정렬을 위한 최근 업로드 일자 계산
+    private long calculateDaysSinceRecentUpdate(Long groupIdx) {
+        Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
+        Puzzle recentPuzzle = puzzleRepository.findTopByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
+        if (recentPuzzle == null) return Long.MAX_VALUE; // 최근 퍼즐 없으면 큰 값 반환
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        LocalDate puzzleCreatedDate = recentPuzzle.getCreatedDate();
+        return ChronoUnit.DAYS.between(puzzleCreatedDate, today);
     }
 
     private String calculateRecentUpdate(Team group) {
@@ -209,7 +229,7 @@ public class GroupService {
     }
 
     // [멤버] 그룹 입장하기
-    public BaseResponse<String> joinGroup(JoinGroupRequest joinGroupRequest) {
+    public BaseResponse<GroupJoinResponse> joinGroup(JoinGroupRequest joinGroupRequest) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         Team group = groupRepository.findByJoinCode(joinGroupRequest.joinCode()).orElseThrow(() -> new BaseException(NO_MATCH_GROUP));
@@ -220,7 +240,7 @@ public class GroupService {
         newUserTeam.setTeam(group);
         userTeamRepository.save(newUserTeam);
 
-        return new BaseResponse<>(SUCCESS);
+        return new BaseResponse<>(new GroupJoinResponse(group.getTeamIdx()));
     }
 
     private void validateAdmin(User user, Team group) {

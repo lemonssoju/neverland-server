@@ -78,7 +78,7 @@ public class GroupController {
 
     // [멤버] 그룹 입장하기
     @PostMapping("/join")
-    public BaseResponse<String> joinGroup(@RequestBody JoinGroupRequest joinGroupRequest) {
+    public BaseResponse<GroupJoinResponse> joinGroup(@RequestBody JoinGroupRequest joinGroupRequest) {
         return groupService.joinGroup(joinGroupRequest);
     }
 }
