@@ -20,4 +20,11 @@ public class PuzzleLocation {
 
     @Builder
     public PuzzleLocation(String location) {this.location = location;}
+
+    @Builder
+    public PuzzleLocation(String location, String x, String y) {
+        this.location = location;
+        this.x = x;
+        this.y = y;
+    }
 }
