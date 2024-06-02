@@ -229,7 +229,7 @@ public class GroupService {
     }
 
     // [멤버] 그룹 입장하기
-    public BaseResponse<String> joinGroup(JoinGroupRequest joinGroupRequest) {
+    public BaseResponse<GroupJoinResponse> joinGroup(JoinGroupRequest joinGroupRequest) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         Team group = groupRepository.findByJoinCode(joinGroupRequest.joinCode()).orElseThrow(() -> new BaseException(NO_MATCH_GROUP));
@@ -240,7 +240,7 @@ public class GroupService {
         newUserTeam.setTeam(group);
         userTeamRepository.save(newUserTeam);
 
-        return new BaseResponse<>(SUCCESS);
+        return new BaseResponse<>(new GroupJoinResponse(group.getTeamIdx()));
     }
 
     private void validateAdmin(User user, Team group) {
