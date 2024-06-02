@@ -74,7 +74,10 @@ public class GroupService {
         Integer puzzleCount = puzzleRepository.countByTeam(group);
 
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        long dayCount = ChronoUnit.DAYS.between(group.getStartDate(), today);
+        YearMonth startYearMonth = group.getStartDate();
+        LocalDate startLocalDate = startYearMonth.atDay(1);
+
+        long dayCount = ChronoUnit.DAYS.between(startLocalDate, today);
 
         GroupProfileResponse profile = new GroupProfileResponse(group.getName(), group.getStartDate().getYear(), memberImageList,
                 group.getUserTeams().size(), puzzleCount, dayCount);
