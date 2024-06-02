@@ -50,7 +50,7 @@ public enum BaseResponseStatus {
     BLANK_GROUP_NAME(false, HttpStatus.BAD_REQUEST, "그룹명이 비었습니다."),
     BLANK_GROUP_SUB_NAME(false, HttpStatus.BAD_REQUEST, "그룹 subname이 비었습니다."),
     NULL_GROUP_IMAGE(false, HttpStatus.BAD_REQUEST, "그룹 이미지가 비었습니다."),
-    GROUP_ADMIN(false, HttpStatus.BAD_REQUEST, "그룹 관리자는 그룹을 나갈 수 없습니다."),
+    GROUP_ADMIN(false, HttpStatus.BAD_REQUEST, "해당 그룹의 관리자입니다."),
 
     NO_GROUP_MEMBER(false, HttpStatus.FORBIDDEN, "그룹 멤버가 아닙니다."),
     NO_GROUP_ADMIN(false, HttpStatus.FORBIDDEN, "해당 그룹의 관리자가 아닙니다."),
