@@ -51,9 +51,9 @@ import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 @RequiredArgsConstructor
 public class PuzzleService {
 
-    private static final String API_URL = "https://dapi.kakao.com/v2/local/search/address.json?query=";
+    private final String API_URL = "https://dapi.kakao.com/v2/local/search/address.json?query=";
     @Value("${kakao.maps.api-key}")
-    private final String API_KEY;
+    private String API_KEY;
 
     private final UserService userService;
     private final PuzzleRepository puzzleRepository;
@@ -176,7 +176,6 @@ public class PuzzleService {
         return puzzle;
     }
 
-    //TODO: API KEY 수정 필요
     private PuzzleLocation convertAddressToCoordinates(String address) {
         RestTemplate restTemplate = new RestTemplate();
 
