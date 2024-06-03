@@ -35,7 +35,7 @@ public class PuzzleController {
 
     // 퍼즐 생성
     @PostMapping("")
-    public BaseResponse<String> createPuzzle(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart CreatePuzzleRequest createPuzzleRequest) {
+    public BaseResponse<CreatePuzzleResponse> createPuzzle(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart CreatePuzzleRequest createPuzzleRequest) {
         try {
             return puzzleService.createPuzzle(groupIdx, image, createPuzzleRequest);
         } catch (IOException e) {
