@@ -2,11 +2,15 @@ package com.lesso.neverland.album.presentation;
 
 import com.lesso.neverland.album.application.AlbumService;
 import com.lesso.neverland.album.dto.AlbumDetailResponse;
-import com.lesso.neverland.album.dto.AlbumImageRequest;
+import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
+import static com.lesso.neverland.common.base.BaseResponseStatus.IMAGE_UPLOAD_FAIL;
 import static com.lesso.neverland.common.constants.RequestURI.album;
 
 @RestController
@@ -18,8 +22,12 @@ public class AlbumController {
 
     // 추억 이미지 등록
     @PostMapping("/{albumIdx}/image")
-    public BaseResponse<String> uploadAlbumImage(@PathVariable("groupIdx") Long groupIdx, @PathVariable("albumIdx") Long albumIdx, @RequestBody AlbumImageRequest albumImageRequest) {
-        return albumService.uploadAlbumImage(groupIdx, albumIdx, albumImageRequest);
+    public BaseResponse<String> uploadAlbumImage(@PathVariable("groupIdx") Long groupIdx, @PathVariable("albumIdx") Long albumIdx, @RequestPart MultipartFile image) {
+        try {
+            return albumService.uploadAlbumImage(groupIdx, albumIdx, image);
+        } catch (IOException e) {
+            throw new BaseException(IMAGE_UPLOAD_FAIL);
+        }
     }
 
     // 앨범 상세 조회
