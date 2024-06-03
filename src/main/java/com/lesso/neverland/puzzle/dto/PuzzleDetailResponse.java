@@ -4,6 +4,7 @@ import java.util.List;
 public record PuzzleDetailResponse(String location,
                                    String puzzleImage,
                                    String puzzleDate,
+                                   String createdDate,
                                    String writer,
                                    String title,
                                    String content,
