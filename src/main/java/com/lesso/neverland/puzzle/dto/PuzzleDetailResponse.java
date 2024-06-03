@@ -9,6 +9,7 @@ public record PuzzleDetailResponse(String location,
                                    String title,
                                    String content,
                                    List<String> memberImageList, // 3명만
+                                   List<String> memberNicknameList,
                                    Integer memberCount,
                                    Integer writeCount, // PuzzlePieceCount+1
                                    boolean isWriter,
