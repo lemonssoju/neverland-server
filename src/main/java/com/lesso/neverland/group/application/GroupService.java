@@ -186,6 +186,8 @@ public class GroupService {
 
         UserTeam userTeam = validateMember(user, group);
         userTeam.delete();
+        userTeam.removeTeam(group);
+        userTeam.removeUser(user);
         userTeamRepository.save(userTeam);
 
         return new BaseResponse<>(SUCCESS);
