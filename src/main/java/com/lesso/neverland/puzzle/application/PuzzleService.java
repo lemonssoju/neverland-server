@@ -11,7 +11,6 @@ import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.gpt.application.GptService;
 import com.lesso.neverland.gpt.dto.GptResponseDto;
 import com.lesso.neverland.puzzle.domain.PuzzleLocation;
-import com.lesso.neverland.puzzle.dto.CompletePuzzleRequest;
 import com.lesso.neverland.puzzle.dto.CompletePuzzleResponse;
 import com.lesso.neverland.gpt.dto.GptResponse;
 import com.lesso.neverland.group.domain.Team;
@@ -42,8 +41,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
@@ -101,10 +102,11 @@ public class PuzzleService {
 
         boolean isWriter = puzzle.getUser().equals(user);
         boolean hasWrite = puzzlePieceRepository.existsByPuzzleAndUser(puzzle, user);
+        boolean hasAlbum = albumRepository.existsByPuzzle(puzzle);
 
         PuzzleDetailResponse puzzleDetail = new PuzzleDetailResponse(puzzle.getLocation().getLocation(), puzzle.getPuzzleImage(),
-                puzzle.getPuzzleDate().toString(), puzzle.getUser().getProfile().getNickname(), puzzle.getTitle(), puzzle.getContent(),
-                getMemberImageList(puzzle), puzzle.getPuzzleMembers().size(), puzzle.getPuzzlePieces().size()+1, isWriter, hasWrite,
+                puzzle.getPuzzleDate().toString(), puzzle.getCreatedDate().toString(), puzzle.getUser().getProfile().getNickname(), puzzle.getTitle(), puzzle.getContent(),
+                getMemberImageList(puzzle), getMemberNicknameList(puzzle), puzzle.getPuzzleMembers().size(), puzzle.getPuzzlePieces().size()+1, isWriter, hasWrite, hasAlbum,
                 getPuzzlePieceList(puzzle));
         return new BaseResponse<>(puzzleDetail);
     }
@@ -121,15 +123,24 @@ public class PuzzleService {
 
     // puzzleMember 3명의 프로필 이미지 조회
     private List<String> getMemberImageList(Puzzle puzzle) {
-        return puzzle.getPuzzleMembers().stream()
+        List<String> imageList = new ArrayList<>();
+        imageList.add(puzzle.getUser().getProfile().getProfileImage());
+
+        List<String> memberImages = puzzle.getPuzzleMembers().stream()
                 .map(puzzleMember -> puzzleMember.getUser().getProfile().getProfileImage())
-                .limit(3)
-                .toList();
+                .limit(2).toList();
+        imageList.addAll(memberImages);
+        return imageList;
+    }
+
+    private List<String> getMemberNicknameList(Puzzle puzzle) {
+        return puzzle.getPuzzleMembers().stream()
+                .map(puzzleMember -> puzzleMember.getUser().getProfile().getNickname()).toList();
     }
 
     // 퍼즐 생성
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<String> createPuzzle(Long groupIdx, MultipartFile image, CreatePuzzleRequest createPuzzleRequest) throws IOException {
+    public BaseResponse<CreatePuzzleResponse> createPuzzle(Long groupIdx, MultipartFile image, CreatePuzzleRequest createPuzzleRequest) throws IOException {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
@@ -139,7 +150,7 @@ public class PuzzleService {
         Puzzle newPuzzle = createPuzzle(createPuzzleRequest, group, writer, imagePath, puzzleDate);
         addPuzzleMember(createPuzzleRequest, newPuzzle);
 
-        return new BaseResponse<>(SUCCESS);
+        return new BaseResponse<>(new CreatePuzzleResponse(newPuzzle.getPuzzleIdx()));
     }
 
     // Puzzle 생성 시 PuzzleMember entity 함께 생성
@@ -278,18 +289,24 @@ public class PuzzleService {
 
     // [작성자] 퍼즐 완성하기
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<CompletePuzzleResponse> completePuzzle(Long groupIdx, Long puzzleIdx, CompletePuzzleRequest completePuzzleRequest) {
+    public BaseResponse<CompletePuzzleResponse> completePuzzle(Long groupIdx, Long puzzleIdx) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         validateWriter(user, puzzle);
 
+        List<String> puzzleTextList = puzzle.getPuzzlePieces().stream()
+                .map(PuzzlePiece::getContent).collect(Collectors.toList());
+        puzzleTextList.add(puzzle.getContent());
+
         // GPT 요약 수행
-        GptResponse response = gptService.completion(gptService.toText(completePuzzleRequest.puzzleTextList()));
+        GptResponse response = gptService.completion(gptService.toText(puzzleTextList));
         GptResponseDto gptResponseDto = gptService.parseResponse(response.messages().get(0).message());
 
         // Album 생성
         Album newAlbum = Album.builder()
                 .puzzle(puzzle)
+                .albumImage("")
+                .team(puzzle.getTeam())
                 .content(gptResponseDto.description()).build();
         albumRepository.save(newAlbum);
 

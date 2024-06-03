@@ -46,7 +46,9 @@ public class GroupService {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         List<Team> groupList_admin = groupRepository.findByAdminAndStatusEquals(user, ACTIVE);
-        List<Team> groupList_member = user.getUserTeams().stream().map(UserTeam::getTeam).toList();
+        List<Team> groupList_member = user.getUserTeams().stream()
+                .filter(userTeam -> "active".equals(userTeam.getStatus()))
+                .map(UserTeam::getTeam).toList();
         List<Team> combinedGroupList = Stream.concat(groupList_admin.stream(), groupList_member.stream()).distinct().toList();
 
         List<GroupListDto> groupListDto = combinedGroupList.stream()
@@ -99,7 +101,7 @@ public class GroupService {
 
         long dayCount = ChronoUnit.DAYS.between(startLocalDate, today);
 
-        GroupProfileResponse profile = new GroupProfileResponse(group.getName(), group.getStartDate().getYear(), memberImageList,
+        GroupProfileResponse profile = new GroupProfileResponse(group.getName(), group.getAdmin().getProfile().getNickname(), group.getStartDate().getYear(), memberImageList,
                 group.getUserTeams().size(), puzzleCount, dayCount);
         return new BaseResponse<>(profile);
     }
@@ -186,6 +188,8 @@ public class GroupService {
 
         UserTeam userTeam = validateMember(user, group);
         userTeam.delete();
+        userTeam.removeTeam(group);
+        userTeam.removeUser(user);
         userTeamRepository.save(userTeam);
 
         return new BaseResponse<>(SUCCESS);

@@ -39,6 +39,16 @@ public class UserTeam extends BaseEntity {
         team.getUserTeams().add(this);
     }
 
+    public void removeUser(User user) {
+        this.user = user;
+        user.getUserTeams().remove(this);
+    }
+
+    public void removeTeam(Team team) {
+        this.team = team;
+        team.getUserTeams().remove(this);
+    }
+
     @Builder
     public UserTeam(User user, Team team) {
         this.user = user;

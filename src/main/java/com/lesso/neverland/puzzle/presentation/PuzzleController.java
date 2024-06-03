@@ -2,8 +2,6 @@ package com.lesso.neverland.puzzle.presentation;
 
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
-import com.lesso.neverland.gpt.application.GptService;
-import com.lesso.neverland.puzzle.dto.CompletePuzzleRequest;
 import com.lesso.neverland.puzzle.dto.CompletePuzzleResponse;
 import com.lesso.neverland.group.dto.GroupPuzzleListResponse;
 import com.lesso.neverland.puzzle.application.PuzzleService;
@@ -22,7 +20,6 @@ import static com.lesso.neverland.common.constants.RequestURI.puzzle;
 @RequestMapping(puzzle)
 public class PuzzleController {
     private final PuzzleService puzzleService;
-    private final GptService gptService;
 
     // 퍼즐 목록 조회
     @GetMapping("")
@@ -38,7 +35,7 @@ public class PuzzleController {
 
     // 퍼즐 생성
     @PostMapping("")
-    public BaseResponse<String> createPuzzle(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart CreatePuzzleRequest createPuzzleRequest) {
+    public BaseResponse<CreatePuzzleResponse> createPuzzle(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart CreatePuzzleRequest createPuzzleRequest) {
         try {
             return puzzleService.createPuzzle(groupIdx, image, createPuzzleRequest);
         } catch (IOException e) {
@@ -72,11 +69,8 @@ public class PuzzleController {
 
     // [작성자] 퍼즐 완성하기
     @PostMapping("/{puzzleIdx}")
-    public BaseResponse<CompletePuzzleResponse> completePuzzle(@PathVariable("groupIdx") Long groupIdx,
-                                                               @PathVariable("puzzleIdx") Long puzzleIdx,
-                                                               @RequestBody CompletePuzzleRequest completePuzzleRequest)
-    {
-        return puzzleService.completePuzzle(groupIdx, puzzleIdx, completePuzzleRequest);
+    public BaseResponse<CompletePuzzleResponse> completePuzzle(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx) {
+        return puzzleService.completePuzzle(groupIdx, puzzleIdx);
     }
 
 }
