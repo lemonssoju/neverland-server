@@ -21,10 +21,10 @@ import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
-    UserRepository userRepository;
-    CommentRepository commentRepository;
-    UserService userService;
-    AlbumRepository albumRepository;
+    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final UserService userService;
+    private final AlbumRepository albumRepository;
 
     // 댓글 등록
     @Transactional(rollbackFor = Exception.class)
