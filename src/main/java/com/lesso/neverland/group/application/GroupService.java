@@ -99,7 +99,7 @@ public class GroupService {
 
         long dayCount = ChronoUnit.DAYS.between(startLocalDate, today);
 
-        GroupProfileResponse profile = new GroupProfileResponse(group.getName(), group.getStartDate().getYear(), memberImageList,
+        GroupProfileResponse profile = new GroupProfileResponse(group.getName(), group.getAdmin().getProfile().getNickname(), group.getStartDate().getYear(), memberImageList,
                 group.getUserTeams().size(), puzzleCount, dayCount);
         return new BaseResponse<>(profile);
     }
