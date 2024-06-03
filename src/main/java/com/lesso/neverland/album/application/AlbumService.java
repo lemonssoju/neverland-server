@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
+import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -65,10 +67,14 @@ public class AlbumService {
     // 앨범 목록 조회(sortType="time", "location")
     public BaseResponse<?> getAlbumList(Long groupIdx, String sortType) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-        List<Album> albumList = albumRepository.findByTeamOrderByCreatedDateDesc(group);
+
+        List<Album> albumList = albumRepository.findByTeamAndStatusEquals(group, ACTIVE);
+        List<Album> sortedAlbums = albumList.stream()
+                .sorted(Comparator.comparing(album -> album.getPuzzle().getPuzzleDate(), Comparator.reverseOrder()))
+                .toList();
 
         if (sortType.equals("time")) {
-            List<AlbumByTimeDto> albumDtoList = albumList.stream().map(AlbumByTimeDto::from).toList();
+            List<AlbumByTimeDto> albumDtoList = sortedAlbums.stream().map(AlbumByTimeDto::from).toList();
             return new BaseResponse<>(new AlbumListByTimeResponse(albumDtoList));
         } else {
             List<AlbumByLocationDto> albumDtoList = albumList.stream().map(AlbumByLocationDto::from).toList();
