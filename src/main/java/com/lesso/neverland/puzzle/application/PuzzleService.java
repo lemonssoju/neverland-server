@@ -102,10 +102,11 @@ public class PuzzleService {
 
         boolean isWriter = puzzle.getUser().equals(user);
         boolean hasWrite = puzzlePieceRepository.existsByPuzzleAndUser(puzzle, user);
+        boolean hasAlbum = albumRepository.existsByPuzzle(puzzle);
 
         PuzzleDetailResponse puzzleDetail = new PuzzleDetailResponse(puzzle.getLocation().getLocation(), puzzle.getPuzzleImage(),
                 puzzle.getPuzzleDate().toString(), puzzle.getCreatedDate().toString(), puzzle.getUser().getProfile().getNickname(), puzzle.getTitle(), puzzle.getContent(),
-                getMemberImageList(puzzle), getMemberNicknameList(puzzle), puzzle.getPuzzleMembers().size(), puzzle.getPuzzlePieces().size()+1, isWriter, hasWrite,
+                getMemberImageList(puzzle), getMemberNicknameList(puzzle), puzzle.getPuzzleMembers().size(), puzzle.getPuzzlePieces().size()+1, isWriter, hasWrite, hasAlbum,
                 getPuzzlePieceList(puzzle));
         return new BaseResponse<>(puzzleDetail);
     }

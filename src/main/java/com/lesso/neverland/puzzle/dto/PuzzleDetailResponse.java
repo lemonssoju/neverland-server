@@ -14,4 +14,5 @@ public record PuzzleDetailResponse(String location,
                                    Integer writeCount, // PuzzlePieceCount+1
                                    boolean isWriter,
                                    boolean hasWrite, // 해당 user가 퍼즐피스 작성했는지 여부
+                                   boolean hasAlbum,
                                    List<PuzzlePieceDto> puzzlePieces) {}
