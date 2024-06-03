@@ -46,7 +46,9 @@ public class GroupService {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
         List<Team> groupList_admin = groupRepository.findByAdminAndStatusEquals(user, ACTIVE);
-        List<Team> groupList_member = user.getUserTeams().stream().map(UserTeam::getTeam).toList();
+        List<Team> groupList_member = user.getUserTeams().stream()
+                .filter(userTeam -> "active".equals(userTeam.getStatus()))
+                .map(UserTeam::getTeam).toList();
         List<Team> combinedGroupList = Stream.concat(groupList_admin.stream(), groupList_member.stream()).distinct().toList();
 
         List<GroupListDto> groupListDto = combinedGroupList.stream()
