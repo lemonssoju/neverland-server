@@ -105,7 +105,7 @@ public class PuzzleService {
 
         PuzzleDetailResponse puzzleDetail = new PuzzleDetailResponse(puzzle.getLocation().getLocation(), puzzle.getPuzzleImage(),
                 puzzle.getPuzzleDate().toString(), puzzle.getCreatedDate().toString(), puzzle.getUser().getProfile().getNickname(), puzzle.getTitle(), puzzle.getContent(),
-                getMemberImageList(puzzle), puzzle.getPuzzleMembers().size(), puzzle.getPuzzlePieces().size()+1, isWriter, hasWrite,
+                getMemberImageList(puzzle), getMemberNicknameList(puzzle), puzzle.getPuzzleMembers().size(), puzzle.getPuzzlePieces().size()+1, isWriter, hasWrite,
                 getPuzzlePieceList(puzzle));
         return new BaseResponse<>(puzzleDetail);
     }
@@ -130,6 +130,11 @@ public class PuzzleService {
                 .limit(2).toList();
         imageList.addAll(memberImages);
         return imageList;
+    }
+
+    private List<String> getMemberNicknameList(Puzzle puzzle) {
+        return puzzle.getPuzzleMembers().stream()
+                .map(puzzleMember -> puzzleMember.getUser().getProfile().getNickname()).toList();
     }
 
     // 퍼즐 생성
