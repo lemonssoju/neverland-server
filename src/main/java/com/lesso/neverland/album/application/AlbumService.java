@@ -42,6 +42,7 @@ public class AlbumService {
                 .map(puzzleMember -> puzzleMember.getUser().getProfile().getNickname()).toList();
 
         List<CommentDto> commentList = album.getComments().stream()
+                .filter(comment -> "active".equals(comment.getStatus()))
                 .map(comment -> new CommentDto(
                         comment.getCommentIdx(),
                         comment.getUser().getProfile().getNickname(),
