@@ -139,7 +139,7 @@ public class PuzzleService {
 
     // 퍼즐 생성
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<String> createPuzzle(Long groupIdx, MultipartFile image, CreatePuzzleRequest createPuzzleRequest) throws IOException {
+    public BaseResponse<CreatePuzzleResponse> createPuzzle(Long groupIdx, MultipartFile image, CreatePuzzleRequest createPuzzleRequest) throws IOException {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
@@ -149,7 +149,7 @@ public class PuzzleService {
         Puzzle newPuzzle = createPuzzle(createPuzzleRequest, group, writer, imagePath, puzzleDate);
         addPuzzleMember(createPuzzleRequest, newPuzzle);
 
-        return new BaseResponse<>(SUCCESS);
+        return new BaseResponse<>(new CreatePuzzleResponse(newPuzzle.getPuzzleIdx()));
     }
 
     // Puzzle 생성 시 PuzzleMember entity 함께 생성
