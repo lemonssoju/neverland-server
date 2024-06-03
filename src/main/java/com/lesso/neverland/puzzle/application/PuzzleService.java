@@ -11,7 +11,6 @@ import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.gpt.application.GptService;
 import com.lesso.neverland.gpt.dto.GptResponseDto;
 import com.lesso.neverland.puzzle.domain.PuzzleLocation;
-import com.lesso.neverland.puzzle.dto.CompletePuzzleRequest;
 import com.lesso.neverland.puzzle.dto.CompletePuzzleResponse;
 import com.lesso.neverland.gpt.dto.GptResponse;
 import com.lesso.neverland.group.domain.Team;
@@ -45,6 +44,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 import static com.lesso.neverland.common.constants.Constants.ACTIVE;
@@ -288,18 +288,24 @@ public class PuzzleService {
 
     // [작성자] 퍼즐 완성하기
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<CompletePuzzleResponse> completePuzzle(Long groupIdx, Long puzzleIdx, CompletePuzzleRequest completePuzzleRequest) {
+    public BaseResponse<CompletePuzzleResponse> completePuzzle(Long groupIdx, Long puzzleIdx) {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         validateWriter(user, puzzle);
 
+        List<String> puzzleTextList = puzzle.getPuzzlePieces().stream()
+                .map(PuzzlePiece::getContent).collect(Collectors.toList());
+        puzzleTextList.add(puzzle.getContent());
+
         // GPT 요약 수행
-        GptResponse response = gptService.completion(gptService.toText(completePuzzleRequest.puzzleTextList()));
+        GptResponse response = gptService.completion(gptService.toText(puzzleTextList));
         GptResponseDto gptResponseDto = gptService.parseResponse(response.messages().get(0).message());
 
         // Album 생성
         Album newAlbum = Album.builder()
                 .puzzle(puzzle)
+                .albumImage("")
+                .team(puzzle.getTeam())
                 .content(gptResponseDto.description()).build();
         albumRepository.save(newAlbum);
 

@@ -34,15 +34,17 @@ public class Album extends BaseEntity {
 
     private String albumImage;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String content;
 
     @OneToMany(mappedBy = "album")
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public Album(Puzzle puzzle, String content) {
+    public Album(Puzzle puzzle, String albumImage, Team team, String content) {
         this.puzzle = puzzle;
+        this.albumImage = albumImage;
+        this.team = team;
         this.content = content;
     }
 
