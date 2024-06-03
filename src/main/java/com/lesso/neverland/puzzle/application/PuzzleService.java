@@ -178,6 +178,7 @@ public class PuzzleService {
         return puzzle;
     }
 
+    // String address값을 KakaoMap API를 활용해 x,y 좌표로 변환
     private PuzzleLocation convertAddressToCoordinates(String address) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -194,9 +195,7 @@ public class PuzzleService {
         String x = firstDocument.path("x").asText();
         String y = firstDocument.path("y").asText();
 
-        PuzzleLocation puzzleLocation = null;
-        puzzleLocation = new PuzzleLocation(address, x, y);
-        return puzzleLocation;
+        return new PuzzleLocation(address, x, y);
     }
 
     // [작성자] 퍼즐 수정
