@@ -1,5 +1,8 @@
 package com.lesso.neverland.puzzle.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesso.neverland.album.domain.Album;
 import com.lesso.neverland.album.repository.AlbumRepository;
 import com.lesso.neverland.common.base.BaseException;
@@ -31,7 +34,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -131,7 +133,7 @@ public class PuzzleService {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
-        String imagePath = imageService.uploadImage("group", image);
+        String imagePath = imageService.uploadImage("puzzle", image);
         LocalDate puzzleDate = convertToLocalDate(createPuzzleRequest.puzzleDate());
 
         Puzzle newPuzzle = createPuzzle(createPuzzleRequest, group, writer, imagePath, puzzleDate);
@@ -163,7 +165,7 @@ public class PuzzleService {
     }
 
     // puzzle entity 생성
-    private Puzzle createPuzzle(CreatePuzzleRequest createPuzzleRequest, Team group, User writer, String imagePath, LocalDate puzzleDate) {
+    private Puzzle createPuzzle(CreatePuzzleRequest createPuzzleRequest, Team group, User writer, String imagePath, LocalDate puzzleDate) throws JsonProcessingException {
         Puzzle puzzle = Puzzle.builder()
                 .user(writer)
                 .team(group)
@@ -176,23 +178,24 @@ public class PuzzleService {
         return puzzle;
     }
 
-    private PuzzleLocation convertAddressToCoordinates(String address) {
+    private PuzzleLocation convertAddressToCoordinates(String address) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + API_KEY);
-        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         String url = API_URL + address;
-        ResponseEntity<KakaoApiResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, KakaoApiResponse.class);
-        KakaoApiResponse responseBody = response.getBody();
+        String responseBody = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        JsonNode firstDocument = jsonNode.path("documents").get(0);
+        String x = firstDocument.path("x").asText();
+        String y = firstDocument.path("y").asText();
 
         PuzzleLocation puzzleLocation = null;
-        if (responseBody != null && responseBody.documents().length > 0) {
-            String x = responseBody.documents()[0].x();
-            String y = responseBody.documents()[0].y();
-            puzzleLocation = new PuzzleLocation(address, x, y);
-        }
+        puzzleLocation = new PuzzleLocation(address, x, y);
         return puzzleLocation;
     }
 
