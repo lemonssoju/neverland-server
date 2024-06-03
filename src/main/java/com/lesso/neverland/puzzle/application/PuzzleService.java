@@ -103,7 +103,7 @@ public class PuzzleService {
         boolean hasWrite = puzzlePieceRepository.existsByPuzzleAndUser(puzzle, user);
 
         PuzzleDetailResponse puzzleDetail = new PuzzleDetailResponse(puzzle.getLocation().getLocation(), puzzle.getPuzzleImage(),
-                puzzle.getPuzzleDate().toString(), puzzle.getUser().getProfile().getNickname(), puzzle.getTitle(), puzzle.getContent(),
+                puzzle.getPuzzleDate().toString(), puzzle.getCreatedDate().toString(), puzzle.getUser().getProfile().getNickname(), puzzle.getTitle(), puzzle.getContent(),
                 getMemberImageList(puzzle), puzzle.getPuzzleMembers().size(), puzzle.getPuzzlePieces().size()+1, isWriter, hasWrite,
                 getPuzzlePieceList(puzzle));
         return new BaseResponse<>(puzzleDetail);
