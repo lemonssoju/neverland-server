@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AlbumRepository extends JpaRepository<Album, Long> {
-    List<Album> findByTeamOrderByCreatedDateDesc(Team team);
+    List<Album> findByTeamAndStatusEquals(Team team, String status);
     boolean existsByPuzzle(Puzzle puzzle);
 }
