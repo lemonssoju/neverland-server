@@ -27,6 +27,7 @@ public class CommentController {
         return commentService.modifyComment(commentIdx, modifyCommentRequest);
     }
 
+    // [작성자] 댓글 삭제
     @PatchMapping("/{commentIdx}/delete")
     public BaseResponse<?> deleteComment(@PathVariable Long commentIdx) {
         return commentService.deleteComment(commentIdx);

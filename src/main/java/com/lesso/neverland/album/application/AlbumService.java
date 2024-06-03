@@ -6,10 +6,14 @@ import com.lesso.neverland.album.repository.AlbumRepository;
 import com.lesso.neverland.comment.dto.CommentDto;
 import com.lesso.neverland.common.base.BaseException;
 import com.lesso.neverland.common.base.BaseResponse;
+import com.lesso.neverland.common.image.ImageService;
 import com.lesso.neverland.group.domain.Team;
 import com.lesso.neverland.group.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 
 import static com.lesso.neverland.common.base.BaseResponseStatus.*;
@@ -19,14 +23,17 @@ import static com.lesso.neverland.common.base.BaseResponseStatus.*;
 public class AlbumService {
     private final GroupRepository groupRepository;
     private final AlbumRepository albumRepository;
+    private final ImageService imageService;
 
     // 추억 이미지 등록
-    public BaseResponse<String> uploadAlbumImage(Long groupIdx, Long albumIdx, AlbumImageRequest albumImageRequest) {
+    public BaseResponse<String> uploadAlbumImage(Long groupIdx, Long albumIdx, MultipartFile image) throws IOException {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         Album album = albumRepository.findById(albumIdx).orElseThrow(() -> new BaseException(INVALID_ALBUM_IDX));
         if (!album.getPuzzle().getTeam().equals(group)) throw new BaseException(NO_GROUP_ALBUM);
 
-        album.saveAlbumImage(albumImageRequest.albumImage());
+        String imagePath = imageService.uploadImage("album", image);
+
+        album.saveAlbumImage(imagePath);
         albumRepository.save(album);
 
         return new BaseResponse<>(SUCCESS);
@@ -42,6 +49,7 @@ public class AlbumService {
                 .map(puzzleMember -> puzzleMember.getUser().getProfile().getNickname()).toList();
 
         List<CommentDto> commentList = album.getComments().stream()
+                .filter(comment -> "active".equals(comment.getStatus()))
                 .map(comment -> new CommentDto(
                         comment.getCommentIdx(),
                         comment.getUser().getProfile().getNickname(),

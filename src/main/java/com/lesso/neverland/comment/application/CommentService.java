@@ -70,4 +70,8 @@ public class CommentService {
         if (!comment.getUser().equals(user)) throw new BaseException(NO_COMMENT_WRITER);
         if (comment.getStatus().equals(INACTIVE)) throw new BaseException(ALREADY_DELETED_COMMENT);
     }
+
+    private static void validateGroupMember(User user) {
+
+    }
 }
