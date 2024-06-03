@@ -42,6 +42,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -121,10 +122,14 @@ public class PuzzleService {
 
     // puzzleMember 3명의 프로필 이미지 조회
     private List<String> getMemberImageList(Puzzle puzzle) {
-        return puzzle.getPuzzleMembers().stream()
+        List<String> imageList = new ArrayList<>();
+        imageList.add(puzzle.getUser().getProfile().getProfileImage());
+
+        List<String> memberImages = puzzle.getPuzzleMembers().stream()
                 .map(puzzleMember -> puzzleMember.getUser().getProfile().getProfileImage())
-                .limit(3)
-                .toList();
+                .limit(2).toList();
+        imageList.addAll(memberImages);
+        return imageList;
     }
 
     // 퍼즐 생성
