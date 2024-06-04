@@ -300,7 +300,8 @@ public class PuzzleService {
 
         // GPT 요약 수행
         GptResponse response = gptService.completion(gptService.toText(puzzleTextList));
-        GptResponseDto gptResponseDto = gptService.parseResponse(response.messages().get(0).message());
+        //GptResponseDto gptResponseDto = gptService.parseResponse(response.messages().get(0).message());
+        GptResponseDto gptResponseDto = gptService.parse(response.messages().get(0).message());
 
         // Album 생성
         Album newAlbum = Album.builder()
