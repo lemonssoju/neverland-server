@@ -1,5 +1,7 @@
 package com.lesso.neverland.gpt.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lesso.neverland.gpt.dto.GptResponseDto;
 import com.lesso.neverland.gpt.dto.GptRequest;
 import com.lesso.neverland.gpt.dto.GptResponse;
@@ -55,5 +57,18 @@ public class GptService {
 
         // 추출된 한글 부분과 영어 부분으로 CompletePuzzleResponse 객체 생성
         return new GptResponseDto(englishPart, koreanPart);
+    }
+
+    public GptResponseDto parse(String response) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        GptResponseDto responseDto = null;
+        try {
+            responseDto = objectMapper.readValue(response, GptResponseDto.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseDto;
     }
 }
