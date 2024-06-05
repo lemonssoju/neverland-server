@@ -60,8 +60,9 @@ public class GroupService {
                         group.getUserTeams().size(),
                         group.getAdmin().getProfile().getNickname(),
                         calculateRecentUpdate(group)))
-                .sorted(Comparator.comparing(groupDto -> calculateDaysSinceRecentUpdate(groupDto.groupIdx())))
-                .toList();
+                .sorted(Comparator.comparing((GroupListDto groupDto) -> calculateDaysSinceRecentUpdate(groupDto.groupIdx()))
+                        .thenComparing(groupDto -> groupRepository.findById(groupDto.groupIdx())
+                                .map(Team::getCreatedDate).orElse(LocalDate.MIN), Comparator.reverseOrder())).toList();
         return new BaseResponse<>(new GroupListResponse(groupListDto));
     }
 
@@ -69,8 +70,8 @@ public class GroupService {
     private long calculateDaysSinceRecentUpdate(Long groupIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         Puzzle recentPuzzle = puzzleRepository.findTopByTeamAndStatusEqualsOrderByCreatedDateDesc(group, ACTIVE);
-        if (recentPuzzle == null) return Long.MAX_VALUE; // 최근 퍼즐 없으면 큰 값 반환
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        if (recentPuzzle == null) return ChronoUnit.DAYS.between(group.getCreatedDate(), today); // 그룹 생성일과 오늘 사이 일수
         LocalDate puzzleCreatedDate = recentPuzzle.getCreatedDate();
         return ChronoUnit.DAYS.between(puzzleCreatedDate, today);
     }
