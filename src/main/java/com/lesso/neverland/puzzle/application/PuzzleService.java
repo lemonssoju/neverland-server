@@ -144,10 +144,12 @@ public class PuzzleService {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
         User writer = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
-        String imagePath = imageService.uploadImage("puzzle", image);
         LocalDate puzzleDate = convertToLocalDate(createPuzzleRequest.puzzleDate());
-
-        Puzzle newPuzzle = createPuzzle(createPuzzleRequest, group, writer, imagePath, puzzleDate);
+        Puzzle newPuzzle = createPuzzle(createPuzzleRequest, group, writer, puzzleDate);
+        if (!image.isEmpty()) {
+            String imagePath = imageService.uploadImage("puzzle", image);
+            newPuzzle.addPuzzleImage(imagePath);
+        }
         addPuzzleMember(createPuzzleRequest, newPuzzle);
 
         return new BaseResponse<>(new CreatePuzzleResponse(newPuzzle.getPuzzleIdx()));
@@ -176,13 +178,12 @@ public class PuzzleService {
     }
 
     // puzzle entity 생성
-    private Puzzle createPuzzle(CreatePuzzleRequest createPuzzleRequest, Team group, User writer, String imagePath, LocalDate puzzleDate) throws JsonProcessingException {
+    private Puzzle createPuzzle(CreatePuzzleRequest createPuzzleRequest, Team group, User writer, LocalDate puzzleDate) throws JsonProcessingException {
         Puzzle puzzle = Puzzle.builder()
                 .user(writer)
                 .team(group)
                 .title(createPuzzleRequest.title())
                 .content(createPuzzleRequest.content())
-                .puzzleImage(imagePath)
                 .puzzleDate(puzzleDate)
                 .location(convertAddressToCoordinates(createPuzzleRequest.location())).build();
         puzzleRepository.save(puzzle);

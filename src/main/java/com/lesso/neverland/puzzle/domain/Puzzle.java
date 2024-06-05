@@ -39,7 +39,7 @@ public class Puzzle extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String puzzleImage;
 
     @Column(nullable = false)
@@ -55,12 +55,11 @@ public class Puzzle extends BaseEntity {
     private List<PuzzleMember> puzzleMembers = new ArrayList<>(); // 해당 퍼즐에 참여한 멤버 목록
 
     @Builder
-    public Puzzle(User user, Team team, String title, String content, String puzzleImage, LocalDate puzzleDate, PuzzleLocation location) {
+    public Puzzle(User user, Team team, String title, String content, LocalDate puzzleDate, PuzzleLocation location) {
         this.user = user;
         this.team = team;
         this.title = title;
         this.content = content;
-        this.puzzleImage = puzzleImage;
         this.puzzleDate = puzzleDate;
         this.location = location;
     }
@@ -73,4 +72,5 @@ public class Puzzle extends BaseEntity {
     public void delete() {
         this.setStatus(INACTIVE);
     }
+    public void addPuzzleImage(String puzzleImage) { this.puzzleImage = puzzleImage; }
 }
