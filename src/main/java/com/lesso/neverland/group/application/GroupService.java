@@ -88,10 +88,9 @@ public class GroupService {
     // 그룹 프로필 조회
     public BaseResponse<GroupProfileResponse> getGroupProfile(Long groupIdx) {
         Team group = groupRepository.findById(groupIdx).orElseThrow(() -> new BaseException(INVALID_GROUP_IDX));
-        List<String> memberImageList = group.getUserTeams().stream()
-                .map(userTeam -> userTeam.getUser().getProfile().getProfileImage())
-                .limit(3)
-                .toList();
+//        List<String> memberImageList = group.getUserTeams().stream()
+//                .map(userTeam -> userTeam.getUser().getProfile().getProfileImage())
+//                .limit(3).toList();
 
         Integer puzzleCount = puzzleRepository.countByTeam(group);
 
@@ -101,9 +100,21 @@ public class GroupService {
 
         long dayCount = ChronoUnit.DAYS.between(startLocalDate, today);
 
-        GroupProfileResponse profile = new GroupProfileResponse(group.getName(), group.getAdmin().getProfile().getNickname(), group.getStartDate().getYear(), memberImageList,
+        GroupProfileResponse profile = new GroupProfileResponse(group.getName(), group.getAdmin().getProfile().getNickname(), group.getStartDate().getYear(), getMemberImageList(group),
                 group.getUserTeams().size(), puzzleCount, dayCount);
         return new BaseResponse<>(profile);
+    }
+
+    private List<String> getMemberImageList(Team group) {
+        List<String> imageList = new ArrayList<>();
+        imageList.add(group.getAdmin().getProfile().getProfileImage());
+
+        List<String> memberImages = group.getUserTeams().stream()
+                .filter(userTeam -> "active".equals(userTeam.getStatus()))
+                .map(userTeam -> userTeam.getUser().getProfile().getProfileImage())
+                .limit(2).toList();
+        imageList.addAll(memberImages);
+        return imageList;
     }
 
 
@@ -188,8 +199,8 @@ public class GroupService {
 
         UserTeam userTeam = validateMember(user, group);
         userTeam.delete();
-        userTeam.removeTeam(group);
-        userTeam.removeUser(user);
+        //userTeam.removeTeam(group);
+        //userTeam.removeUser(user);
         userTeamRepository.save(userTeam);
 
         return new BaseResponse<>(SUCCESS);
