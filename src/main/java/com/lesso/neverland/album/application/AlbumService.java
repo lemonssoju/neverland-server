@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -47,9 +48,6 @@ public class AlbumService {
         Album album = albumRepository.findById(albumIdx).orElseThrow(() -> new BaseException(INVALID_ALBUM_IDX));
         if (!album.getPuzzle().getTeam().equals(group)) throw new BaseException(NO_GROUP_ALBUM);
 
-        List<String> memberList = album.getPuzzle().getPuzzleMembers().stream()
-                .map(puzzleMember -> puzzleMember.getUser().getProfile().getNickname()).toList();
-
         List<CommentDto> commentList = album.getComments().stream()
                 .filter(comment -> "active".equals(comment.getStatus()))
                 .map(comment -> new CommentDto(
@@ -57,11 +55,23 @@ public class AlbumService {
                         comment.getUser().getProfile().getNickname(),
                         comment.getUser().getProfile().getProfileImage(),
                         comment.getCreatedDate().toString(),
-                        comment.getContent())).toList();
+                        comment.getContent()))
+                .toList();
 
         AlbumDetailResponse albumDetailResponse = new AlbumDetailResponse(album.getPuzzle().getTitle(), album.getPuzzle().getPuzzleDate().toString(),
-                album.getPuzzle().getLocation().getLocation(), memberList, album.getAlbumImage(), album.getContent(), album.getPuzzle().getPuzzleIdx(), commentList);
+                album.getPuzzle().getLocation().getLocation(), getMemberList(album), album.getAlbumImage(), album.getContent(), album.getPuzzle().getPuzzleIdx(), commentList);
         return new BaseResponse<>(albumDetailResponse);
+    }
+
+    private List<String> getMemberList(Album album) {
+        List<String> memberList = new ArrayList<>();
+        memberList.add(album.getPuzzle().getUser().getProfile().getNickname());
+
+        memberList.addAll(
+                album.getPuzzle().getPuzzleMembers().stream()
+                        .map(puzzleMember -> puzzleMember.getUser().getProfile().getNickname())
+                        .toList());
+        return memberList;
     }
 
     // 앨범 목록 조회(sortType="time", "location")
