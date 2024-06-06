@@ -146,7 +146,7 @@ public class PuzzleService {
 
         LocalDate puzzleDate = convertToLocalDate(createPuzzleRequest.puzzleDate());
         Puzzle newPuzzle = createPuzzle(createPuzzleRequest, group, writer, puzzleDate);
-        if (!image.isEmpty()) {
+        if (image != null && !image.isEmpty()) {
             String imagePath = imageService.uploadImage("puzzle", image);
             newPuzzle.addPuzzleImage(imagePath);
         }
