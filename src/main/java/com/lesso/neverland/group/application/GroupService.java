@@ -112,12 +112,13 @@ public class GroupService {
 
         List<String> memberImages = group.getUserTeams().stream()
                 .filter(userTeam -> "active".equals(userTeam.getStatus()))
+                .filter(userTeam -> !userTeam.getUser().equals(group.getAdmin()))
                 .map(userTeam -> userTeam.getUser().getProfile().getProfileImage())
-                .limit(2).toList();
+                .limit(2)
+                .toList();
         imageList.addAll(memberImages);
         return imageList;
     }
-
 
     // [관리자] 그룹 수정 화면 조회
     public BaseResponse<GroupEditViewResponse> getGroupEditView(Long groupIdx) {

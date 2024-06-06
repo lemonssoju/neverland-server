@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.lesso.neverland.common.constants.Constants.ACTIVE;
 import static com.lesso.neverland.common.constants.Constants.INACTIVE;
 
 @Entity
@@ -62,6 +63,7 @@ public class Puzzle extends BaseEntity {
         this.content = content;
         this.puzzleDate = puzzleDate;
         this.location = location;
+        this.setStatus(ACTIVE);
     }
 
     public void setUser(User user) {
