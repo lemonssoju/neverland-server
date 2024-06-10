@@ -40,7 +40,7 @@ public class GroupController {
 
     // [관리자] 그룹 수정
     @PatchMapping("/{groupIdx}/edit")
-    public BaseResponse<String> editGroup(@PathVariable Long groupIdx, @RequestPart MultipartFile image, @RequestPart EditGroupRequest editGroupRequest) {
+    public BaseResponse<String> editGroup(@PathVariable Long groupIdx, @RequestPart(required = false) MultipartFile image, @RequestPart EditGroupRequest editGroupRequest) {
         try {
             return groupService.editGroup(groupIdx, image, editGroupRequest);
         } catch (IOException e) {
