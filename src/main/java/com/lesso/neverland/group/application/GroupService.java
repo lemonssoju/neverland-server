@@ -159,15 +159,12 @@ public class GroupService {
                 userTeamRepository.save(userTeam);
             }
         }
-
-        if (image != null) {//TODO: 이미지 삭제 및 업로드 설정 후 동작 확인하기
-            // delete previous image
+        if (image != null && !image.isEmpty()) {
             imageService.deleteImage(group.getTeamImage());
 
-            // upload new image
-            String imagePath = imageService.uploadImage("group", image);
-            group.modifyImage(imagePath);
-        } else throw new BaseException(NULL_GROUP_IMAGE);
+            String newImagePath = imageService.uploadImage("group", image);
+            group.modifyImage(newImagePath);
+        }
         groupRepository.save(group);
         return new BaseResponse<>(SUCCESS);
     }
