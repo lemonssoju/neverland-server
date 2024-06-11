@@ -75,4 +75,6 @@ public class Puzzle extends BaseEntity {
         this.setStatus(INACTIVE);
     }
     public void addPuzzleImage(String puzzleImage) { this.puzzleImage = puzzleImage; }
+    public void modifyImage(String puzzleImage) {this.puzzleImage = puzzleImage;}
+    public void editContent(String content) { this.content = content;}
 }
