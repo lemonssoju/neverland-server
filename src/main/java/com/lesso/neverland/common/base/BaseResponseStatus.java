@@ -42,6 +42,8 @@ public enum BaseResponseStatus {
     ALREADY_DELETED_PUZZLE(false, HttpStatus.CONFLICT, "이미 삭제된 puzzle 입니다."),
     NO_PUZZLER(false, HttpStatus.FORBIDDEN, "해당 퍼즐의 퍼즐러가 아닙니다."),
     TOO_LONG_CONTENT(false, HttpStatus.BAD_REQUEST, "퍼즐피스의 길이는 100자 이하여야 합니다."),
+    BLANK_PUZZLE_CONTENT(false, HttpStatus.BAD_REQUEST, "퍼즐 내용이 비었습니다."),
+    ALREADY_HAS_ALBUM(false, HttpStatus.CONFLICT, "이미 앨범이 만들어진 퍼즐입니다."),
 
 
     // group

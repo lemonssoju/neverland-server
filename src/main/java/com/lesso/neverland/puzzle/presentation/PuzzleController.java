@@ -46,7 +46,11 @@ public class PuzzleController {
     // [작성자] 퍼즐 수정
     @GetMapping("/{puzzleIdx}/edit")
     public BaseResponse<String> editPuzzle(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx, @RequestPart MultipartFile newImage, @RequestPart EditPuzzleRequest editPuzzleRequest) {
-        return puzzleService.editPuzzle(groupIdx, puzzleIdx, newImage, editPuzzleRequest);
+        try {
+            return puzzleService.editPuzzle(groupIdx, puzzleIdx, newImage, editPuzzleRequest);
+        } catch (IOException e) {
+            throw new BaseException(IMAGE_UPLOAD_FAIL);
+        }
     }
 
     // [작성자] 퍼즐 삭제

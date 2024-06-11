@@ -211,12 +211,24 @@ public class PuzzleService {
     }
 
     // [작성자] 퍼즐 수정
-    public BaseResponse<String> editPuzzle(Long groupIdx, Long puzzleIdx, MultipartFile newImage, EditPuzzleRequest editPuzzleRequest) {
+    public BaseResponse<String> editPuzzle(Long groupIdx, Long puzzleIdx, MultipartFile newImage, EditPuzzleRequest editPuzzleRequest) throws IOException {
         User user = userRepository.findById(userService.getUserIdxWithValidation()).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         Puzzle puzzle = puzzleRepository.findById(puzzleIdx).orElseThrow(() -> new BaseException(INVALID_PUZZLE_IDX));
         validateWriter(user, puzzle);
+        if (albumRepository.existsByPuzzle(puzzle)) throw new BaseException(ALREADY_HAS_ALBUM);
 
+        if (editPuzzleRequest.content() != null) {
+            if (!editPuzzleRequest.content().equals("") && !editPuzzleRequest.content().equals(" "))
+                puzzle.editContent(editPuzzleRequest.content());
+            else throw new BaseException(BLANK_PUZZLE_CONTENT);
+        }
+        if (newImage != null && !newImage.isEmpty()) {
+            imageService.deleteImage(puzzle.getPuzzleImage());
 
+            String newImagePath = imageService.uploadImage("puzzle", newImage);
+            puzzle.modifyImage(newImagePath);
+        }
+        puzzleRepository.save(puzzle);
         return new BaseResponse<>(SUCCESS);
     }
 
