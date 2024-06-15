@@ -12,7 +12,7 @@
 <img src="https://img.shields.io/badge/AWS ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white">
 
 #### CD
-<img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/github actions-2088FF?style=for-the-badge&logo=github actions&logoColor=black">
+<img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/github actions-2088FF?style=for-the-badge&logo=github actions&logoColor=white">
 
 #### External API
 <img src="https://img.shields.io/badge/ChatGPT 3.5-74AA9C?style=for-the-badge&logo=openai&logoColor=white"><img src="https://img.shields.io/badge/kakaomap api-FFCD00?style=for-the-badge&logo=kakao&logoColor=black">
