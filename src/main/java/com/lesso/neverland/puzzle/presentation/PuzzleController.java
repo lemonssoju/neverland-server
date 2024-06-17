@@ -44,7 +44,7 @@ public class PuzzleController {
     }
 
     // [작성자] 퍼즐 수정
-    @GetMapping("/{puzzleIdx}/edit")
+    @PatchMapping("/{puzzleIdx}/edit")
     public BaseResponse<String> editPuzzle(@PathVariable("groupIdx") Long groupIdx, @PathVariable("puzzleIdx") Long puzzleIdx, @RequestPart MultipartFile newImage, @RequestPart EditPuzzleRequest editPuzzleRequest) {
         try {
             return puzzleService.editPuzzle(groupIdx, puzzleIdx, newImage, editPuzzleRequest);
