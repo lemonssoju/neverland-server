@@ -21,6 +21,20 @@ This enhances the diversity and efficiency of the memory archiving process.
 <br>
 
 ## 🚀 Getting Started
+#### Prerequisites
+- Install the latest version of [Java](https://www.java.com/ko/) and [JDK 17](https://docs.aws.amazon.com/ko_kr/corretto/latest/corretto-17-ug/downloads-list.html)
+
+#### Install
+1. Clone the repository<br>
+```
+$ git clone https://github.com/lemonssoju/neverland-server.git
+ ```
+2. Set the environment values in `application.yml` file
+```
+gpt.token={Your OpenAI API Key}
+kakao.maps.api-key:{Your Kakao API Key}
+```
+<br>
 
 ## 📌 System Architecture
 ![architecture](https://github.com/lemonssoju/.github/assets/80838501/f9e6a5f3-fcbe-442b-9314-55874d10bdf4)
