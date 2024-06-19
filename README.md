@@ -27,7 +27,7 @@ This enhances the diversity and efficiency of the memory archiving process.
 
 <br>
 
-## Project Structure
+## ⚙️ Project Structure
 <details>
 <summary>Code Structure</summary>
 <div>
